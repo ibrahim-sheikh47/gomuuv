@@ -1,0 +1,71 @@
+import React from "react";
+import {
+  View,
+  Text,
+  Modal,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+} from "react-native";
+import { colors } from "../constants/colors"; // Adjust the import path as needed
+
+const CustomModal = ({ visible, onClose, modalText, modalIcon }) => {
+  return (
+    <Modal
+      transparent={true}
+      visible={visible}
+      animationType="slide"
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Image source={modalIcon} style={styles.modalIcon} />
+          <Text style={styles.modalText}>{modalText}</Text>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+export default CustomModal;
+
+const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center", // Center vertically
+    alignItems: "center", // Center horizontally
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+  },
+  modalContent: {
+    width: 205,
+    height: 222,
+    backgroundColor: "#121212",
+    borderRadius: 10,
+    alignItems: "center", // Align content horizontally
+    justifyContent: "center", // Align content vertically
+    padding: 20, // Optional padding to ensure no content touches the edges
+    flexDirection: "column",
+  },
+  modalText: {
+    fontSize: 14,
+    color: colors.green,
+    fontFamily: "Poppins-SemiBold",
+    marginTop: 20,
+    textAlign: "center", // Ensure text is centered
+  },
+  button: {
+    backgroundColor: colors.green,
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily: "Poppins-Bold",
+  },
+  modalIcon: {
+    width: 60,
+    height: 60,
+  },
+});

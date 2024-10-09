@@ -1,20 +1,40 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect } from "react";
+import { useFonts } from "expo-font";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import * as SplashScreen from "expo-splash-screen";
+
+// APP NAVIGATOR
+import { NavigationContainer } from "@react-navigation/native";
+import AppNavigator from "./src/navigation/AppNavigator/AppNavigator";
+
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    "Poppins-Bold": require("./src/assets/fonts/Poppins-Bold.ttf"),
+    "Poppins-ExtraBold": require("./src/assets/fonts/Poppins-ExtraBold.ttf"),
+    "Poppins-Light": require("./src/assets/fonts/Poppins-Light.ttf"),
+    "Poppins-Medium": require("./src/assets/fonts/Poppins-Medium.ttf"),
+    "Poppins-Regular": require("./src/assets/fonts/Poppins-Regular.ttf"),
+    "Poppins-SemiBold": require("./src/assets/fonts/Poppins-SemiBold.ttf"),
+    "Poppins-Italic": require("./src/assets/fonts/Poppins-Italic.ttf"), // If available
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NavigationContainer>
+        <AppNavigator />
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
