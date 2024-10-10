@@ -44,8 +44,28 @@ import cart2 from "../assets/icons/cart2.png";
 import shopTab from "../assets/icons/shopTab.png";
 import shopTabFilled from "../assets/icons/shopTabFilled.png";
 import addedToCart from "../assets/icons/addedToCart.png";
+import eaten from "../assets/icons/eaten.png";
+import burned from "../assets/icons/burned.png";
+import glass from "../assets/icons/glass.png";
+import weightLoss from "../assets/icons/weightLoss.png";
+import muscleGain from "../assets/icons/muscleGain.png";
+import keto from "../assets/icons/keto.png";
+import vegetarian from "../assets/icons/vegetarian.png";
+import maintenance from "../assets/icons/maintainance.png";
+import breakfast from "../assets/icons/breakfast.png";
+import lunch from "../assets/icons/lunch.png";
+import dinner from "../assets/icons/dinner.png";
+import snacks from "../assets/icons/snacks.png";
 
 export default {
+  weightLoss,
+  muscleGain,
+  keto,
+  vegetarian,
+  maintenance,
+  eaten,
+  glass,
+  burned,
   pace,
   addedToCart,
   timePerMile,
@@ -92,4 +112,8 @@ export default {
   cart2,
   shopTab,
   shopTabFilled,
+  breakfast,
+  lunch,
+  dinner,
+  snacks,
 };

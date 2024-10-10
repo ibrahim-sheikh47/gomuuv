@@ -16,6 +16,9 @@ import ActivityDetailScreen from "../../screens/Home/ActivityDetailScreen";
 import FinishActivity from "../../screens/Home/FinishActivity";
 import ProductDetailScreen from "../../screens/Shop/ProductDetailScreen";
 import ShopScreen from "../../screens/Shop/Shop";
+import MealDetailScreen from "../../screens/Nutrition/MealDetailScreen";
+import ViewAllMeals from "../../screens/Nutrition/ViewAllMeals";
+import AddMeal from "../../screens/Nutrition/AddMeal";
 
 const Stack = createNativeStackNavigator();
 
@@ -45,6 +48,10 @@ export default function AppNavigator() {
         name="ActivityDetailScreen"
         component={ActivityDetailScreen}
       />
+      <Stack.Screen name="MealDetailScreen" component={MealDetailScreen} />
+      <Stack.Screen name="ViewAllMeals" component={ViewAllMeals} />
+      <Stack.Screen name="AddMeal" component={AddMeal} />
+
       <Stack.Screen
         name="ManageNotifications"
         component={ManageNotifications}

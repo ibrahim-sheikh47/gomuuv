@@ -6,6 +6,7 @@ import { colors } from "../../constants/colors"; // Import your color palette
 import HomeScreen from "../../screens/Home/Home";
 import Container from "../../components/Container";
 import ShopScreen from "../../screens/Shop/Shop";
+import NutritionScreen from "../../screens/Nutrition/Nutrition";
 
 const Tab = createBottomTabNavigator();
 
@@ -137,24 +138,6 @@ export const WorkoutScreen = () => {
         }}
       >
         Workout Screen
-      </Text>
-    </Container>
-  );
-};
-
-export const NutritionScreen = () => {
-  return (
-    <Container>
-      <Text
-        style={{
-          color: colors.green,
-          fontFamily: "Poppins-Bold",
-          fontSize: 20,
-          textAlign: "center",
-          marginVertical: "auto",
-        }}
-      >
-        Nutrition Screen
       </Text>
     </Container>
   );

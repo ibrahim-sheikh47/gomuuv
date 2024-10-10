@@ -151,3 +151,110 @@ export const shopProducts = [
     manufacturer: "Manufacturer G",
   },
 ];
+
+export const mealData = [
+  {
+    id: "1",
+    title: "Breakfast",
+    mealName: "Avocado Egg Toast",
+    mealImage: images.breakfast,
+    calories: 190,
+    time: "25",
+    ingredients: [
+      { id: "1", name: "Avocado", quantity: "30g" },
+      { id: "2", name: "Egg", quantity: "1 whole" },
+      { id: "3", name: "Purple Onion", quantity: "30g" },
+      { id: "4", name: "Fresh Asparagus", quantity: "70g" },
+      { id: "5", name: "Pepper", quantity: "50g" },
+      { id: "6", name: "Wheat Bread", quantity: "1 Slice" },
+      { id: "7", name: "Coconut Oil", quantity: "1 Tbsp" },
+      { id: "8", name: "Lime Juice", quantity: "To Taste" },
+    ],
+    steps: [
+      { id: "1", step: "Wash all vegetables thoroughly." },
+      { id: "2", step: "Chop the lettuce, tomatoes, and cucumber." },
+      { id: "3", step: "Mix all ingredients in a large bowl." },
+      { id: "4", step: "Add dressing and mix well." },
+      { id: "5", step: "Serve fresh with optional toppings." },
+    ],
+  },
+  {
+    id: "2",
+    title: "Lunch",
+    mealName: "Oatmeal with Fruits",
+    mealImage: images.lunch,
+    calories: 210,
+    time: "30",
+    ingredients: [
+      { id: "1", name: "Oats", quantity: "1 cup" },
+      { id: "2", name: "Milk", quantity: "1 cup" },
+      { id: "3", name: "Banana", quantity: "1" },
+      { id: "4", name: "Honey", quantity: "1 tablespoon" },
+      { id: "5", name: "Berries", quantity: "1/2 cup" },
+    ],
+    steps: [
+      { id: "1", step: "Wash all vegetables thoroughly." },
+      { id: "2", step: "Chop the lettuce, tomatoes, and cucumber." },
+      { id: "3", step: "Mix all ingredients in a large bowl." },
+      { id: "4", step: "Add dressing and mix well." },
+      { id: "5", step: "Serve fresh with optional toppings." },
+    ],
+  },
+];
+
+export const popularRecipes = [
+  {
+    id: "1",
+    title: "Lunch",
+    mealName: "Oatmeal with Fruits",
+    mealImage: images.lunch,
+    calories: 210,
+    time: "30",
+    ingredients: [
+      { id: "1", name: "Oats", quantity: "1 cup" },
+      { id: "2", name: "Milk", quantity: "1 cup" },
+      { id: "3", name: "Banana", quantity: "1" },
+      { id: "4", name: "Honey", quantity: "1 tablespoon" },
+      { id: "5", name: "Berries", quantity: "1/2 cup" },
+    ],
+    steps: [
+      { id: "1", step: "Wash all vegetables thoroughly." },
+      { id: "2", step: "Chop the lettuce, tomatoes, and cucumber." },
+      { id: "3", step: "Mix all ingredients in a large bowl." },
+      { id: "4", step: "Add dressing and mix well." },
+      { id: "5", step: "Serve fresh with optional toppings." },
+    ],
+  },
+  {
+    id: "2",
+    title: "Breakfast",
+    mealName: "Avocado Egg Toast",
+    mealImage: images.breakfast,
+    calories: 190,
+    time: "25",
+    ingredients: [
+      { id: "1", name: "Avocado", quantity: "30g" },
+      { id: "2", name: "Egg", quantity: "1 whole" },
+      { id: "3", name: "Purple Onion", quantity: "30g" },
+      { id: "4", name: "Fresh Asparagus", quantity: "70g" },
+      { id: "5", name: "Pepper", quantity: "50g" },
+      { id: "6", name: "Wheat Bread", quantity: "1 Slice" },
+      { id: "7", name: "Coconut Oil", quantity: "1 Tbsp" },
+      { id: "8", name: "Lime Juice", quantity: "To Taste" },
+    ],
+    steps: [
+      { id: "1", step: "Wash all vegetables thoroughly." },
+      { id: "2", step: "Chop the lettuce, tomatoes, and cucumber." },
+      { id: "3", step: "Mix all ingredients in a large bowl." },
+      { id: "4", step: "Add dressing and mix well." },
+      { id: "5", step: "Serve fresh with optional toppings." },
+    ],
+  },
+];
+export const nutritionPlans = [
+  { id: "1", title: "Weight Loss Plan", icon: icons.weightLoss },
+  { id: "2", title: "Muscle Gain Plan", icon: icons.muscleGain },
+  { id: "3", title: "Maintenance Plan", icon: icons.maintenance },
+  { id: "4", title: "Keto Plan", icon: icons.keto },
+  { id: "5", title: "Vegetarian Plan", icon: icons.vegetarian },
+];
