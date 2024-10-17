@@ -1,11 +1,22 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Image, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
 import Container from "../../components/Container";
+import CustomButton from "../../components/CustomButton";
 import { colors } from "../../constants/colors";
 import icons from "../../constants/icons";
 import NutrientItem from "../../components/NutrientItem";
+import CustomModal from "../../components/CustomModal";
+import { useNavigation } from "@react-navigation/native";
 
 const MealDetailScreen = ({ route }) => {
+  const navigation = useNavigation();
   const { meal } = route.params; // Extract meal data from route params
   const [carbs, setCarbs] = useState({ current: 20, total: 30 });
   const [proteins, setProteins] = useState({ current: 10, total: 30 });
@@ -18,10 +29,36 @@ const MealDetailScreen = ({ route }) => {
     { type: "steps", id: "steps", steps: meal.steps },
   ];
 
+  const [isModalVisible, setModalVisible] = useState(false);
+  const handleAddToPlan = () => {
+    setModalVisible(true);
+  };
+  const handleClose = () => {
+    setModalVisible(false);
+    setTimeout(() => {
+      navigation.navigate("Nutrition");
+    }, 500);
+  };
+
   const renderItem = ({ item }) => {
     if (item.type === "mealInfo") {
       return (
-        <View>
+        <View style={{ position: "relative" }}>
+          {/* Back Button */}
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              top: 60, // Adjust according to your image top padding
+              left: 20, // Aligning to the left
+              zIndex: 1,
+            }}
+            onPress={() => navigation.goBack()} // Add back navigation logic
+          >
+            <Image
+              source={icons.back}
+              style={{ width: 20, height: 20, objectFit: "contain" }}
+            />
+          </TouchableOpacity>
           <Image source={item.meal.mealImage} style={styles.image} />
           <View style={{ padding: 20 }}>
             <Text style={styles.mealName}>{item.meal.mealName}</Text>
@@ -123,6 +160,18 @@ const MealDetailScreen = ({ route }) => {
                 <Text style={styles.stepText}>{item.step}</Text>
               </View>
             )}
+          />
+
+          <CustomButton
+            style={{ marginTop: 20 }}
+            title={"Add to your Plan"}
+            onPress={handleAddToPlan}
+          />
+          <CustomModal
+            visible={isModalVisible}
+            onClose={handleClose}
+            modalIcon={icons.mealAdded}
+            modalText={"Meal Added!"}
           />
         </View>
       );

@@ -12,7 +12,7 @@ export const MealItem = ({
   time,
   onPress,
   style,
-  showDelIcon,
+  iconType, // New prop for icon type
 }) => {
   return (
     <TouchableOpacity style={[styles.mealContainer, style]} onPress={onPress}>
@@ -25,15 +25,32 @@ export const MealItem = ({
             justifyContent: "space-between",
           }}
         >
-          <Text style={styles.mealTitle}>{title}</Text>
-          {showDelIcon && (
+          <Text style={styles.mealTitle}>{mealName}</Text>
+          {iconType === "delete" && (
             <TouchableOpacity>
               <Ionicons name="trash-outline" size={15} color="#AFAFAF" />
             </TouchableOpacity>
           )}
+          {iconType === "next" && (
+            <TouchableOpacity>
+              <View
+                style={{
+                  backgroundColor: colors.green, // Background color
+                  borderRadius: 50, // Circular border radius
+                  padding: 5, // Padding to ensure the icon fits well
+                }}
+              >
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={15}
+                  color="#121212" // Icon color
+                />
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
 
-        <Text style={styles.mealName}>{mealName}</Text>
+        <Text style={styles.mealName}>{title}</Text>
         <View style={styles.mealStats}>
           <View style={styles.statItem}>
             <Image style={styles.statIcon} source={icons.burned} />

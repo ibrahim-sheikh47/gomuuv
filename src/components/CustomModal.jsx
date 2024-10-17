@@ -8,6 +8,7 @@ import {
   Image,
 } from "react-native";
 import { colors } from "../constants/colors"; // Adjust the import path as needed
+import icons from "../constants/icons";
 
 const CustomModal = ({ visible, onClose, modalText, modalIcon }) => {
   return (
@@ -21,6 +22,9 @@ const CustomModal = ({ visible, onClose, modalText, modalIcon }) => {
         <View style={styles.modalContent}>
           <Image source={modalIcon} style={styles.modalIcon} />
           <Text style={styles.modalText}>{modalText}</Text>
+          <TouchableOpacity style={styles.absolute} onPress={onClose}>
+            <Image style={styles.closeBtn} source={icons.modalClose} />
+          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -37,10 +41,13 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.8)",
   },
   modalContent: {
+    position: "relative",
     width: 205,
     height: 222,
-    backgroundColor: "#121212",
+    backgroundColor: colors.black,
     borderRadius: 10,
+    borderColor: "#696969",
+    borderWidth: 1,
     alignItems: "center", // Align content horizontally
     justifyContent: "center", // Align content vertically
     padding: 20, // Optional padding to ensure no content touches the edges
@@ -65,6 +72,15 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Bold",
   },
   modalIcon: {
+    width: 60,
+    height: 70,
+  },
+  absolute: {
+    position: "absolute",
+    top: -20,
+    right: -24,
+  },
+  closeBtn: {
     width: 60,
     height: 60,
   },

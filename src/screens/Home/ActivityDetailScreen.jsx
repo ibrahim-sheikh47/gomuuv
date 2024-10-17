@@ -26,8 +26,6 @@ const ActivityDetailScreen = () => {
           items={duration}
           selectedItem={selectedPeriod}
           setSelectedItem={setSelectedPeriod}
-          label="Discount Offer"
-          description="Choose discount on your portfolio"
         />
 
         <View style={styles.content}>

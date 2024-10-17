@@ -7,10 +7,10 @@ import icons from "../constants/icons";
 import { colors } from "../constants/colors";
 
 const WaterIntake = ({ consumedGlasses, totalGlasses, onAddWater }) => {
-  const waterProgress = (consumedGlasses / totalGlasses) * 100;
+  const waterProgress = Math.min((consumedGlasses / totalGlasses) * 100, 100);
 
   return (
-    <TouchableOpacity style={styles.waterIntakeContainer}>
+    <TouchableOpacity style={styles.waterIntakeContainer} onPress={onAddWater}>
       <View style={styles.waterIntakeHeader}>
         <Text style={styles.waterIntakeText}>Mark Water Intake</Text>
         <Image source={icons.glass} style={styles.glassIcon} />
@@ -27,7 +27,7 @@ export default WaterIntake;
 
 const styles = StyleSheet.create({
   waterIntakeContainer: {
-    height: 117,
+    height: 130,
     backgroundColor: "#252525",
     borderRadius: 15,
     marginTop: 10,
@@ -45,24 +45,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   glassIcon: {
-    width: 24,
-    height: 24,
+    width: 50,
+    height: 50,
   },
   waterConsumptionText: {
     fontFamily: "Poppins-SemiBold",
     color: "white",
     fontSize: 12,
-    marginTop: 10,
   },
   waterProgressBar: {
     marginTop: 10,
     height: 12,
-  },
-  addWaterText: {
-    fontSize: 12,
-    fontFamily: "Poppins-Bold",
-    color: colors.green,
-    textAlign: "center",
-    marginTop: 10,
   },
 });

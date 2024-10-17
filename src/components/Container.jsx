@@ -2,18 +2,19 @@ import Constants from "expo-constants";
 import { Platform, StyleSheet, View } from "react-native";
 import React from "react";
 import { StatusBar } from "expo-status-bar";
+import { colors } from "../constants/colors";
 
 export default function Container({
   children,
   cusStyles,
   modal = false,
-  bgclr = "#121212",
+  bgclr = colors.black,
   pd = 18,
 }) {
   const height = Constants.statusBarHeight;
   return (
     <>
-      <StatusBar style="light" backgroundColor="#121212" />
+      <StatusBar style="light" backgroundColor={colors.black} />
       <View
         style={[
           containerStyles.container,
@@ -39,6 +40,5 @@ export const containerStyles = StyleSheet.create({
   container: {
     flex: 1,
     flexGrow: 1,
-    backgroundColor: "#000",
   },
 });

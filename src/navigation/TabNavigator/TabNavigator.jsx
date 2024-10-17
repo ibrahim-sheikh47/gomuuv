@@ -7,6 +7,7 @@ import HomeScreen from "../../screens/Home/Home";
 import Container from "../../components/Container";
 import ShopScreen from "../../screens/Shop/Shop";
 import NutritionScreen from "../../screens/Nutrition/Nutrition";
+import WorkoutScreen from "../../screens/Workout/Workout";
 
 const Tab = createBottomTabNavigator();
 
@@ -120,24 +121,6 @@ export const ChallengesScreen = () => {
         }}
       >
         Challenges Screen
-      </Text>
-    </Container>
-  );
-};
-
-export const WorkoutScreen = () => {
-  return (
-    <Container>
-      <Text
-        style={{
-          color: colors.green,
-          fontFamily: "Poppins-Bold",
-          fontSize: 20,
-          textAlign: "center",
-          marginVertical: "auto",
-        }}
-      >
-        Workout Screen
       </Text>
     </Container>
   );

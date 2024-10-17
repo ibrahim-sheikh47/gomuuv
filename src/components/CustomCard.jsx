@@ -1,4 +1,5 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { colors } from "../constants/colors";
 
 export const CustomCard = ({
   label,
@@ -38,7 +39,7 @@ export const CustomCard = ({
 const styles = StyleSheet.create({
   activityCard: {
     flex: 1,
-    backgroundColor: "#242425",
+    backgroundColor: colors.bgColor,
     height: 170,
     borderRadius: 14,
   },

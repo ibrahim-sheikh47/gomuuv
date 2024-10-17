@@ -19,6 +19,15 @@ import ShopScreen from "../../screens/Shop/Shop";
 import MealDetailScreen from "../../screens/Nutrition/MealDetailScreen";
 import ViewAllMeals from "../../screens/Nutrition/ViewAllMeals";
 import AddMeal from "../../screens/Nutrition/AddMeal";
+import AddMealDetails from "../../screens/Nutrition/AddMealDetails";
+import CreatePlan from "../../screens/Nutrition/CreatePlan";
+import SetWaterGoal from "../../screens/Nutrition/SetWaterGoal";
+import NutritionPlans from "../../screens/Nutrition/NutritionPlans";
+import FastingScreen from "../../screens/Workout/FastingScreen";
+import EquipmentDetails from "../../screens/Workout/EquipmentDetails";
+import NewWorkout from "../../screens/Workout/NewWorkout";
+import ViewAllWorkouts from "../../screens/Workout/ViewAllWorkouts";
+import WorkoutDetails from "../../screens/Workout/WorkoutDetails";
 
 const Stack = createNativeStackNavigator();
 
@@ -51,6 +60,15 @@ export default function AppNavigator() {
       <Stack.Screen name="MealDetailScreen" component={MealDetailScreen} />
       <Stack.Screen name="ViewAllMeals" component={ViewAllMeals} />
       <Stack.Screen name="AddMeal" component={AddMeal} />
+      <Stack.Screen name="AddMealDetails" component={AddMealDetails} />
+      <Stack.Screen name="CreatePlan" component={CreatePlan} />
+      <Stack.Screen name="SetWaterGoal" component={SetWaterGoal} />
+      <Stack.Screen name="NutritionPlans" component={NutritionPlans} />
+      <Stack.Screen name="FastingScreen" component={FastingScreen} />
+      <Stack.Screen name="EquipmentDetails" component={EquipmentDetails} />
+      <Stack.Screen name="NewWorkout" component={NewWorkout} />
+      <Stack.Screen name="ViewAllWorkouts" component={ViewAllWorkouts} />
+      <Stack.Screen name="WorkoutDetails" component={WorkoutDetails} />
 
       <Stack.Screen
         name="ManageNotifications"

@@ -17,7 +17,13 @@ import { ProgressBar } from "../../components/ProgressBar";
 import NutrientItem from "../../components/NutrientItem";
 import images from "../../constants/images";
 import { MealItem } from "../../components/MealItem";
-import { mealData, nutritionPlans, popularRecipes } from "../../utils/data";
+import {
+  dailyPlanData,
+  mealData,
+  nutritionPlans,
+  popularRecipes,
+  popularRecipesData,
+} from "../../utils/data";
 import CustomButton from "../../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
 import WaterIntake from "../../components/WaterIntake";
@@ -26,16 +32,17 @@ import WaterIntake from "../../components/WaterIntake";
 
 const NutritionScreen = () => {
   const navigation = useNavigation();
-  const [eatenCalories, setEatenCalories] = useState(300);
-  const [burnedCalories, setBurnedCalories] = useState(300);
-  const [totalCalories, setTotalCalories] = useState(1000);
-  const [consumedGlasses, setConsumedGlasses] = useState(3); // Track consumed water glasses
-  const totalGlasses = 5;
+  const [eatenCalories, setEatenCalories] = useState(200);
+  const [burnedCalories, setBurnedCalories] = useState(200);
+  const [totalCalories, setTotalCalories] = useState(1500);
+  const [consumedGlasses, setConsumedGlasses] = useState(0);
+  const [totalGlasses, setTotalGlasses] = useState(0); // Default to 8 glasses
+  const [totalIntakeGoal, setTotalIntakeGoal] = useState(0);
 
   // State for nutrients (carbs, proteins, fats)
-  const [carbs, setCarbs] = useState({ current: 20, total: 30 });
+  const [carbs, setCarbs] = useState({ current: 30, total: 30 });
   const [proteins, setProteins] = useState({ current: 10, total: 30 });
-  const [fats, setFats] = useState({ current: 30, total: 30 });
+  const [fats, setFats] = useState({ current: 20, total: 30 });
 
   // Calculate remaining calories
   const remainingCalories = totalCalories - eatenCalories;
@@ -46,16 +53,22 @@ const NutritionScreen = () => {
   const waterProgress = (consumedGlasses / totalGlasses) * 100;
 
   const handleAddWater = () => {
-    if (consumedGlasses < totalGlasses) {
-      setConsumedGlasses(consumedGlasses + 1);
-    }
+    // Allow consumed glasses to increase without restriction
+    setConsumedGlasses((prevConsumed) => prevConsumed + 1);
+  };
+
+  const handleSetGoal = () => {
+    navigation.navigate("SetWaterGoal", {
+      setTotalIntakeGoal,
+      setTotalGlasses,
+    });
   };
 
   // Data for daily meal plan
 
   return (
     <Container>
-      <Header title={"Nutrition"} showBackButton={true} />
+      <Header title={"Nutrition"} />
       <ScrollView>
         <View style={styles.rowContainer}>
           {/* Eaten Section */}
@@ -114,9 +127,9 @@ const NutritionScreen = () => {
 
         {/* Water Intake Section */}
         <View style={styles.intakeHeader}>
-          <Text style={styles.title}>Water Intake</Text>
-          <TouchableOpacity>
-            <Text style={styles.greenText}>+ Add Water</Text>
+          <Text style={styles.title}>Water Tracker</Text>
+          <TouchableOpacity onPress={handleSetGoal}>
+            <Text style={styles.greenText}>Set Goal</Text>
           </TouchableOpacity>
         </View>
         <WaterIntake
@@ -128,7 +141,9 @@ const NutritionScreen = () => {
         <View style={styles.dailyPlanHeader}>
           <Text style={styles.title}>Your Daily Plan</Text>
           <TouchableOpacity
-            onPress={() => navigation.navigate("ViewAllMeals")} // Navigate to the new screen
+            onPress={() =>
+              navigation.navigate("ViewAllMeals", { title: "My Daily Plan" })
+            }
           >
             <Text style={styles.greenText}>View all</Text>
           </TouchableOpacity>
@@ -136,7 +151,7 @@ const NutritionScreen = () => {
 
         <FlatList
           horizontal
-          data={mealData}
+          data={dailyPlanData}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <MealItem
@@ -164,14 +179,16 @@ const NutritionScreen = () => {
         <View style={styles.dailyPlanHeader}>
           <Text style={styles.title}>Popular Recipes</Text>
           <TouchableOpacity
-            onPress={() => navigation.navigate("ViewAllMeals")} // Navigate to the new screen
+            onPress={() =>
+              navigation.navigate("ViewAllMeals", { title: "Recipes" })
+            } // Navigate to the new screen
           >
             <Text style={styles.greenText}>View all</Text>
           </TouchableOpacity>
         </View>
         <FlatList
           horizontal
-          data={popularRecipes}
+          data={popularRecipesData}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <MealItem
@@ -192,13 +209,23 @@ const NutritionScreen = () => {
         <Text style={styles.title}>Nutrition Your Way</Text>
 
         <View style={styles.gridContainer}>
-          {nutritionPlans.map((plan, index) => (
-            <TouchableOpacity key={plan.id} style={styles.nutritionPlanCard}>
+          {nutritionPlans.map((plan) => (
+            <TouchableOpacity
+              key={plan.id}
+              style={styles.nutritionPlanCard}
+              onPress={() =>
+                navigation.navigate("NutritionPlans", {
+                  title: plan.title,
+                  type: plan.type,
+                })
+              }
+            >
               <Image source={plan.icon} style={styles.nutritionPlanIcon} />
               <Text style={styles.nutritionPlanText}>{plan.title}</Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity
+            onPress={() => navigation.navigate("CreatePlan")}
             style={[
               styles.nutritionPlanCard,
               { backgroundColor: colors.green },

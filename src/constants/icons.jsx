@@ -56,8 +56,36 @@ import breakfast from "../assets/icons/breakfast.png";
 import lunch from "../assets/icons/lunch.png";
 import dinner from "../assets/icons/dinner.png";
 import snacks from "../assets/icons/snacks.png";
+import mealAdded from "../assets/icons/mealAdded.png";
+import modalClose from "../assets/icons/modalClose.png";
+import scan from "../assets/icons/scan.png";
+import greenPlus from "../assets/icons/plus.png";
+import male from "../assets/icons/male.png";
+import female from "../assets/icons/female.png";
+import wait from "../assets/icons/wait.png";
+import planAdded from "../assets/icons/planAdded.png";
+import nextBg from "../assets/icons/nextBg.png";
+import quadriceps from "../assets/icons/quadriceps.png";
+import treadmill from "../assets/icons/treadmill.png";
+import pullUp from "../assets/icons/pullUp.png";
+import dumbbell from "../assets/icons/dumbbell.png";
+import jumpRope from "../assets/icons/jumpRope.png";
 
 export default {
+  treadmill,
+  jumpRope,
+  dumbbell,
+  pullUp,
+  quadriceps,
+  nextBg,
+  planAdded,
+  wait,
+  male,
+  female,
+  greenPlus,
+  scan,
+  modalClose,
+  mealAdded,
   weightLoss,
   muscleGain,
   keto,

@@ -3,19 +3,13 @@ import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
 import icons from "../../constants/icons";
-
-// Reusable MealCard component
-const MealCard = ({ icon, label }) => (
-  <TouchableOpacity style={styles.card}>
-    <Image source={icon} style={{ width: 32, height: 32 }} />
-    <Text style={styles.cardText}>{label}</Text>
-  </TouchableOpacity>
-);
+import { useNavigation } from "@react-navigation/native";
+import MealCard from "../../components/MealCard";
 
 const AddMeal = () => {
   return (
     <Container>
-      <Header title={"Choose to Add Meal"} showBackButton={true} />
+      <Header title={"Choose Meal to Add "} showBackButton={true} />
 
       <View style={styles.grid}>
         <MealCard label="Breakfast" icon={icons.breakfast} />
@@ -35,19 +29,5 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
     marginTop: 40,
-  },
-  card: {
-    backgroundColor: "#242425",
-    height: 163,
-    width: "48%", // Ensures two cards fit per row
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  cardText: {
-    color: "#fff",
-    fontSize: 16,
-    marginTop: 10,
   },
 });

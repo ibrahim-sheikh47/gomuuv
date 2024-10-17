@@ -1,11 +1,12 @@
 import { Image, Text, TouchableOpacity, View } from "react-native";
+import { colors } from "../constants/colors";
 
 export const ActivityCard = ({ iconSource, label, onPress }) => (
   <TouchableOpacity
     onPress={onPress}
     style={{
       flex: 1,
-      backgroundColor: "#242425",
+      backgroundColor: colors.bgColor,
       height: 101,
       borderRadius: 20,
       justifyContent: "center",
@@ -14,6 +15,6 @@ export const ActivityCard = ({ iconSource, label, onPress }) => (
     }}
   >
     <Image style={{ width: 30, height: 30 }} source={iconSource} />
-    <Text style={{ color: "#fff" }}>{label}</Text>
+    <Text style={{ color: "white" }}>{label}</Text>
   </TouchableOpacity>
 );

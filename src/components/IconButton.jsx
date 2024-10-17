@@ -5,8 +5,8 @@ const IconButton = ({ iconSource, onPress }) => {
     <TouchableOpacity onPress={onPress}>
       <Image
         style={{
-          width: 24,
-          height: 24,
+          width: 20,
+          height: 20,
         }}
         source={iconSource}
       />

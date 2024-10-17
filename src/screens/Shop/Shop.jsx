@@ -20,12 +20,7 @@ const ShopScreen = () => {
 
   return (
     <Container>
-      <Header
-        title="Shop"
-        showBackButton={true}
-        rightIcon1={icons.cart}
-        rightIcon2={icons.cart2}
-      />
+      <Header title="Shop" rightIcon1={icons.cart} rightIcon2={icons.cart2} />
 
       {/* Use ScrollView to enable scrolling for the entire screen */}
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
