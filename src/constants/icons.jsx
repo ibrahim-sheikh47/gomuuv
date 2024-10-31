@@ -70,9 +70,11 @@ import treadmill from "../assets/icons/treadmill.png";
 import pullUp from "../assets/icons/pullUp.png";
 import dumbbell from "../assets/icons/dumbbell.png";
 import jumpRope from "../assets/icons/jumpRope.png";
+import fasting from "../assets/icons/fasting.png";
 
 export default {
   treadmill,
+  fasting,
   jumpRope,
   dumbbell,
   pullUp,

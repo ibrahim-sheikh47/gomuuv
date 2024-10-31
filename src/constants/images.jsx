@@ -10,8 +10,12 @@ import snack from "../assets/images/snack.png";
 import sessionBg from "../assets/images/sessionBg.jpeg";
 import treadmill from "../assets/images/treadmill.jpeg";
 import chestWorkout from "../assets/images/chestWorkout.jpeg";
+import meditation from "../assets/images/meditation.png";
+import weightGraph from "../assets/images/weightGraph.png";
 
 export default {
+  meditation,
+  weightGraph,
   chestWorkout,
   treadmill,
   sessionBg,

@@ -29,9 +29,9 @@ const Header = ({ title, showBackButton, rightIcon1, rightIcon2 }) => {
       {/* Centered Title */}
       <View
         style={{
-          flex: 1,
           alignItems: "center",
           justifyContent: "center",
+          width: 205,
         }}
       >
         <Text

@@ -28,6 +28,13 @@ import EquipmentDetails from "../../screens/Workout/EquipmentDetails";
 import NewWorkout from "../../screens/Workout/NewWorkout";
 import ViewAllWorkouts from "../../screens/Workout/ViewAllWorkouts";
 import WorkoutDetails from "../../screens/Workout/WorkoutDetails";
+import FastingPlans from "../../screens/Workout/FastingPlans";
+import FastingPlanDetail from "../../screens/Workout/FastingPlanDetail";
+import ChallengeDetail from "../../screens/Challenges/ChallengeDetail";
+import CategoryDetail from "../../screens/Challenges/CategoryList";
+import CategoryList from "../../screens/Challenges/CategoryList";
+import Cart from "../../screens/Shop/Cart";
+import SleepScreen from "../../screens/Sleep/Sleep";
 
 const Stack = createNativeStackNavigator();
 
@@ -64,17 +71,26 @@ export default function AppNavigator() {
       <Stack.Screen name="CreatePlan" component={CreatePlan} />
       <Stack.Screen name="SetWaterGoal" component={SetWaterGoal} />
       <Stack.Screen name="NutritionPlans" component={NutritionPlans} />
-      <Stack.Screen name="FastingScreen" component={FastingScreen} />
       <Stack.Screen name="EquipmentDetails" component={EquipmentDetails} />
       <Stack.Screen name="NewWorkout" component={NewWorkout} />
       <Stack.Screen name="ViewAllWorkouts" component={ViewAllWorkouts} />
       <Stack.Screen name="WorkoutDetails" component={WorkoutDetails} />
+
+      <Stack.Screen name="FastingScreen" component={FastingScreen} />
+      <Stack.Screen name="FastingPlans" component={FastingPlans} />
+      <Stack.Screen name="FastingPlanDetail" component={FastingPlanDetail} />
+
+      <Stack.Screen name="ChallengeDetail" component={ChallengeDetail} />
+      <Stack.Screen name="CategoryList" component={CategoryList} />
+
+      <Stack.Screen name="SleepScreen" component={SleepScreen} />
 
       <Stack.Screen
         name="ManageNotifications"
         component={ManageNotifications}
       />
       <Stack.Screen name="ShopScreen" component={ShopScreen} />
+      <Stack.Screen name="Cart" component={Cart} />
     </Stack.Navigator>
   );
 }

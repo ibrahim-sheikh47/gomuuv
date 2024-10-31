@@ -90,6 +90,7 @@ const HomeScreen = () => {
             label="Sleep"
             icon={icons.tab5Filled}
             goal={"Goal: 8 hours of sleep daily"}
+            onPress={() => navigation.navigate("SleepScreen")}
           >
             <Text
               style={{

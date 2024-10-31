@@ -10,7 +10,16 @@ import {
 import { colors } from "../constants/colors"; // Adjust the import path as needed
 import icons from "../constants/icons";
 
-const CustomModal = ({ visible, onClose, modalText, modalIcon }) => {
+const CustomModal = ({
+  visible,
+  onClose,
+  modalText,
+  modalIcon,
+  textStyle,
+  children,
+  width = 205,
+  height = 222,
+}) => {
   return (
     <Modal
       transparent={true}
@@ -19,12 +28,14 @@ const CustomModal = ({ visible, onClose, modalText, modalIcon }) => {
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
+        <View style={[styles.modalContent, { width: width, height: height }]}>
           <Image source={modalIcon} style={styles.modalIcon} />
-          <Text style={styles.modalText}>{modalText}</Text>
+
+          <Text style={[styles.modalText, textStyle]}>{modalText}</Text>
           <TouchableOpacity style={styles.absolute} onPress={onClose}>
             <Image style={styles.closeBtn} source={icons.modalClose} />
           </TouchableOpacity>
+          {children}
         </View>
       </View>
     </Modal>
@@ -42,15 +53,13 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     position: "relative",
-    width: 205,
-    height: 222,
     backgroundColor: colors.black,
     borderRadius: 10,
     borderColor: "#696969",
     borderWidth: 1,
     alignItems: "center", // Align content horizontally
     justifyContent: "center", // Align content vertically
-    padding: 20, // Optional padding to ensure no content touches the edges
+    padding: 10, // Optional padding to ensure no content touches the edges
     flexDirection: "column",
   },
   modalText: {
@@ -73,7 +82,7 @@ const styles = StyleSheet.create({
   },
   modalIcon: {
     width: 60,
-    height: 70,
+    height: 60,
   },
   absolute: {
     position: "absolute",

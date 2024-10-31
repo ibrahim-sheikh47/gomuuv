@@ -14,8 +14,10 @@ import icons from "../../constants/icons";
 import { MaterialIcons } from "@expo/vector-icons"; // Importing Chevron icon (expo icons)
 import CustomButton from "../../components/CustomButton";
 import CustomModal from "../../components/CustomModal";
+import { useNavigation } from "@react-navigation/native";
 
 const ProductDetailScreen = ({ route }) => {
+  const navigation = useNavigation();
   const { product } = route.params;
 
   // State to manage quantity
@@ -43,8 +45,14 @@ const ProductDetailScreen = ({ route }) => {
   const handleAddToCart = () => {
     setModalVisible(true); // Show the modal
     setTimeout(() => {
-      setModalVisible(false); // Auto-close after 2 seconds
+      navigation.navigate("Cart", { product, quantity });
     }, 3000);
+  };
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setTimeout(() => {
+      navigation.navigate("Cart");
+    }, 1000);
   };
 
   return (
@@ -79,7 +87,7 @@ const ProductDetailScreen = ({ route }) => {
             </TouchableOpacity>
           </View>
         </View>
-        <Text style={styles.title}>Features</Text>
+        <Text style={[styles.title, { marginBottom: 0 }]}>Features</Text>
         <View style={styles.featuresList}>
           {product.features.map((feature, index) => (
             <Text key={index} style={styles.detailText}>
@@ -156,7 +164,7 @@ const ProductDetailScreen = ({ route }) => {
       />
       <CustomModal
         visible={isModalVisible}
-        onClose={() => setModalVisible(false)}
+        onClose={handleCloseModal}
         modalIcon={icons.addedToCart}
         modalText={"Item added to cart!"}
       />
@@ -226,6 +234,7 @@ const styles = StyleSheet.create({
   },
   detailRow: {
     flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
     marginVertical: 5,
   },
@@ -235,7 +244,8 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Bold",
   },
   detailText: {
-    fontSize: 14,
+    fontSize: 12,
+    width: 150,
     color: "#AFAFAF",
     fontFamily: "Poppins-Regular",
   },

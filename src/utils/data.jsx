@@ -40,19 +40,24 @@ export const notificationsSettings = [
 export const shopProducts = [
   {
     id: 1,
-    title: "Product 1",
+    title: "Adjustable Dumbbells",
     amount: 29.99,
     productImage: images.product1, // Replace with actual image path
     type: "recommended",
-    description: "Product description",
-    features: ["Feature A", "Feature B"], // Added features
+    description:
+      "These adjustable dumbbells are perfect for a wide range of workouts. They allow you to easily adjust the weight from 5 lbs to 50 lbs in seconds.",
+    features: [
+      "Adjustable weights from 5 to 50 lbs.",
+      "Durable cast iron plates.",
+      "Easy-lock system for quick changes.",
+    ], // Added features
     dimensions: "10 x 5 x 2 inches", // Added dimensions
     weight: "1 lb", // Added weight
-    materials: "Plastic", // Added materials
-    weightRange: "0-2 lbs", // Added weight range
-    audience: "Adults", // Added audience
-    warranty: "1 year", // Added warranty
-    manufacturer: "Manufacturer A", // Added manufacturer
+    materials: "Cast iron with plastic coating", // Added materials
+    weightRange: "5 lbs to 50 lbs", // Added weight range
+    audience: "Suitable for beginners to advanced users", // Added audience
+    warranty: "1 year manufacturer warranty", // Added warranty
+    manufacturer: "ProFit Fitness Co", // Added manufacturer
   },
   {
     id: 2,
@@ -410,35 +415,93 @@ export const workoutData = [
     time: "25",
     category: "Quadriceps",
     image: images.chestWorkout,
-    exercises: 5, // Number of exercises
-    equipment: "Dumbbells", // Equipment needed
-    level: "Intermediate", // Difficulty level
+    exercises: 5,
+    equipment: "Dumbbells",
+    level: "Intermediate",
     description:
-      "series of exercises designed to build strength and size. We’ll start with bench presses for overall mass, move on to push-ups for endurance, and finish with flyes to target the inner chest.",
+      "A series of exercises designed to build strength and size. We’ll start with bench presses for overall mass, move on to push-ups for endurance, and finish with flyes to target the inner chest.",
+    days: {
+      day1: [
+        { title: "Bench Press", reps: "x10", image: images.chestWorkout },
+        { title: "Push Ups", reps: "x15", image: images.chestWorkout },
+      ],
+      day2: [
+        {
+          title: "Incline Bench Press",
+          reps: "x12",
+          image: images.chestWorkout,
+        },
+        { title: "Dumbbell Flyes", reps: "x10", image: images.chestWorkout },
+      ],
+      day3: [
+        {
+          title: "Decline Bench Press",
+          reps: "x10",
+          image: images.chestWorkout,
+        },
+        { title: "Chest Dips", reps: "x8", image: images.chestWorkout },
+      ],
+      day4: [
+        { title: "Cable Crossovers", reps: "x12", image: images.chestWorkout },
+        { title: "Dumbbell Press", reps: "x10", image: images.chestWorkout },
+      ],
+    },
   },
   {
     title: "Leg Workout",
     calories: "200",
     time: "30",
     category: "Legs",
-    image: images.treadmill,
+    image: images.chestWorkout,
     exercises: 6,
     equipment: "Pull-up Bar",
     level: "Advanced",
     description:
-      "series of exercises designed to build strength and size. We’ll start with bench presses for overall mass, move on to push-ups for endurance, and finish with flyes to target the inner chest.",
+      "Leg workout focusing on strength and endurance. We’ll target all major muscle groups using bodyweight and bar exercises.",
+    days: {
+      day1: [
+        { title: "Bench Press", reps: "x10", image: images.chestWorkout },
+        { title: "Push Ups", reps: "x15", image: images.chestWorkout },
+      ],
+      day2: [
+        {
+          title: "Incline Bench Press",
+          reps: "x12",
+          image: images.chestWorkout,
+        },
+        { title: "Dumbbell Flyes", reps: "x10", image: images.chestWorkout },
+      ],
+      day3: [
+        {
+          title: "Decline Bench Press",
+          reps: "x10",
+          image: images.chestWorkout,
+        },
+        { title: "Chest Dips", reps: "x8", image: images.chestWorkout },
+      ],
+      day4: [
+        { title: "Cable Crossovers", reps: "x12", image: images.chestWorkout },
+        { title: "Dumbbell Press", reps: "x10", image: images.chestWorkout },
+      ],
+    },
   },
   {
     title: "Back Workout",
     calories: "180",
     time: "28",
     category: "Back",
-    image: images.sessionBg,
+    image: images.chestWorkout,
     exercises: 4,
     equipment: "Pull-up Bar",
     level: "Beginner",
     description:
-      "series of exercises designed to build strength and size. We’ll start with bench presses for overall mass, move on to push-ups for endurance, and finish with flyes to target the inner chest.",
+      "Back workout focusing on overall back strength, endurance, and stability. Pull-up exercises target key muscle groups.",
+    days: {
+      day1: [],
+      day2: [],
+      day3: [],
+      day4: [],
+    },
   },
   {
     title: "Arm Workout",
@@ -450,7 +513,13 @@ export const workoutData = [
     equipment: "Dumbbells",
     level: "Intermediate",
     description:
-      "series of exercises designed to build strength and size. We’ll start with bench presses for overall mass, move on to push-ups for endurance, and finish with flyes to target the inner chest.",
+      "Arm workout to increase strength and muscle definition. This workout focuses on bicep curls and tricep extensions.",
+    days: {
+      day1: [],
+      day2: [],
+      day3: [],
+      day4: [],
+    },
   },
   {
     title: "Core Workout",
@@ -462,6 +531,221 @@ export const workoutData = [
     equipment: "Treadmill",
     level: "Beginner",
     description:
-      "series of exercises designed to build strength and size. We’ll start with bench presses for overall mass, move on to push-ups for endurance, and finish with flyes to target the inner chest.",
+      "Core workout designed to strengthen your abs and obliques. Exercises include planks and crunches.",
+    days: {
+      day1: [],
+      day2: [],
+      day3: [],
+      day4: [],
+    },
+  },
+];
+export const fastingPlans = [
+  {
+    id: "1",
+    title: "Intermittent Fasting",
+    description: "16 hours of fasting, 8 hours of an eating window",
+    duration: 16,
+    remain: 8,
+  },
+  {
+    id: "2",
+    title: "Intermittent Fasting",
+    description: "20 hours of fasting, 4 hours of an eating window",
+    duration: 20,
+    remain: 4,
+  },
+  {
+    id: "3",
+    title: "Intermittent Fasting",
+    description: "12 hours of fasting, 12 hours of an eating window",
+    duration: 12,
+    remain: 12,
+  },
+  {
+    id: "4",
+    title: "Intermittent Fasting",
+    description: "15 hours of fasting, 9 hours of an eating window",
+    duration: 15,
+    remain: 9,
+  },
+];
+
+export const challenges = [
+  {
+    id: 1,
+    title: "30-Day Squat Challenge ",
+    image: images.chestWorkout,
+    muscleGroup: "Quadriceps",
+    cardSubtitle: "Completed",
+    level: "Intermediate",
+    exercises: 20,
+    calories: 80,
+    time: "25m",
+    equipment: "Pull-up Bar",
+    type: "enroll",
+    percent: "40%",
+    startDate: "03 Sept",
+    endDate: "03 Oct",
+    days: {
+      day1: [
+        { title: "Bench Press", reps: "x10", image: images.chestWorkout },
+        { title: "Push Ups", reps: "x15", image: images.chestWorkout },
+      ],
+    },
+  },
+  {
+    id: 2,
+    title: "Core Strength Challenge",
+    image: images.chestWorkout,
+    muscleGroup: "Core",
+    cardSubtitle: "Strengthen your core with daily planks.",
+    level: "Intermediate",
+    exercises: 20,
+    calories: 80,
+    time: "25m",
+    equipment: "Pull-up Bar",
+    type: "upcoming",
+    date: 10,
+    month: "Jan",
+    days: {
+      day1: [
+        { title: "Plank", reps: "x60s", image: images.chestWorkout },
+        { title: "Russian Twists", reps: "x20", image: images.chestWorkout },
+      ],
+    },
+  },
+  {
+    id: 3,
+    title: "Core Strength Challenge",
+    image: images.chestWorkout,
+    muscleGroup: "Core",
+    cardSubtitle: "Strengthen your core with daily planks.",
+    level: "Intermediate",
+    exercises: 20,
+    calories: 80,
+    time: "25m",
+    equipment: "Pull-up Bar",
+    type: "upcoming",
+    date: 10,
+    month: "Jan",
+    days: {
+      day1: [
+        { title: "Plank", reps: "x60s", image: images.chestWorkout },
+        { title: "Russian Twists", reps: "x20", image: images.chestWorkout },
+      ],
+    },
+  },
+];
+
+export const challengesData = [
+  {
+    id: 1,
+    title: "Daily Meditation",
+    image: images.meditation,
+    description: "Meditate for clearer mind and reduced stress.",
+    type: "Health & Wellness",
+    startDate: "18",
+    startMonth: "Jan",
+  },
+  {
+    id: 2,
+    title: "Core Strength",
+    image: images.meditation,
+    description: "Strengthen your core with daily planks.",
+    type: "Strength",
+    startDate: "03",
+    startMonth: "Sept",
+  },
+  {
+    id: 3,
+    title: "Flexibility Routine",
+    image: images.meditation,
+    description: "Improve flexibility with targeted stretches.",
+    type: "Flexibility",
+    startDate: "10",
+    startMonth: "Mar",
+  },
+  {
+    id: 4,
+    title: "Flexibility Routine",
+    image: images.meditation,
+    description: "Improve flexibility with targeted stretches.",
+    type: "Endurance",
+    startDate: "10",
+    startMonth: "Mar",
+  },
+  {
+    id: 5,
+    title: "Flexibility Routine",
+    image: images.meditation,
+    description: "Improve flexibility with targeted stretches.",
+    type: "Lifestyle & Habit",
+    startDate: "10",
+    startMonth: "Mar",
+  },
+  {
+    id: 6,
+    title: "Flexibility Routine",
+    image: images.meditation,
+    description: "Improve flexibility with targeted stretches.",
+    type: "Skills Based",
+    startDate: "10",
+    startMonth: "Mar",
+  },
+];
+
+export const fastingMeals = [
+  {
+    id: "1",
+    title: "Breakfast",
+    mealName: "Avocado Egg Toast",
+    mealImage: images.breakfast,
+    calories: 190,
+    type: "breakfast",
+    time: "25",
+    duration: 16,
+    ingredients: [
+      { id: "1", name: "Avocado", quantity: "30g" },
+      { id: "2", name: "Egg", quantity: "1 whole" },
+      { id: "3", name: "Purple Onion", quantity: "30g" },
+      { id: "4", name: "Fresh Asparagus", quantity: "70g" },
+      { id: "5", name: "Pepper", quantity: "50g" },
+      { id: "6", name: "Wheat Bread", quantity: "1 Slice" },
+      { id: "7", name: "Coconut Oil", quantity: "1 Tbsp" },
+      { id: "8", name: "Lime Juice", quantity: "To Taste" },
+    ],
+    steps: [
+      { id: "1", step: "Wash all vegetables thoroughly." },
+      { id: "2", step: "Chop the lettuce, tomatoes, and cucumber." },
+      { id: "3", step: "Mix all ingredients in a large bowl." },
+      { id: "4", step: "Add dressing and mix well." },
+      { id: "5", step: "Serve fresh with optional toppings." },
+    ],
+  },
+  {
+    id: "2",
+    title: "Lunch",
+    mealName: "Grilled Chicken Salad",
+    mealImage: images.lunch,
+    calories: 350,
+    type: "lunch",
+    time: "35",
+    duration: 20,
+    ingredients: [
+      { id: "1", name: "Chicken Breast", quantity: "200g" },
+      { id: "2", name: "Lettuce", quantity: "100g" },
+      { id: "3", name: "Tomato", quantity: "50g" },
+      { id: "4", name: "Cucumber", quantity: "50g" },
+      { id: "5", name: "Olive Oil", quantity: "2 Tbsp" },
+      { id: "6", name: "Lemon Juice", quantity: "To Taste" },
+    ],
+    steps: [
+      { id: "1", step: "Grill the chicken breast until fully cooked." },
+      { id: "2", step: "Chop all vegetables and mix in a bowl." },
+      { id: "3", step: "Add grilled chicken to the salad." },
+      { id: "4", step: "Drizzle olive oil and lemon juice on top." },
+      { id: "5", step: "Serve fresh." },
+    ],
   },
 ];

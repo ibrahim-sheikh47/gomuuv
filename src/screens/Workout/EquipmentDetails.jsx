@@ -50,7 +50,7 @@ const EquipmentDetails = () => {
   };
   return (
     <Container>
-      <Header title={"qwerty"} showBackButton={true} />
+      <Header title={category.label} showBackButton={true} />
       <View style={{ flex: 1 }}>
         <View style={styles.progressContainer}>
           {/* Circular Progress */}
