@@ -68,6 +68,7 @@ const ViewAllMeals = ({ route, navigation }) => {
               fontFamily: "Poppins-Bold",
               fontSize: 16,
               marginBottom: 5,
+              marginTop: 20,
             }}
           >
             Popular Recipes

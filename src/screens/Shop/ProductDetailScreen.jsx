@@ -51,7 +51,7 @@ const ProductDetailScreen = ({ route }) => {
   const handleCloseModal = () => {
     setModalVisible(false);
     setTimeout(() => {
-      navigation.navigate("Cart");
+      navigation.navigate("Cart", { product, quantity });
     }, 1000);
   };
 
@@ -154,6 +154,7 @@ const ProductDetailScreen = ({ route }) => {
       </ScrollView>
       <CustomButton title={"Add to Cart"} onPress={handleAddToCart} />
       <CustomButton
+        onPress={() => navigation.navigate("Checkout")}
         title={"Proceed to Checkout"}
         style={{
           backgroundColor: "transparent",

@@ -12,6 +12,7 @@ import { colors } from "../constants/colors";
 const InputField = ({
   label,
   value,
+  cusStyles,
   onChangeText,
   secureTextEntry = false,
   keyboardType = "default",
@@ -43,13 +44,16 @@ const InputField = ({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
+      {label && <Text style={styles.label}>{label}</Text>}
+      {/* Render label only if it exists */}
       <View style={styles.inputContainer}>
         <TextInput
           ref={inputRef}
           style={[
             styles.input,
             isFocused ? styles.inputFocused : styles.inputBlurred,
+
+            cusStyles,
           ]}
           value={value}
           onChangeText={onChangeText}
@@ -58,7 +62,7 @@ const InputField = ({
           secureTextEntry={secureTextEntry && !showPassword}
           keyboardType={keyboardType}
           placeholder={placeholder} // Set placeholder
-          placeholderTextColor="#5C5C5C" // Set placeholder text color
+          placeholderTextColor="#AFAFAF" // Set placeholder text color
         />
         {secureTextEntry && (
           <TouchableOpacity

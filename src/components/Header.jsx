@@ -4,7 +4,14 @@ import { Ionicons } from "@expo/vector-icons"; // Ensure you have Ionicons insta
 import IconButton from "./IconButton";
 import icons from "../constants/icons";
 
-const Header = ({ title, showBackButton, rightIcon1, rightIcon2 }) => {
+const Header = ({
+  title,
+  showBackButton,
+  rightIcon1,
+  rightIcon2,
+  rightIcon1Press,
+  rightIcon2Press,
+}) => {
   const navigation = useNavigation();
 
   return (
@@ -55,8 +62,12 @@ const Header = ({ title, showBackButton, rightIcon1, rightIcon2 }) => {
           gap: 5,
         }}
       >
-        {rightIcon1 && <IconButton iconSource={rightIcon1} />}
-        {rightIcon2 && <IconButton iconSource={rightIcon2} />}
+        {rightIcon1 && (
+          <IconButton iconSource={rightIcon1} onPress={rightIcon1Press} />
+        )}
+        {rightIcon2 && (
+          <IconButton iconSource={rightIcon2} onPress={rightIcon2Press} />
+        )}
       </View>
     </View>
   );

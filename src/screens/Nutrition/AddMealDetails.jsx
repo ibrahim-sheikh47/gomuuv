@@ -10,8 +10,10 @@ import { colors } from "../../constants/colors";
 // Import the new meal data arrays
 import { dailyPlanData, popularRecipesData } from "../../utils/data";
 import { MealItem } from "../../components/MealItem";
+import { useNavigation } from "@react-navigation/native";
 
 const AddMealDetails = ({ route }) => {
+  const navigation = useNavigation();
   const { label } = route.params; // Label passed from MealCard (e.g., "Breakfast", "Lunch")
   const [carbs, setCarbs] = useState({ current: 10, total: 30 });
   const [proteins, setProteins] = useState({ current: 10, total: 30 });
@@ -119,6 +121,9 @@ const AddMealDetails = ({ route }) => {
         iconStyle={{ width: 18, height: 18 }}
       />
       <CustomButton
+        onPress={() =>
+          navigation.navigate("ViewAllMeals", { title: "Recipes" })
+        }
         title={"Add Manually"}
         style={{
           borderColor: colors.green,

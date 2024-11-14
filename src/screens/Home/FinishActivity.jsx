@@ -22,60 +22,20 @@ const FinishActivity = () => {
           style={{ width: "100%", height: 200, marginVertical: 30 }}
         />
         <View style={styles.gridContainer}>
-          <CustomCard label="Time Per Mile" icon={icons.timePerMile}>
-            <Text
-              style={{
-                color: "#F8F8F8",
-                textAlign: "center",
-                fontSize: 24,
-                fontFamily: "Poppins-Bold",
-                marginTop: "auto",
-              }}
-            >
-              8m:40s/mi
-            </Text>
-          </CustomCard>
-          <CustomCard label="Total Time" icon={icons.time}>
-            <Text
-              style={{
-                color: "#F8F8F8",
-                textAlign: "center",
-                fontSize: 24,
-                fontFamily: "Poppins-Bold",
-                marginTop: 10,
-              }}
-            >
-              {time} {/* Display passed time */}
-            </Text>
-          </CustomCard>
+          <CustomCard
+            label="Time Per Mile"
+            icon={icons.timePerMile}
+            message="8m:40s/mi"
+          />
+          <CustomCard label="Total Time" icon={icons.time} message={time} />
         </View>
         <View style={styles.gridContainer}>
-          <CustomCard label="Pace" icon={icons.pace}>
-            <Text
-              style={{
-                color: "#F8F8F8",
-                textAlign: "center",
-                fontSize: 24,
-                fontFamily: "Poppins-Bold",
-                marginTop: "auto",
-              }}
-            >
-              8m:40s/mi
-            </Text>
-          </CustomCard>
-          <CustomCard label="Distance" icon={icons.distance}>
-            <Text
-              style={{
-                color: "#F8F8F8",
-                textAlign: "center",
-                fontSize: 24,
-                fontFamily: "Poppins-Bold",
-                marginTop: 10,
-              }}
-            >
-              {distance} {distanceUnit}
-            </Text>
-          </CustomCard>
+          <CustomCard label="Pace" icon={icons.pace} message="1.1mi/hr" />
+          <CustomCard
+            label="Distance"
+            icon={icons.distance}
+            message={`${distance} ${distanceUnit}`}
+          />
         </View>
       </View>
       <CustomButton

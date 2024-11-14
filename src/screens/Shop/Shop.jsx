@@ -8,7 +8,9 @@ import ProductSection from "../../components/ProductSection";
 import images from "../../constants/images";
 import icons from "../../constants/icons";
 import { shopProducts } from "../../utils/data";
+import { useNavigation } from "@react-navigation/native";
 const ShopScreen = () => {
+  const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
   const onChangeSearch = (query) => setSearchQuery(query);
 

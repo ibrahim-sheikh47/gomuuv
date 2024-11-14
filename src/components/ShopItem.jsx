@@ -13,21 +13,26 @@ const ShopItem = ({ productImage, title, amount, onPress, product }) => {
   };
 
   return (
-    <TouchableOpacity style={styles.container} onPress={handlePress}>
+    <View style={styles.container}>
       {/* Product Image */}
-      <Image source={productImage} style={styles.productImage} />
+      <TouchableOpacity onPress={handlePress}>
+        <Image source={productImage} style={styles.productImage} />
+      </TouchableOpacity>
 
       {/* Product Details */}
-      <View style={styles.detailsContainer}>
+      <TouchableOpacity style={styles.detailsContainer} onPress={handlePress}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.amount}>{`$${amount}`}</Text>
-      </View>
+      </TouchableOpacity>
 
       {/* Add to Cart Button */}
-      <TouchableOpacity style={styles.addToCartButton}>
+      <TouchableOpacity
+        style={styles.addToCartButton}
+        onPress={() => navigation.navigate("Cart", { product, quantity: 1 })}
+      >
         <Text style={styles.buttonText}>Add to Cart</Text>
       </TouchableOpacity>
-    </TouchableOpacity>
+    </View>
   );
 };
 

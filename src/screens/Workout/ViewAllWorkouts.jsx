@@ -21,8 +21,8 @@ const ViewAllWorkouts = () => {
     <View style={{ marginBottom: 20 }}>
       <WorkoutCard
         title={item.title}
-        calories={`${item.calories} kcal`}
-        time={`${item.time} mins`}
+        calories={`${item.calories}`}
+        time={`${item.time}`}
         category={item.category}
         image={item.image}
         onPress={() => handleOnPress(item)} // Pass the item to the handleOnPress function

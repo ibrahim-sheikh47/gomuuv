@@ -10,10 +10,14 @@ import snack from "../assets/images/snack.png";
 import sessionBg from "../assets/images/sessionBg.jpeg";
 import treadmill from "../assets/images/treadmill.jpeg";
 import chestWorkout from "../assets/images/chestWorkout.jpeg";
+import leanMean from "../assets/images/leanMean.jpeg";
+import muscleBuilder from "../assets/images/muscleBuilder.jpeg";
 import meditation from "../assets/images/meditation.png";
 import weightGraph from "../assets/images/weightGraph.png";
 
 export default {
+  leanMean,
+  muscleBuilder,
   meditation,
   weightGraph,
   chestWorkout,

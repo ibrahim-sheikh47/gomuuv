@@ -41,60 +41,27 @@ const ActivityDetailScreen = () => {
             label="Distance"
             icon={icons.distance}
             goal={"Goal: 2mi daily"}
-          >
-            <Text
-              style={{
-                color: "#F8F8F8",
-                textAlign: "center",
-                fontSize: 24,
-                fontFamily: "Poppins-Bold",
-              }}
-            >
-              {`${distance} ${distanceUnit}`}
-            </Text>
-          </CustomCard>
-          <CustomCard label="Time" icon={icons.time} goal={"Goal: 45min"}>
-            <Text
-              style={{
-                color: "#F8F8F8",
-                textAlign: "center",
-                fontSize: 24,
-                fontFamily: "Poppins-Bold",
-                marginTop: 10,
-              }}
-            >
-              {time} {/* Display time */}
-            </Text>
-          </CustomCard>
+            message={`${distance} ${distanceUnit}`}
+          />
+          <CustomCard
+            label="Time"
+            icon={icons.time}
+            goal={"Goal: 45min"}
+            message={time}
+          />
         </View>
 
         <View style={styles.gridContainer}>
-          <CustomCard label="Calories" icon={icons.calories}>
-            <Text
-              style={{
-                color: "#F8F8F8",
-                textAlign: "center",
-                fontSize: 24,
-                fontFamily: "Poppins-Bold",
-                marginTop: 10,
-              }}
-            >
-              65 kcal
-            </Text>
-          </CustomCard>
-          <CustomCard label="Heart Rate" icon={icons.heartRate}>
-            <Text
-              style={{
-                color: "#F8F8F8",
-                textAlign: "center",
-                fontSize: 24,
-                fontFamily: "Poppins-Bold",
-                marginTop: 10,
-              }}
-            >
-              96 bpm
-            </Text>
-          </CustomCard>
+          <CustomCard
+            label="Calories"
+            icon={icons.calories}
+            message="65 kcal"
+          />
+          <CustomCard
+            label="Heart Rate"
+            icon={icons.heartRate}
+            message="96 bpm"
+          />
         </View>
       </View>
       <TouchableOpacity

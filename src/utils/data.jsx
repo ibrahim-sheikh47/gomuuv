@@ -448,11 +448,11 @@ export const workoutData = [
     },
   },
   {
-    title: "Leg Workout",
+    title: "Lean & Mean",
     calories: "200",
     time: "30",
     category: "Legs",
-    image: images.chestWorkout,
+    image: images.leanMean,
     exercises: 6,
     equipment: "Pull-up Bar",
     level: "Advanced",
@@ -486,21 +486,41 @@ export const workoutData = [
     },
   },
   {
-    title: "Back Workout",
+    title: "Muscle Builder",
     calories: "180",
     time: "28",
     category: "Back",
-    image: images.chestWorkout,
+    image: images.muscleBuilder,
     exercises: 4,
     equipment: "Pull-up Bar",
     level: "Beginner",
     description:
       "Back workout focusing on overall back strength, endurance, and stability. Pull-up exercises target key muscle groups.",
     days: {
-      day1: [],
-      day2: [],
-      day3: [],
-      day4: [],
+      day1: [
+        { title: "Bench Press", reps: "x10", image: images.chestWorkout },
+        { title: "Push Ups", reps: "x15", image: images.chestWorkout },
+      ],
+      day2: [
+        {
+          title: "Incline Bench Press",
+          reps: "x12",
+          image: images.chestWorkout,
+        },
+        { title: "Dumbbell Flyes", reps: "x10", image: images.chestWorkout },
+      ],
+      day3: [
+        {
+          title: "Decline Bench Press",
+          reps: "x10",
+          image: images.chestWorkout,
+        },
+        { title: "Chest Dips", reps: "x8", image: images.chestWorkout },
+      ],
+      day4: [
+        { title: "Cable Crossovers", reps: "x12", image: images.chestWorkout },
+        { title: "Dumbbell Press", reps: "x10", image: images.chestWorkout },
+      ],
     },
   },
   {
@@ -515,10 +535,30 @@ export const workoutData = [
     description:
       "Arm workout to increase strength and muscle definition. This workout focuses on bicep curls and tricep extensions.",
     days: {
-      day1: [],
-      day2: [],
-      day3: [],
-      day4: [],
+      day1: [
+        { title: "Bench Press", reps: "x10", image: images.chestWorkout },
+        { title: "Push Ups", reps: "x15", image: images.chestWorkout },
+      ],
+      day2: [
+        {
+          title: "Incline Bench Press",
+          reps: "x12",
+          image: images.chestWorkout,
+        },
+        { title: "Dumbbell Flyes", reps: "x10", image: images.chestWorkout },
+      ],
+      day3: [
+        {
+          title: "Decline Bench Press",
+          reps: "x10",
+          image: images.chestWorkout,
+        },
+        { title: "Chest Dips", reps: "x8", image: images.chestWorkout },
+      ],
+      day4: [
+        { title: "Cable Crossovers", reps: "x12", image: images.chestWorkout },
+        { title: "Dumbbell Press", reps: "x10", image: images.chestWorkout },
+      ],
     },
   },
   {
@@ -533,10 +573,30 @@ export const workoutData = [
     description:
       "Core workout designed to strengthen your abs and obliques. Exercises include planks and crunches.",
     days: {
-      day1: [],
-      day2: [],
-      day3: [],
-      day4: [],
+      day1: [
+        { title: "Bench Press", reps: "x10", image: images.chestWorkout },
+        { title: "Push Ups", reps: "x15", image: images.chestWorkout },
+      ],
+      day2: [
+        {
+          title: "Incline Bench Press",
+          reps: "x12",
+          image: images.chestWorkout,
+        },
+        { title: "Dumbbell Flyes", reps: "x10", image: images.chestWorkout },
+      ],
+      day3: [
+        {
+          title: "Decline Bench Press",
+          reps: "x10",
+          image: images.chestWorkout,
+        },
+        { title: "Chest Dips", reps: "x8", image: images.chestWorkout },
+      ],
+      day4: [
+        { title: "Cable Crossovers", reps: "x12", image: images.chestWorkout },
+        { title: "Dumbbell Press", reps: "x10", image: images.chestWorkout },
+      ],
     },
   },
 ];
@@ -668,9 +728,9 @@ export const challengesData = [
   },
   {
     id: 4,
-    title: "Flexibility Routine",
+    title: "Beast Mode",
     image: images.meditation,
-    description: "Improve flexibility with targeted stretches.",
+    description: "Strive for Great Body and Stress Management.",
     type: "Endurance",
     startDate: "10",
     startMonth: "Mar",
@@ -690,6 +750,24 @@ export const challengesData = [
     image: images.meditation,
     description: "Improve flexibility with targeted stretches.",
     type: "Skills Based",
+    startDate: "10",
+    startMonth: "Mar",
+  },
+  {
+    id: 7,
+    title: "Break your Soul",
+    image: images.meditation,
+    description: "Strengthen your core with daily planks.",
+    type: "Strength",
+    startDate: "03",
+    startMonth: "Sept",
+  },
+  {
+    id: 8,
+    title: "Rock Back",
+    image: images.meditation,
+    description: "Commit to make your back strong as a rock.",
+    type: "Endurance",
     startDate: "10",
     startMonth: "Mar",
   },

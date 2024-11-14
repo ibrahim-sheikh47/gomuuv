@@ -26,8 +26,8 @@ const ChallengesScreen = () => {
   const [weightUpdatedVisible, setWeightUpdatedVisible] = useState(false);
   const [targetUpdatedVisible, setTargetUpdatedVisible] = useState(false);
 
-  const [currentWeight, setCurrentWeight] = useState(100);
-  const [targetWeight, setTargetWeight] = useState(30);
+  const [currentWeight, setCurrentWeight] = useState(0);
+  const [targetWeight, setTargetWeight] = useState(0);
 
   const handleUpdateWeight = (newWeight) => {
     setCurrentWeight(newWeight); // Update the current weight
@@ -235,6 +235,30 @@ const ChallengesScreen = () => {
       <Text style={styles.sectionTitle}>Upcoming Challenges</Text>
     </>
   );
+  const renderFooter = () => (
+    <>
+      <Text style={styles.sectionTitle}>Find Your Challenge</Text>
+      <View style={styles.cardRow}>
+        {[
+          "Endurance",
+          "Strength",
+          "Flexibility",
+          "Health & Wellness",
+          "Lifestyle & Habit",
+          "Skills Based",
+        ].map((text) => (
+          <TouchableOpacity
+            key={text}
+            style={styles.card}
+            onPress={() => handleCategoryPress(text)} // Navigate with selected category
+          >
+            <Image source={icons.challenges} style={styles.icon} />
+            <Text style={styles.cardText}>{text}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </>
+  );
 
   return (
     <Container>
@@ -256,6 +280,7 @@ const ChallengesScreen = () => {
           activeTab === "Challenges" ? renderListHeader : renderGoalsSection
         }
         showsVerticalScrollIndicator={false}
+        ListFooterComponent={activeTab === "Challenges" && renderFooter}
       />
 
       {/* Modals for Update Weight and Set Target */}

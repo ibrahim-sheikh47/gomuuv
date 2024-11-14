@@ -13,21 +13,19 @@ import { useNavigation } from "@react-navigation/native";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
-  // State to manage user activity data
-  const [activities, setActivities] = useState({
-    activity: false,
-    sleep: false,
-    challenges: false,
-    workouts: false,
-    nutrition: false,
-    shop: false,
-  });
 
   const completionPercentage = 75;
+  const [isFirstTime, setIsFirstTime] = useState(true); // Track if it's the user's first time
+
+  const handleInteraction = () => {
+    if (isFirstTime) {
+      setIsFirstTime(false);
+    }
+  };
 
   return (
     <Container>
-      <ScrollView>
+      <ScrollView onScroll={handleInteraction}>
         <View style={styles.header}>
           <ProfileSection userName="*username here*" imageSource={images.dp} />
           <View style={styles.iconButtonContainer}>
@@ -41,146 +39,100 @@ const HomeScreen = () => {
           reportText="Daily Report"
         />
 
-        <Text style={styles.activityText}>What are you up to today?</Text>
+        <Text style={styles.sectionText}>What are you up to today?</Text>
         <View style={styles.activityCardContainer}>
-          <ActivityCard
-            iconSource={icons.walking}
-            label="Walking"
-            onPress={() =>
-              navigation.navigate("ActivityScreen", { activityType: "Walking" })
-            }
-          />
-          <ActivityCard
-            iconSource={icons.running}
-            label="Running"
-            onPress={() =>
-              navigation.navigate("ActivityScreen", { activityType: "Running" })
-            }
-          />
-          <ActivityCard
-            iconSource={icons.biking}
-            label="Biking"
-            onPress={() =>
-              navigation.navigate("ActivityScreen", { activityType: "Biking" })
-            }
-          />
+          {["Walking", "Running", "Biking"].map((activity, index) => (
+            <ActivityCard
+              key={activity}
+              iconSource={icons[activity.toLowerCase()]}
+              label={activity}
+              onPress={() => {
+                handleInteraction();
+                navigation.navigate("ActivityScreen", {
+                  activityType: activity,
+                });
+              }}
+            />
+          ))}
         </View>
 
-        <Text style={styles.fitnessSpaceText}>Your Fitness Space</Text>
+        <Text style={styles.sectionText}>Your Fitness Space</Text>
 
         <View style={styles.cardRow}>
           <CustomCard
             label="Activity"
             icon={icons.running}
-            goal={"Goal: Walk 2 miles daily"}
-          >
-            <Text
-              style={{
-                color: "#F8F8F8",
-                textAlign: "center",
-                fontSize: 24,
-                fontFamily: "Poppins-Bold",
-                marginTop: 10,
-              }}
-            >
-              1.5 mi
-            </Text>
-          </CustomCard>
+            message={
+              isFirstTime ? `Please start Activity to see data` : "1.5 mi"
+            }
+            goal="Goal: Walk 2 miles daily"
+            value="1.5 mi"
+          />
           <CustomCard
             label="Sleep"
             icon={icons.tab5Filled}
-            goal={"Goal: 8 hours of sleep daily"}
-            onPress={() => navigation.navigate("SleepScreen")}
-          >
-            <Text
-              style={{
-                color: "#F8F8F8",
-                textAlign: "center",
-                fontSize: 24,
-                fontFamily: "Poppins-Bold",
-                marginTop: 10,
-              }}
-            >
-              7h 32m
-            </Text>
-          </CustomCard>
+            message={isFirstTime ? `Please start Sleep to see data` : "7h 32m"}
+            goal="Goal: 8 hours of sleep daily"
+            value="7h 32m"
+            onPress={() => {
+              handleInteraction();
+              navigation.navigate("SleepScreen");
+            }}
+          />
         </View>
 
         <View style={styles.cardRow}>
           <CustomCard
             label="Challenges"
             icon={icons.challenges}
-            goal={"Goal: burn 1,457 kcal this week"}
-          >
-            <Text
-              style={{
-                color: "#F8F8F8",
-                textAlign: "center",
-                fontSize: 24,
-                fontFamily: "Poppins-Bold",
-                marginTop: 10,
-              }}
-            >
-              123
-            </Text>
-          </CustomCard>
+            message={
+              isFirstTime ? `Please start Challenges to see data` : "100"
+            }
+            goal="Goal: burn 1,457 kcal this week"
+            value="123"
+            onPress={() => {
+              handleInteraction();
+              navigation.navigate("Challenges");
+            }}
+          />
           <CustomCard
             label="Workouts"
             icon={icons.workouts}
-            goal={"Goal: 4 workouts per week"}
-          >
-            <Text
-              style={{
-                color: "#F8F8F8",
-                textAlign: "center",
-                fontSize: 24,
-                fontFamily: "Poppins-Bold",
-                marginTop: 10,
-              }}
-            >
-              3
-            </Text>
-          </CustomCard>
+            message={isFirstTime ? `Please start Workouts to see data` : 3}
+            goal="Goal: 4 workouts per week"
+            value="3"
+            onPress={() => {
+              handleInteraction();
+              navigation.navigate("Workout");
+            }}
+          />
         </View>
 
         <View style={styles.cardRow}>
           <CustomCard
             label="Nutrition"
             icon={icons.nutrition}
-            goal={"Goal: 54kg"}
-          >
-            <Text
-              style={{
-                color: "#F8F8F8",
-                textAlign: "center",
-                fontSize: 24,
-                fontFamily: "Poppins-Bold",
-                marginTop: 10,
-              }}
-            >
-              63kg
-            </Text>
-          </CustomCard>
+            message={
+              isFirstTime ? `Please start Nutrition to see data` : "64kg"
+            }
+            goal="Goal: 84kg"
+            value="63kg"
+            onPress={() => {
+              handleInteraction();
+              navigation.navigate("Nutrition");
+            }}
+          />
           <CustomCard
             label="Shop"
             icon={icons.shop2}
-            goal={"items in cart"}
+            message={isFirstTime ? `Please start Shop to see data` : 2}
+            goal="items in cart"
+            value="02"
             onPress={() => {
-              navigation.navigate("ShopScreen");
+              handleInteraction();
+              navigation.navigate("Shop");
             }}
-          >
-            <Text
-              style={{
-                color: "#F8F8F8",
-                textAlign: "center",
-                fontSize: 24,
-                fontFamily: "Poppins-Bold",
-                marginTop: 10,
-              }}
-            >
-              02
-            </Text>
-          </CustomCard>
+          />
         </View>
       </ScrollView>
     </Container>
@@ -199,9 +151,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
   },
-  activityText: {
+  sectionText: {
     color: "#fff",
     marginTop: 20,
+    fontSize: 16,
+    fontFamily: "Poppins-Bold",
   },
   activityCardContainer: {
     flexDirection: "row",
@@ -215,10 +169,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     gap: 20,
-    marginTop: 20,
-  },
-  fitnessSpaceText: {
-    color: "#fff",
     marginTop: 20,
   },
 });

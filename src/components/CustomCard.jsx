@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "../constants/colors";
 
@@ -6,41 +7,69 @@ export const CustomCard = ({
   icon,
   goal,
   children,
-  message,
+  message = "",
   onPress,
-}) => (
-  <TouchableOpacity style={styles.activityCard} onPress={onPress}>
-    <View style={styles.activityCardContent}>
-      <Text
-        style={{ color: "#fff", fontSize: 12, fontFamily: "Poppins-SemiBold" }}
-      >
-        {label}
-      </Text>
-      <Image style={styles.iconImage} source={icon} />
-    </View>
+}) => {
+  const [showGoal, setShowGoal] = useState(false);
 
-    <View style={{ flex: 1, paddingHorizontal: 10 }}>{children}</View>
-    <View>
+  useEffect(() => {
+    // Check if the message does not start with "Please start" to determine if the goal should be shown
+    setShowGoal(!/^Please start/.test(message));
+  }, [message]);
+
+  return (
+    <TouchableOpacity style={styles.activityCard} onPress={onPress}>
+      <View style={styles.activityCardContent}>
+        <Text
+          style={{
+            color: "#fff",
+            fontSize: 12,
+            fontFamily: "Poppins-SemiBold",
+          }}
+        >
+          {label}
+        </Text>
+        <Image style={styles.iconImage} source={icon} />
+      </View>
       <Text
         style={{
           color: "#F8F8F8",
-          fontSize: 9,
-          paddingHorizontal: 14,
-          marginBottom: 10,
-          fontFamily: "Poppins-Regular",
+          textAlign: "center",
+          fontSize: message === `Please start ${label} to see data` ? 12 : 24,
+          fontFamily: "Poppins-Bold",
+          marginTop: 10,
+          paddingHorizontal: 20,
         }}
       >
-        <Text>{goal}</Text>
+        {message}
       </Text>
-    </View>
-  </TouchableOpacity>
-);
+      <View style={{ flex: 1, paddingHorizontal: 10 }}>{children}</View>
+
+      {/* Conditionally render goal text based on showGoal state */}
+      {showGoal && (
+        <View>
+          <Text
+            style={{
+              color: "#F8F8F8",
+              fontSize: 10,
+              paddingHorizontal: 14,
+              marginBottom: 10,
+              fontFamily: "Poppins-Regular",
+            }}
+          >
+            <Text>{goal}</Text>
+          </Text>
+        </View>
+      )}
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   activityCard: {
     flex: 1,
     backgroundColor: colors.bgColor,
-    height: 170,
+    height: 162,
     borderRadius: 14,
   },
   activityCardContent: {

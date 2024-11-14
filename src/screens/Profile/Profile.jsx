@@ -9,6 +9,9 @@ import StatCard from "../../components/StatCard";
 import { notificationsSettings, settings } from "../../utils/data";
 
 const Profile = ({ navigation }) => {
+  const height = "168cm";
+  const weight = "57kg";
+  const age = 20;
   return (
     <Container>
       <BackHeader title="Profile" showBackButton={true} />
@@ -17,9 +20,9 @@ const Profile = ({ navigation }) => {
           <Image source={images.dp} style={styles.profileImage} />
         </View>
         <View style={styles.statsContainer}>
-          <StatCard label="Height" value="168 cm" />
-          <StatCard label="Weight" value="57 kg" />
-          <StatCard label="Age" value="26" />
+          <StatCard label="Height" value={height} />
+          <StatCard label="Weight" value={weight} />
+          <StatCard label="Age" value={age} />
         </View>
 
         <Text style={styles.accountSettingsHeader}>Account Settings:</Text>

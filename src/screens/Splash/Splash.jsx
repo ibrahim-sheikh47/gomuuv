@@ -39,10 +39,15 @@ const Splash = () => {
           <CustomButton
             title="Join Now As User"
             onPress={() => {
-              navigation.navigate("Signup");
+              navigation.navigate("UserApp");
             }}
           />
-          <CustomButton title="Join Now As Trainer" onPress={() => {}} />
+          <CustomButton
+            title="Join Now As Trainer"
+            onPress={() => {
+              navigation.navigate("TrainerApp");
+            }}
+          />
           <View
             style={{
               flexDirection: "row",

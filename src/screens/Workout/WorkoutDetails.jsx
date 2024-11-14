@@ -74,11 +74,22 @@ const WorkoutDetails = () => {
       case "Day 4":
         return workout.days.day4 || [];
       default:
-        return []; // Return an empty array if the day is not found
+        return [];
     }
   };
 
   const selectedExercises = getExercisesForDay(selectedPeriod);
+
+  const handleStartWorkout = () => {
+    navigation.navigate("StartWorkout", {
+      title: workout.title,
+      image: workout.image,
+      time: workout.time,
+      exercises: selectedExercises,
+      level: workout.level,
+      calories: workout.calories,
+    });
+  };
 
   return (
     <Container cusStyles={{ padding: 0 }}>
@@ -164,7 +175,7 @@ const WorkoutDetails = () => {
       </ScrollView>
 
       <View style={{ padding: 16 }}>
-        <CustomButton title={"Start Workout"} />
+        <CustomButton title={"Start Workout"} onPress={handleStartWorkout} />
       </View>
     </Container>
   );
