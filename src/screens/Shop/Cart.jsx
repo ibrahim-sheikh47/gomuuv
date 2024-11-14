@@ -1,5 +1,12 @@
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+} from "react-native";
+import React, { useState } from "react";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
 import icons from "../../constants/icons";
@@ -10,13 +17,33 @@ import CustomButton from "../../components/CustomButton";
 const Cart = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { product, quantity } = route.params || {};
+  const { product } = route.params || {};
+  const [quantity, setQuantity] = useState(route.params?.quantity || 1);
 
+  // Calculate the subtotal based on the quantity
   const subtotal = product.amount * quantity;
   const shippingCharges = 10;
   const total = subtotal + shippingCharges;
 
-  // example shipping charges
+  const incrementQuantity = () => {
+    setQuantity((prevQuantity) => prevQuantity + 1);
+  };
+
+  const decrementQuantity = () => {
+    setQuantity((prevQuantity) => (prevQuantity > 1 ? prevQuantity - 1 : 1));
+  };
+
+  const handleCheckout = () => {
+    navigation.navigate("Checkout", {
+      productImage: product.productImage,
+      title: product.title,
+      quantity: quantity,
+      weight: product.weight,
+      price: subtotal.toFixed(2),
+    });
+  };
+
+  const price = subtotal.toFixed(2);
 
   if (!product) {
     return (
@@ -50,11 +77,35 @@ const Cart = () => {
           <View style={styles.productContainer}>
             <Image source={product.productImage} style={styles.image} />
             <View style={styles.productDetails}>
-              <Text style={styles.productTitle}>{product.title}</Text>
-              <Text style={styles.productQuantity}>
-                Weight: {product.weight}
-              </Text>
-              <Text style={styles.productQuantity}>Quantity: {quantity}</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "start",
+                }}
+              >
+                <View>
+                  <Text style={styles.productTitle}>{product.title}</Text>
+                  <Text style={styles.productQuantity}>
+                    Weight: {product.weight}
+                  </Text>
+                </View>
+                <View style={styles.quantityContainer}>
+                  <TouchableOpacity
+                    onPress={decrementQuantity}
+                    style={styles.quantityButton}
+                  >
+                    <Text style={styles.quantityButtonText}>-</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.quantity}>{quantity}</Text>
+                  <TouchableOpacity
+                    onPress={incrementQuantity}
+                    style={styles.quantityButton}
+                  >
+                    <Text style={styles.quantityButtonText}>+</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
               <View style={styles.priceContainer}>
                 <Text style={styles.productPrice}>${subtotal.toFixed(2)}</Text>
                 <Text style={styles.removeText}>Remove</Text>
@@ -80,10 +131,7 @@ const Cart = () => {
           </View>
         </View>
       </ScrollView>
-      <CustomButton
-        title={"Proceed to Checkout"}
-        onPress={() => navigation.navigate("Checkout", { product, quantity })}
-      />
+      <CustomButton title={"Proceed to Checkout"} onPress={handleCheckout} />
 
       <CustomButton
         title={"Continue Shopping"}
@@ -130,6 +178,28 @@ const styles = StyleSheet.create({
     color: "#AFAFAF",
     fontSize: 12,
     fontFamily: "Poppins-Regular",
+  },
+  quantityContainer: {
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  quantityButton: {
+    backgroundColor: "#2D2D2F",
+    borderRadius: 100,
+    width: 24,
+    height: 24,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  quantityButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily: "Poppins-Bold",
+  },
+  quantity: {
+    color: colors.green,
+    fontSize: 12,
+    fontFamily: "Poppins-Bold",
   },
   priceContainer: {
     flexDirection: "row",

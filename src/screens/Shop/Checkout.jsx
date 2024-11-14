@@ -1,4 +1,5 @@
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,12 +14,41 @@ import InputField from "../../components/InputField";
 import { colors } from "../../constants/colors";
 import CustomButton from "../../components/CustomButton";
 import CustomModal from "../../components/CustomModal";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const Checkout = () => {
   const navigation = useNavigation();
+  const route = useRoute();
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
+
+  const {
+    productImage,
+    title,
+    weight,
+    price: initialPrice,
+  } = route.params || {};
+
+  const [quantity, setQuantity] = useState(route.params?.quantity || 1);
+  const [price, setPrice] = useState(initialPrice);
+
+  const updatePrice = (newQuantity) => {
+    const updatedPrice = initialPrice * newQuantity;
+    setPrice(updatedPrice);
+  };
+
+  // Handle increment and decrement for quantity
+  const incrementQuantity = () => {
+    const newQuantity = quantity + 1;
+    setQuantity(newQuantity);
+    updatePrice(newQuantity);
+  };
+
+  const decrementQuantity = () => {
+    const newQuantity = quantity > 1 ? quantity - 1 : 1;
+    setQuantity(newQuantity);
+    updatePrice(newQuantity);
+  };
 
   // Consolidate all input values into a single state object
   const [formData, setFormData] = useState({
@@ -55,6 +85,8 @@ const Checkout = () => {
     }, 2000);
   };
 
+  const prices = price.toFixed(2);
+
   return (
     <Container>
       <Header
@@ -67,6 +99,43 @@ const Checkout = () => {
         <Text style={[styles.paymentMethodTitle, { marginTop: 10 }]}>
           Show Order Summary
         </Text>
+        <View style={styles.productContainer}>
+          <Image source={productImage} style={styles.image} />
+          <View style={styles.productDetails}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "start",
+              }}
+            >
+              <View>
+                <Text style={styles.productTitle}>{title}</Text>
+                <Text style={styles.productQuantity}>Weight: {weight}</Text>
+              </View>
+              <View style={styles.quantityContainer}>
+                <TouchableOpacity
+                  onPress={decrementQuantity}
+                  style={styles.quantityButton}
+                >
+                  <Text style={styles.quantityButtonText}>-</Text>
+                </TouchableOpacity>
+                <Text style={styles.quantity}>{quantity}</Text>
+                <TouchableOpacity
+                  onPress={incrementQuantity}
+                  style={styles.quantityButton}
+                >
+                  <Text style={styles.quantityButtonText}>+</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={styles.priceContainer}>
+              <Text style={styles.summaryText}>Price: ${prices}</Text>
+
+              <Text style={styles.removeText}>Remove</Text>
+            </View>
+          </View>
+        </View>
         <InputField
           label={"Contact"}
           placeholder={"Email"}
@@ -290,6 +359,74 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "Poppins-Regular",
     color: "#AFAFAF",
+  },
+  productContainer: {
+    flexDirection: "row",
+    marginVertical: 10,
+    backgroundColor: colors.bgColor,
+    borderRadius: 10,
+    padding: 10,
+  },
+  image: {
+    width: 170,
+    height: "100%",
+    borderRadius: 10,
+  },
+  productDetails: {
+    marginLeft: 10,
+    flex: 1,
+  },
+  productTitle: {
+    color: "#fff",
+    fontSize: 14,
+    fontFamily: "Poppins-Bold",
+  },
+  productQuantity: {
+    color: "#AFAFAF",
+    fontSize: 12,
+    fontFamily: "Poppins-Regular",
+  },
+  quantityContainer: {
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  quantityButton: {
+    backgroundColor: "#2D2D2F",
+    borderRadius: 100,
+    width: 24,
+    height: 24,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  quantityButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily: "Poppins-Bold",
+  },
+  quantity: {
+    color: colors.green,
+    fontSize: 12,
+    fontFamily: "Poppins-Bold",
+  },
+  priceContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+  },
+  productPrice: {
+    color: colors.green,
+    fontSize: 14,
+    fontFamily: "Poppins-Bold",
+  },
+  summaryText: {
+    color: "#f8f8f8",
+    fontSize: 12,
+    fontFamily: "Poppins-Regular",
+  },
+  removeText: {
+    color: "#AFAFAF",
+    fontSize: 12,
+    fontFamily: "Poppins-Regular",
   },
 });
 

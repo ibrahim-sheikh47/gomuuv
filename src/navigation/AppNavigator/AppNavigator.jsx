@@ -4,10 +4,6 @@ import Splash from "../../screens/Splash/Splash";
 import UserNavigator from "../UserNavigator/UserNavigator";
 import TrainerNavigator from "../TrainerNavigator/TrainerNavigator";
 import Login from "../../screens/Auth/Login/Login";
-import Signup from "../../screens/Auth/Signup/Signup";
-import ForgotPass from "../../screens/Auth/ForgotPass/ForgotPass";
-import Verify from "../../screens/Auth/ForgotPass/Verify";
-import NewPass from "../../screens/Auth/ForgotPass/NewPass";
 import TabNavigator from "../TabNavigator/TabNavigator";
 const Stack = createNativeStackNavigator();
 

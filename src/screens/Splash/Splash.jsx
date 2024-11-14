@@ -57,7 +57,7 @@ const Splash = () => {
             }}
           >
             <Text style={styles.signInText}>Already a member?</Text>
-            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+            <TouchableOpacity onPress={() => navigation.navigate("UserApp")}>
               <Text style={styles.signInLink}>Sign in</Text>
             </TouchableOpacity>
           </View>

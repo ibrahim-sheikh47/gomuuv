@@ -18,10 +18,23 @@
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.gomuuv.frontend"
     },
     "web": {
       "favicon": "./src/assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "043ba87c-8b62-411c-91de-265476701a7e"
+      }
+    },
+    "owner": "gomuuv",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/043ba87c-8b62-411c-91de-265476701a7e"
     }
   }
 }

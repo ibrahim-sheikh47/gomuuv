@@ -50,11 +50,18 @@ const ProductDetailScreen = ({ route }) => {
   };
   const handleCloseModal = () => {
     setModalVisible(false);
-    setTimeout(() => {
-      navigation.navigate("Cart", { product, quantity });
-    }, 1000);
+    navigation.navigate("Cart", { product, quantity });
   };
 
+  const handleCheckout = () => {
+    navigation.navigate("Checkout", {
+      productImage: product.productImage,
+      title: product.title,
+      quantity: quantity,
+      weight: product.weight,
+      price: product.amount,
+    });
+  };
   return (
     <Container>
       <Header
@@ -154,7 +161,7 @@ const ProductDetailScreen = ({ route }) => {
       </ScrollView>
       <CustomButton title={"Add to Cart"} onPress={handleAddToCart} />
       <CustomButton
-        onPress={() => navigation.navigate("Checkout")}
+        onPress={handleCheckout}
         title={"Proceed to Checkout"}
         style={{
           backgroundColor: "transparent",
