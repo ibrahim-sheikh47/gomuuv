@@ -33,8 +33,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     textAlign: "center",
-    fontFamily: "Poppins-SemiBold",
-    fontSize: 18,
+    fontFamily: "Poppins-Bold",
+    fontSize: 20,
     marginTop: 2,
   },
 });

@@ -1,9 +1,8 @@
 // NAVIGATION
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Splash from "../../screens/Splash/Splash";
+import Splash from "../../UserScreens/Splash/Splash";
 import UserNavigator from "../UserNavigator/UserNavigator";
 import TrainerNavigator from "../TrainerNavigator/TrainerNavigator";
-import Login from "../../screens/Auth/Login/Login";
 import TabNavigator from "../TabNavigator/TabNavigator";
 const Stack = createNativeStackNavigator();
 

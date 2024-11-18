@@ -3,12 +3,11 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Image, View, Text } from "react-native";
 import icons from "../../constants/icons"; // Import your icons
 import { colors } from "../../constants/colors"; // Import your color palette
-import HomeScreen from "../../screens/Home/Home";
-import Container from "../../components/Container";
-import ShopScreen from "../../screens/Shop/Shop";
-import NutritionScreen from "../../screens/Nutrition/Nutrition";
-import WorkoutScreen from "../../screens/Workout/Workout";
-import ChallengesScreen from "../../screens/Challenges/Challenges";
+import HomeScreen from "../../UserScreens/Home/Home";
+import ShopScreen from "../../UserScreens/Shop/Shop";
+import NutritionScreen from "../../UserScreens/Nutrition/Nutrition";
+import WorkoutScreen from "../../UserScreens/Workout/Workout";
+import ChallengesScreen from "../../UserScreens/Challenges/Challenges";
 
 const Tab = createBottomTabNavigator();
 

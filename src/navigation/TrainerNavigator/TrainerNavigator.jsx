@@ -1,17 +1,28 @@
 // NAVIGATION
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Login from "../../screens/Auth/Login/Login";
-import Signup from "../../screens/Auth/Signup/Signup";
 import { Text, View } from "react-native";
+import Container from "../../components/Container";
 const Stack = createNativeStackNavigator();
 
 export default function TrainerNavigator() {
   const Trainer = () => {
     return (
       <>
-        <View style={{ padding: 30 }}>
-          <Text>TRAINER</Text>
-        </View>
+        <Container>
+          <View
+            style={{ justifyContent: "center", alignItems: "center", flex: 1 }}
+          >
+            <Text
+              style={{
+                color: "white",
+                fontFamily: "Poppins-Bold",
+                fontSize: 20,
+              }}
+            >
+              TRAINER APP
+            </Text>
+          </View>
+        </Container>
       </>
     );
   };

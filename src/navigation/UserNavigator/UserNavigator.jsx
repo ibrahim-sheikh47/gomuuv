@@ -1,42 +1,42 @@
 // NAVIGATION
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Splash from "../../screens/Splash/Splash";
-import Login from "../../screens/Auth/Login/Login";
-import Signup from "../../screens/Auth/Signup/Signup";
-import ForgotPass from "../../screens/Auth/ForgotPass/ForgotPass";
-import Verify from "../../screens/Auth/ForgotPass/Verify";
-import NewPass from "../../screens/Auth/ForgotPass/NewPass";
-import Profile from "../../screens/Profile/Profile";
-import PersonalInfoScreen from "../../screens/Profile/PersonalInfo/PersonalInfo";
-import ChangePassScreen from "../../screens/Profile/ChangePass/ChangePass";
-import ManageNotifications from "../../screens/Profile/ManageNotifications/ManageNotifications";
+import Splash from "../../UserScreens/Splash/Splash";
+import Login from "../../UserScreens/Auth/Login/Login";
+import Signup from "../../UserScreens/Auth/Signup/Signup";
+import ForgotPass from "../../UserScreens/Auth/ForgotPass/ForgotPass";
+import Verify from "../../UserScreens/Auth/ForgotPass/Verify";
+import NewPass from "../../UserScreens/Auth/ForgotPass/NewPass";
+import Profile from "../../UserScreens/Profile/Profile";
+import PersonalInfoScreen from "../../UserScreens/Profile/PersonalInfo/PersonalInfo";
+import ChangePassScreen from "../../UserScreens/Profile/ChangePass/ChangePass";
+import ManageNotifications from "../../UserScreens/Profile/ManageNotifications/ManageNotifications";
 import TabNavigator from "../TabNavigator/TabNavigator";
-import ActivityScreen from "../../screens/Home/ActivityScreen";
-import ActivityDetailScreen from "../../screens/Home/ActivityDetailScreen";
-import FinishActivity from "../../screens/Home/FinishActivity";
-import ProductDetailScreen from "../../screens/Shop/ProductDetailScreen";
-import MealDetailScreen from "../../screens/Nutrition/MealDetailScreen";
-import ViewAllMeals from "../../screens/Nutrition/ViewAllMeals";
-import AddMeal from "../../screens/Nutrition/AddMeal";
-import AddMealDetails from "../../screens/Nutrition/AddMealDetails";
-import CreatePlan from "../../screens/Nutrition/CreatePlan";
-import SetWaterGoal from "../../screens/Nutrition/SetWaterGoal";
-import NutritionPlans from "../../screens/Nutrition/NutritionPlans";
-import FastingScreen from "../../screens/Workout/FastingScreen";
-import EquipmentDetails from "../../screens/Workout/EquipmentDetails";
-import NewWorkout from "../../screens/Workout/NewWorkout";
-import ViewAllWorkouts from "../../screens/Workout/ViewAllWorkouts";
-import WorkoutDetails from "../../screens/Workout/WorkoutDetails";
-import FastingPlans from "../../screens/Workout/FastingPlans";
-import FastingPlanDetail from "../../screens/Workout/FastingPlanDetail";
-import ChallengeDetail from "../../screens/Challenges/ChallengeDetail";
-import CategoryList from "../../screens/Challenges/CategoryList";
-import Cart from "../../screens/Shop/Cart";
-import SleepScreen from "../../screens/Sleep/Sleep";
-import Checkout from "../../screens/Shop/Checkout";
-import CompletedOrder from "../../screens/Shop/CompletedOrder";
-import StartWorkout from "../../screens/Workout/StartWorkout";
-import WorkoutCompleted from "../../screens/Workout/WorkoutCompleted";
+import ActivityScreen from "../../UserScreens/Home/ActivityScreen";
+import ActivityDetailScreen from "../../UserScreens/Home/ActivityDetailScreen";
+import FinishActivity from "../../UserScreens/Home/FinishActivity";
+import ProductDetailScreen from "../../UserScreens/Shop/ProductDetailScreen";
+import MealDetailScreen from "../../UserScreens/Nutrition/MealDetailScreen";
+import ViewAllMeals from "../../UserScreens/Nutrition/ViewAllMeals";
+import AddMeal from "../../UserScreens/Nutrition/AddMeal";
+import AddMealDetails from "../../UserScreens/Nutrition/AddMealDetails";
+import CreatePlan from "../../UserScreens/Nutrition/CreatePlan";
+import SetWaterGoal from "../../UserScreens/Nutrition/SetWaterGoal";
+import NutritionPlans from "../../UserScreens/Nutrition/NutritionPlans";
+import FastingScreen from "../../UserScreens/Workout/FastingScreen";
+import EquipmentDetails from "../../UserScreens/Workout/EquipmentDetails";
+import NewWorkout from "../../UserScreens/Workout/NewWorkout";
+import ViewAllWorkouts from "../../UserScreens/Workout/ViewAllWorkouts";
+import WorkoutDetails from "../../UserScreens/Workout/WorkoutDetails";
+import FastingPlans from "../../UserScreens/Workout/FastingPlans";
+import FastingPlanDetail from "../../UserScreens/Workout/FastingPlanDetail";
+import ChallengeDetail from "../../UserScreens/Challenges/ChallengeDetail";
+import CategoryList from "../../UserScreens/Challenges/CategoryList";
+import Cart from "../../UserScreens/Shop/Cart";
+import SleepScreen from "../../UserScreens/Sleep/Sleep";
+import Checkout from "../../UserScreens/Shop/Checkout";
+import CompletedOrder from "../../UserScreens/Shop/CompletedOrder";
+import StartWorkout from "../../UserScreens/Workout/StartWorkout";
+import WorkoutCompleted from "../../UserScreens/Workout/WorkoutCompleted";
 
 const Stack = createNativeStackNavigator();
 
@@ -48,8 +48,8 @@ export default function UserNavigator() {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Signup" component={Signup} />
+      <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="ForgotPass" component={ForgotPass} />
       <Stack.Screen name="Verify" component={Verify} />
       <Stack.Screen name="NewPass" component={NewPass} />
