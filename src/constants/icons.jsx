@@ -71,8 +71,36 @@ import pullUp from "../assets/icons/pullUp.png";
 import dumbbell from "../assets/icons/dumbbell.png";
 import jumpRope from "../assets/icons/jumpRope.png";
 import fasting from "../assets/icons/fasting.png";
+import editBtn from "../assets/icons/editBtn.png";
+import level from "../assets/icons/level.png";
+import calendar from "../assets/icons/calendar.png";
+import device from "../assets/icons/device.png";
+import endurance from "../assets/icons/endurance.png";
+import strength from "../assets/icons/strength.png";
+import healthWellness from "../assets/icons/healthWellness.png";
+import flexibility from "../assets/icons/flexibility.png";
+import habit from "../assets/icons/habit.png";
+import fastType from "../assets/icons/fastType.png";
+import progress from "../assets/icons/progress.png";
+import programSold from "../assets/icons/programSold.png";
+import revenue from "../assets/icons/revenue.png";
+import activeClients from "../assets/icons/activeClients.png";
 
 export default {
+  activeClients,
+  revenue,
+  programSold,
+  fastType,
+  progress,
+  endurance,
+  strength,
+  healthWellness,
+  flexibility,
+  habit,
+  calendar,
+  device,
+  level,
+  editBtn,
   treadmill,
   fasting,
   jumpRope,

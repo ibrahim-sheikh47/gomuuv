@@ -11,6 +11,7 @@ const Header = ({
   rightIcon2,
   rightIcon1Press,
   rightIcon2Press,
+  cusStyle,
 }) => {
   const navigation = useNavigation();
 
@@ -63,10 +64,18 @@ const Header = ({
         }}
       >
         {rightIcon1 && (
-          <IconButton iconSource={rightIcon1} onPress={rightIcon1Press} />
+          <IconButton
+            cusStyle={cusStyle}
+            iconSource={rightIcon1}
+            onPress={rightIcon1Press}
+          />
         )}
         {rightIcon2 && (
-          <IconButton iconSource={rightIcon2} onPress={rightIcon2Press} />
+          <IconButton
+            cusStyle={cusStyle}
+            iconSource={rightIcon2}
+            onPress={rightIcon2Press}
+          />
         )}
       </View>
     </View>

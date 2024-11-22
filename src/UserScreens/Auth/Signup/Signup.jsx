@@ -48,6 +48,7 @@ const Signup = () => {
     console.log("Weight:", form.weight, form.weightUnit);
     console.log("Email:", form.email);
     console.log("Password:", form.password);
+    navigation.navigate("TabNavigator");
   };
 
   return (
@@ -89,6 +90,7 @@ const Signup = () => {
                 onValueChange={(itemValue) =>
                   handleInputChange("heightUnit", itemValue)
                 }
+                dropdownIconColor={colors.green}
               >
                 <Picker.Item label="cm" value="cm" />
                 <Picker.Item label="ft" value="ft" />
@@ -113,6 +115,7 @@ const Signup = () => {
                 onValueChange={(itemValue) =>
                   handleInputChange("weightUnit", itemValue)
                 }
+                dropdownIconColor={colors.green}
               >
                 <Picker.Item label="kg" value="kg" />
                 <Picker.Item label="lb" value="lb" />

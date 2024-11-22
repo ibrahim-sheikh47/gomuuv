@@ -19,6 +19,7 @@ const CustomModal = ({
   children,
   width = 205,
   height = 222,
+  modalStyles,
 }) => {
   return (
     <Modal
@@ -28,14 +29,28 @@ const CustomModal = ({
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
-        <View style={[styles.modalContent, { width: width, height: height }]}>
-          <Image source={modalIcon} style={styles.modalIcon} />
+        <View
+          style={[
+            styles.modalContent,
+            { width: width, height: height },
+            modalStyles,
+          ]}
+        >
+          {/* Render icon only if modalIcon is provided */}
+          {modalIcon && <Image source={modalIcon} style={styles.modalIcon} />}
 
-          <Text style={[styles.modalText, textStyle]}>{modalText}</Text>
+          {/* Render modalText only if it exists */}
+          {modalText && (
+            <Text style={[styles.modalText, textStyle]}>{modalText}</Text>
+          )}
+
+          {/* Close button */}
           <TouchableOpacity style={styles.absolute} onPress={onClose}>
             <Image style={styles.closeBtn} source={icons.modalClose} />
           </TouchableOpacity>
-          {children}
+
+          {/* Render children only if they are provided */}
+          {children && <View>{children}</View>}
         </View>
       </View>
     </Modal>

@@ -2,30 +2,19 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Text, View } from "react-native";
 import Container from "../../components/Container";
+import TrainerSignup from "../../TrainerScreens/Auth/TrainerSignup/TrainerSignup";
+import TrainerHome from "../../TrainerScreens/TrainerHome/TrainerHome";
+import WorkoutProgramsList from "../../TrainerScreens/TrainerHome/WorkoutProgramsList";
+import WorkoutProgramDetail from "../../TrainerScreens/TrainerHome/WorkoutProgramDetail";
+import CreateProgram from "../../TrainerScreens/TrainerHome/CreateProgram";
+import TrainerProfile from "../../TrainerScreens/TrainerProfile/TrainerProfile";
+import PersonalInfoScreen from "../../UserScreens/Profile/PersonalInfo/PersonalInfo";
+import ChangePassScreen from "../../UserScreens/Profile/ChangePass/ChangePass";
+import TrainerInfo from "../../TrainerScreens/TrainerHome/TrainerInfo";
+import TrainerChangePass from "../../TrainerScreens/TrainerHome/TrainerChangePass";
 const Stack = createNativeStackNavigator();
 
 export default function TrainerNavigator() {
-  const Trainer = () => {
-    return (
-      <>
-        <Container>
-          <View
-            style={{ justifyContent: "center", alignItems: "center", flex: 1 }}
-          >
-            <Text
-              style={{
-                color: "white",
-                fontFamily: "Poppins-Bold",
-                fontSize: 20,
-              }}
-            >
-              TRAINER APP
-            </Text>
-          </View>
-        </Container>
-      </>
-    );
-  };
   return (
     <Stack.Navigator
       screenOptions={{
@@ -33,7 +22,21 @@ export default function TrainerNavigator() {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="Trainer" component={Trainer} />
+      <Stack.Screen name="TrainerSignup" component={TrainerSignup} />
+      <Stack.Screen name="TrainerHome" component={TrainerHome} />
+      <Stack.Screen
+        name="WorkoutProgramsList"
+        component={WorkoutProgramsList}
+      />
+      <Stack.Screen
+        name="WorkoutProgramDetail"
+        component={WorkoutProgramDetail}
+      />
+      <Stack.Screen name="CreateProgram" component={CreateProgram} />
+
+      <Stack.Screen name="TrainerProfile" component={TrainerProfile} />
+      <Stack.Screen name="PersonalInfoScreen" component={TrainerInfo} />
+      <Stack.Screen name="ChangePassScreen" component={TrainerChangePass} />
     </Stack.Navigator>
   );
 }

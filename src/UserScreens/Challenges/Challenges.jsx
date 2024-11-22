@@ -18,6 +18,7 @@ import { challenges } from "../../utils/data";
 import CustomButton from "../../components/CustomButton";
 import GoalModal from "../../components/GoalModal";
 import CustomModal from "../../components/CustomModal";
+import { ProgressBar } from "../../components/ProgressBar";
 
 const ChallengesScreen = () => {
   const [activeTab, setActiveTab] = useState("Challenges");
@@ -49,6 +50,14 @@ const ChallengesScreen = () => {
 
   const handleCardPress = (challenge) => {
     navigation.navigate("ChallengeDetail", { challenge });
+  };
+  const categoryIcons = {
+    Endurance: icons.endurance,
+    Strength: icons.strength,
+    Flexibility: icons.flexibility,
+    "Health & Wellness": icons.healthWellness,
+    "Lifestyle & Habit": icons.habit,
+    "Skills Based": icons.challenges,
   };
 
   const renderChallengeCard = ({ item: challenge }) => (
@@ -101,9 +110,11 @@ const ChallengesScreen = () => {
             <View style={styles.cardHeader}>
               <Text style={styles.cardSubtitle}>{challenge.cardSubtitle}</Text>
               <Text style={[styles.cardSubtitle, { color: colors.green }]}>
-                {challenge.percent}
+                {challenge.percent} %
               </Text>
             </View>
+
+            <ProgressBar progress={challenge.percent} />
             <Text style={styles.cardSubtitle}>
               {challenge.startDate} - {challenge.endDate}
             </Text>
@@ -134,7 +145,6 @@ const ChallengesScreen = () => {
       <Text style={styles.sectionTitle}>Your Progress</Text>
       <View
         style={{
-          height: 104,
           backgroundColor: colors.bgColor,
           borderRadius: 15,
         }}
@@ -252,7 +262,7 @@ const ChallengesScreen = () => {
             style={styles.card}
             onPress={() => handleCategoryPress(text)} // Navigate with selected category
           >
-            <Image source={icons.challenges} style={styles.icon} />
+            <Image source={categoryIcons[text]} style={styles.icon} />
             <Text style={styles.cardText}>{text}</Text>
           </TouchableOpacity>
         ))}
@@ -322,7 +332,6 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Bold",
   },
   challengeCard: {
-    height: 284,
     backgroundColor: colors.bgColor,
     borderRadius: 15,
     marginBottom: 20,

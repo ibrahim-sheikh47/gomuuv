@@ -39,11 +39,11 @@ const Cart = () => {
       title: product.title,
       quantity: quantity,
       weight: product.weight,
-      price: subtotal.toFixed(2),
+      price: prices,
     });
   };
 
-  const price = subtotal.toFixed(2);
+  const prices = subtotal.toFixed(2);
 
   if (!product) {
     return (

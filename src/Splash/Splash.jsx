@@ -9,11 +9,11 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import Constants from "expo-constants";
-import images from "../../constants/images";
-import icons from "../../constants/icons";
-import { colors } from "../../constants/colors";
+import images from "../constants/images";
+import icons from "../constants/icons";
+import { colors } from "../constants/colors";
 import { useNavigation } from "@react-navigation/native";
-import CustomButton from "../../components/CustomButton";
+import CustomButton from "../components/CustomButton";
 
 const Splash = () => {
   const navigation = useNavigation();

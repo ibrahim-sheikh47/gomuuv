@@ -85,8 +85,6 @@ const Checkout = () => {
     }, 2000);
   };
 
-  const prices = price.toFixed(2);
-
   return (
     <Container>
       <Header
@@ -130,7 +128,7 @@ const Checkout = () => {
               </View>
             </View>
             <View style={styles.priceContainer}>
-              <Text style={styles.summaryText}>Price: ${prices}</Text>
+              <Text style={styles.summaryText}>Price: ${price}</Text>
 
               <Text style={styles.removeText}>Remove</Text>
             </View>

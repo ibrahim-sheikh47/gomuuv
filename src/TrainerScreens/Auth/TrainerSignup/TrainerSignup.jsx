@@ -15,20 +15,13 @@ import { SocialButton } from "../../../components/SocialButton";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
 import CustomButton from "../../../components/CustomButton";
-import { Picker } from "@react-native-picker/picker"; // Import Picker
 
-const Signup = () => {
+const TrainerSignup = () => {
   const navigation = useNavigation();
 
   // Single state for all form fields
   const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    height: "",
-    heightUnit: "cm", // Default unit
-    weight: "",
-    age: "",
-    weightUnit: "kg", // Default unit
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -43,11 +36,10 @@ const Signup = () => {
 
   const handleSignup = () => {
     // Add your signup logic here
-    console.log("Name:", form.firstName, form.lastName);
-    console.log("Height:", form.height, form.heightUnit);
-    console.log("Weight:", form.weight, form.weightUnit);
+    console.log("Name:", form.name);
     console.log("Email:", form.email);
     console.log("Password:", form.password);
+    navigation.navigate("TrainerHome");
   };
 
   return (
@@ -61,71 +53,9 @@ const Signup = () => {
         <View style={styles.inputContainer}>
           <InputField
             label="First Name"
-            value={form.firstName}
-            onChangeText={(value) => handleInputChange("firstName", value)}
-            placeholder="Enter your first name"
-          />
-          <InputField
-            label="Last Name"
-            value={form.lastName}
-            onChangeText={(value) => handleInputChange("lastName", value)}
-            placeholder="Enter your last name"
-          />
-
-          <View style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <InputField
-                label="Height"
-                value={form.height}
-                onChangeText={(value) => handleInputChange("height", value)}
-                placeholder="Enter your height"
-                keyboardType="numeric" // Ensure only numbers are entered
-              />
-            </View>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={form.heightUnit}
-                style={styles.picker}
-                onValueChange={(itemValue) =>
-                  handleInputChange("heightUnit", itemValue)
-                }
-              >
-                <Picker.Item label="cm" value="cm" />
-                <Picker.Item label="ft" value="ft" />
-              </Picker>
-            </View>
-          </View>
-
-          <View style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <InputField
-                label="Weight"
-                value={form.weight}
-                onChangeText={(value) => handleInputChange("weight", value)}
-                placeholder="Enter your weight"
-                keyboardType="numeric" // Ensure only numbers are entered
-              />
-            </View>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={form.weightUnit}
-                style={styles.picker}
-                onValueChange={(itemValue) =>
-                  handleInputChange("weightUnit", itemValue)
-                }
-              >
-                <Picker.Item label="kg" value="kg" />
-                <Picker.Item label="lb" value="lb" />
-              </Picker>
-            </View>
-          </View>
-
-          <InputField
-            label="Age"
-            value={form.age}
-            onChangeText={(value) => handleInputChange("age", value)}
-            placeholder="Enter your age"
-            keyboardType="numeric" // Ensure only numbers are entered
+            value={form.name}
+            onChangeText={(value) => handleInputChange("name", value)}
+            placeholder="Enter your name"
           />
           <InputField
             label="Email"
@@ -185,32 +115,6 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 40,
   },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 10,
-    gap: 10,
-  },
-  pickerContainer: {
-    height: 50,
-    width: 100,
-    marginTop: 30,
-    borderRadius: 10,
-    backgroundColor: "#1A1919", // Match the input field background
-  },
-  picker: {
-    height: "100%",
-    width: "100%",
-    color: "#fff",
-  },
-  loginButton: {
-    backgroundColor: colors.green,
-    height: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-    marginTop: 50,
-  },
   dividerContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -252,4 +156,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Signup;
+export default TrainerSignup;

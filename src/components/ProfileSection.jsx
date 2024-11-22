@@ -1,18 +1,13 @@
 // ProfileSection.js
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import { colors } from "../constants/colors";
 
-const ProfileSection = ({ userName, imageSource }) => {
-  const navigation = useNavigation();
-
+const ProfileSection = ({ userName, imageSource, onPress }) => {
   return (
     <TouchableOpacity
       style={{ flexDirection: "row", alignItems: "center", gap: 12 }}
-      onPress={() => {
-        navigation.navigate("Profile");
-      }}
+      onPress={onPress}
     >
       <Image
         source={imageSource}

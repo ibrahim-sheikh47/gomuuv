@@ -27,7 +27,13 @@ const HomeScreen = () => {
     <Container>
       <ScrollView onScroll={handleInteraction}>
         <View style={styles.header}>
-          <ProfileSection userName="*username here*" imageSource={images.dp} />
+          <ProfileSection
+            userName="*username here*"
+            imageSource={images.dp}
+            onPress={() => {
+              navigation.navigate("Profile");
+            }}
+          />
           <View style={styles.iconButtonContainer}>
             <IconButton iconSource={icons.search} />
             <IconButton iconSource={icons.shop} />
@@ -50,6 +56,7 @@ const HomeScreen = () => {
                 handleInteraction();
                 navigation.navigate("ActivityScreen", {
                   activityType: activity,
+                  activityName: activity,
                 });
               }}
             />

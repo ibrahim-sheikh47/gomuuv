@@ -27,13 +27,19 @@ const FinishActivity = () => {
             icon={icons.timePerMile}
             message="8m:40s/mi"
           />
-          <CustomCard label="Total Time" icon={icons.time} message={time} />
+          <CustomCard
+            label="Total Time"
+            icon={icons.time}
+            message={time}
+            goal={"Goal: 30 min daily"}
+          />
         </View>
         <View style={styles.gridContainer}>
           <CustomCard label="Pace" icon={icons.pace} message="1.1mi/hr" />
           <CustomCard
             label="Distance"
             icon={icons.distance}
+            goal={"Goal: 2mi daily"}
             message={`${distance} ${distanceUnit}`}
           />
         </View>

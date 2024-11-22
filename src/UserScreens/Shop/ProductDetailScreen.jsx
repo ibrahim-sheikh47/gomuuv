@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     color: "#fff",
-    fontFamily: "Poppins-Bold",
+    fontFamily: "Poppins-SemiBold",
     marginVertical: 10,
   },
   description: {
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
   detailHeading: {
     fontSize: 14,
     color: "#fff",
-    fontFamily: "Poppins-Bold",
+    fontFamily: "Poppins-SemiBold",
   },
   detailText: {
     fontSize: 12,

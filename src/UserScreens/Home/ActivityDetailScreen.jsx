@@ -1,8 +1,20 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import React, { useState, useRef } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  PanResponder,
+  Animated,
+} from "react-native";
+import {
+  useNavigation,
+  useRoute,
+  useFocusEffect,
+} from "@react-navigation/native";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
-import { useNavigation, useRoute } from "@react-navigation/native";
 import Selectable from "../../components/Selectable";
 import { colors } from "../../constants/colors";
 import icons from "../../constants/icons";
@@ -17,6 +29,45 @@ const ActivityDetailScreen = () => {
   const duration = ["Today", "Weekly", "Monthly", "Quarterly", "Yearly"];
   const [selectedPeriod, setSelectedPeriod] = useState(null);
 
+  const pan = useRef(new Animated.ValueXY()).current;
+  const buttonWidth = 300; // Adjust this to match your button width
+  const dragThreshold = buttonWidth * 0.7; // Trigger navigation when dragged 70% of the button width
+
+  // Reset position when the screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      Animated.timing(pan, {
+        toValue: { x: 0, y: 0 },
+        duration: 0,
+        useNativeDriver: false,
+      }).start();
+    }, [])
+  );
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: Animated.event([null, { dx: pan.x }], {
+        useNativeDriver: false,
+      }),
+      onPanResponderRelease: (_, gestureState) => {
+        if ((gestureState.dx = dragThreshold)) {
+          navigation.navigate("FinishActivity", {
+            activityName: activityName,
+            distance: distance,
+            time: time,
+            distanceUnit: distanceUnit,
+          });
+        } else {
+          Animated.spring(pan, {
+            toValue: { x: 0, y: 0 },
+            useNativeDriver: false,
+          }).start();
+        }
+      },
+    })
+  ).current;
+
   return (
     <Container>
       <Header title={`${activityName}`} showBackButton={true} />
@@ -30,7 +81,12 @@ const ActivityDetailScreen = () => {
 
         <View style={styles.content}>
           <Text style={styles.title}>Your Insights</Text>
-          <TouchableOpacity style={styles.goalButton}>
+          <TouchableOpacity
+            style={styles.goalButton}
+            onPress={() =>
+              navigation.navigate("ActivityScreen", { activityName })
+            }
+          >
             <Image source={icons.goal} style={styles.goalIcon} />
             <Text style={styles.goalText}>Set Goal</Text>
           </TouchableOpacity>
@@ -64,24 +120,19 @@ const ActivityDetailScreen = () => {
           />
         </View>
       </View>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          navigation.navigate("FinishActivity", {
-            activityName: activityName,
-            distance: distance, // Pass distance
-            time: time, // Pass time
-            distanceUnit: distanceUnit,
-          })
-        }
-      >
-        <Image source={images.locationBg} style={{ height: 48, width: 48 }} />
+      <View style={styles.button}>
+        <Animated.View
+          style={[pan.getLayout(), { height: 48, width: 48 }]}
+          {...panResponder.panHandlers}
+        >
+          <Image source={images.locationBg} style={{ height: 48, width: 48 }} />
+        </Animated.View>
         <Text style={styles.buttonText}>Start {`${activityName}`}</Text>
         <Image
           source={icons.slideArrows}
           style={{ width: 35, height: 12, marginRight: 10 }}
         />
-      </TouchableOpacity>
+      </View>
     </Container>
   );
 };
@@ -105,7 +156,7 @@ const styles = StyleSheet.create({
     height: 28,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 10,
+    borderRadius: 7,
     flexDirection: "row",
     gap: 7,
   },
@@ -133,6 +184,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
     borderRadius: 10,
+    overflow: "hidden", // Ensure image stays within the button
   },
   buttonText: {
     textAlign: "center",

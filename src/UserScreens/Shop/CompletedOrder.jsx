@@ -23,7 +23,9 @@ const CompletedOrder = () => {
 
       <View style={{ marginTop: 30 }}>
         <Text style={styles.mainText}>Thanks for your order</Text>
-        <Text style={styles.mainText}>Estimated Delivery</Text>
+        <Text style={[styles.mainText, { marginTop: 50 }]}>
+          Estimated Delivery
+        </Text>
 
         <View style={{ marginTop: 20 }}>
           {steps.map((step, index) => (

@@ -255,12 +255,12 @@ const FastingScreen = () => {
               <StatsHistoryCard
                 label={"Weekly Progress"}
                 value={10}
-                icon={icons.fasting}
+                icon={icons.progress}
               />
               <StatsHistoryCard
                 label={"Longest Fast"}
                 value={10}
-                icon={icons.fasting}
+                icon={icons.progress}
               />
             </View>
             <View
@@ -274,12 +274,12 @@ const FastingScreen = () => {
               <StatsHistoryCard
                 label={"Water Intake"}
                 value={10}
-                icon={icons.fasting}
+                icon={icons.glass}
               />
               <StatsHistoryCard
                 label={"Fast Type"}
                 value={10}
-                icon={icons.fasting}
+                icon={icons.fastType}
               />
             </View>
             <Text

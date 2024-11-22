@@ -7,10 +7,11 @@ import Header from "../../components/Header";
 import icons from "../../constants/icons";
 import InputField from "../../components/InputField";
 import CustomButton from "../../components/CustomButton";
+import { colors } from "../../constants/colors";
 
 const ActivityScreen = () => {
   const route = useRoute();
-  const { activityType } = route.params;
+  const { activityType, activityName } = route.params;
   const navigation = useNavigation();
   const [formValues, setFormValues] = useState({
     pace: "",
@@ -38,7 +39,7 @@ const ActivityScreen = () => {
 
   return (
     <Container>
-      <Header title={activityType} showBackButton={true} />
+      <Header title={activityName} showBackButton={true} />
 
       <ScrollView>
         <Text
@@ -49,7 +50,7 @@ const ActivityScreen = () => {
             fontFamily: "Poppins-Bold",
           }}
         >
-          Set Your {activityType} Goal
+          Set Your Goal
         </Text>
 
         <View style={styles.row}>
@@ -61,6 +62,7 @@ const ActivityScreen = () => {
               onChangeText={(value) => handleInputChange("timeHours", value)}
               keyboardType="numeric"
             />
+            <Image style={styles.editIcon} source={icons.edit} />
           </View>
           <Image
             source={icons.colon}
@@ -74,6 +76,7 @@ const ActivityScreen = () => {
               onChangeText={(value) => handleInputChange("timeMinutes", value)}
               keyboardType="numeric"
             />
+            <Image style={styles.editIcon} source={icons.edit} />
           </View>
         </View>
 
@@ -86,6 +89,7 @@ const ActivityScreen = () => {
               placeholder="Enter distance"
               keyboardType="numeric"
             />
+            <Image style={styles.editIcon} source={icons.edit} />
           </View>
           <View style={styles.pickerContainer}>
             <Picker
@@ -94,6 +98,7 @@ const ActivityScreen = () => {
               onValueChange={(itemValue) =>
                 handleInputChange("distanceUnit", itemValue)
               }
+              dropdownIconColor={colors.green}
             >
               <Picker.Item label="mi" value="mi" />
               <Picker.Item label="in" value="in" />
@@ -126,6 +131,14 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
     color: "#fff",
+  },
+  editIcon: {
+    position: "absolute",
+    tintColor: colors.green,
+    right: 15,
+    bottom: 30,
+    width: 12,
+    height: 12,
   },
 });
 

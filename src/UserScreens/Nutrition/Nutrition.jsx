@@ -53,8 +53,12 @@ const NutritionScreen = () => {
   const waterProgress = (consumedGlasses / totalGlasses) * 100;
 
   const handleAddWater = () => {
-    // Allow consumed glasses to increase without restriction
-    setConsumedGlasses((prevConsumed) => prevConsumed + 1);
+    // Check if consumed glasses have reached the total glasses limit
+    if (consumedGlasses < totalGlasses) {
+      setConsumedGlasses((prevConsumed) => prevConsumed + 1);
+    } else {
+      alert("You have reached your daily water intake goal!");
+    }
   };
 
   const handleSetGoal = () => {
@@ -128,8 +132,9 @@ const NutritionScreen = () => {
         {/* Water Intake Section */}
         <View style={styles.intakeHeader}>
           <Text style={styles.title}>Water Tracker</Text>
-          <TouchableOpacity onPress={handleSetGoal}>
-            <Text style={styles.greenText}>Set Goal</Text>
+          <TouchableOpacity style={styles.goalButton} onPress={handleSetGoal}>
+            <Image source={icons.goal} style={styles.goalIcon} />
+            <Text style={styles.goalText}>Set Goal</Text>
           </TouchableOpacity>
         </View>
         <WaterIntake
@@ -331,6 +336,25 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-SemiBold",
     color: colors.green,
     fontSize: 12,
+  },
+  goalButton: {
+    backgroundColor: colors.green,
+    width: 92,
+    height: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 7,
+    flexDirection: "row",
+    gap: 7,
+  },
+  goalIcon: {
+    width: 17,
+    height: 17,
+  },
+  goalText: {
+    fontSize: 12,
+    marginTop: 2,
+    fontFamily: "Poppins-SemiBold",
   },
   glassIcon: {
     width: 24,

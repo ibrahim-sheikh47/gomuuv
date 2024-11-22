@@ -1,7 +1,5 @@
 // NAVIGATION
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Splash from "../../UserScreens/Splash/Splash";
-import Login from "../../UserScreens/Auth/Login/Login";
 import Signup from "../../UserScreens/Auth/Signup/Signup";
 import ForgotPass from "../../UserScreens/Auth/ForgotPass/ForgotPass";
 import Verify from "../../UserScreens/Auth/ForgotPass/Verify";
@@ -37,6 +35,9 @@ import Checkout from "../../UserScreens/Shop/Checkout";
 import CompletedOrder from "../../UserScreens/Shop/CompletedOrder";
 import StartWorkout from "../../UserScreens/Workout/StartWorkout";
 import WorkoutCompleted from "../../UserScreens/Workout/WorkoutCompleted";
+import AddDevice from "../../UserScreens/Profile/Device/AddDevice";
+import Device from "../../UserScreens/Profile/Device/Device";
+import Login from "../../UserScreens/Auth/Login/Login";
 
 const Stack = createNativeStackNavigator();
 
@@ -53,9 +54,13 @@ export default function UserNavigator() {
       <Stack.Screen name="ForgotPass" component={ForgotPass} />
       <Stack.Screen name="Verify" component={Verify} />
       <Stack.Screen name="NewPass" component={NewPass} />
+
       <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="PersonalInfoScreen" component={PersonalInfoScreen} />
       <Stack.Screen name="ChangePassScreen" component={ChangePassScreen} />
+      <Stack.Screen name="Device" component={Device} />
+      <Stack.Screen name="AddDevice" component={AddDevice} />
+
       <Stack.Screen name="TabNavigator" component={TabNavigator} />
       <Stack.Screen name="ActivityScreen" component={ActivityScreen} />
       <Stack.Screen name="FinishActivity" component={FinishActivity} />

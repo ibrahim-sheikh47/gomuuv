@@ -33,7 +33,7 @@ export const notificationsSettings = [
   {
     icon: icons.devices,
     text: "Manage Connected Devices",
-    route: "SyncSecureDataScreen",
+    route: "Device",
   },
 ];
 
@@ -644,7 +644,7 @@ export const challenges = [
     time: "25m",
     equipment: "Pull-up Bar",
     type: "enroll",
-    percent: "40%",
+    percent: 40,
     startDate: "03 Sept",
     endDate: "03 Oct",
     days: {

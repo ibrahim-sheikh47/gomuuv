@@ -1,9 +1,10 @@
 // NAVIGATION
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Splash from "../../UserScreens/Splash/Splash";
+import Splash from "../../Splash/Splash";
 import UserNavigator from "../UserNavigator/UserNavigator";
 import TrainerNavigator from "../TrainerNavigator/TrainerNavigator";
 import TabNavigator from "../TabNavigator/TabNavigator";
+import Login from "../../UserScreens/Auth/Login/Login";
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
@@ -17,7 +18,6 @@ export default function AppNavigator() {
       <Stack.Screen name="Splash" component={Splash} />
       <Stack.Screen name="UserApp" component={UserNavigator} />
       <Stack.Screen name="TrainerApp" component={TrainerNavigator} />
-      <Stack.Screen name="TabNavigator" component={TabNavigator} />
     </Stack.Navigator>
   );
 }

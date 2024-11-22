@@ -1,19 +1,20 @@
 import { StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
-import Container from "../../../components/Container";
-import BackHeader from "../../../components/BackHeader";
-import InputField from "../../../components/InputField";
-import CustomButton from "../../../components/CustomButton";
-import Loader from "../../../components/Loader";
+import BackHeader from "../../components/BackHeader";
+import InputField from "../../components/InputField";
+import CustomButton from "../../components/CustomButton";
+import Loader from "../../components/Loader";
 import { useNavigation } from "@react-navigation/native";
+import Container from "../../components/Container";
 
-const NewPass = () => {
+const TrainerChangePass = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
 
   // Single state object to manage inputs
   const [formData, setFormData] = useState({
-    password: "",
+    email: "henry.irh@gmail.com",
+    newPassword: "",
     confirmPassword: "",
   });
 
@@ -25,9 +26,9 @@ const NewPass = () => {
   };
 
   const handleSaveChange = () => {
-    const { password, confirmPassword } = formData;
+    const { newPassword, confirmPassword } = formData;
 
-    if (password === confirmPassword) {
+    if (newPassword === confirmPassword) {
       // Proceed to the next step, such as navigation to Verify
       setLoading(true);
       setTimeout(() => {
@@ -42,29 +43,35 @@ const NewPass = () => {
 
   return (
     <Container>
-      <BackHeader title="New Password" showBackButton={true} />
+      <BackHeader title="Change Password" showBackButton={true} />
       <View style={{ marginTop: 30, flex: 1 }}>
         <InputField
-          label="New Password"
-          value={formData.password}
-          onChangeText={(value) => handleInputChange("password", value)}
+          label={"Email"}
+          value={formData.email}
+          onChangeText={(value) => handleInputChange("email", value)}
+        />
+        <InputField
+          label={"New Password"}
+          value={formData.newPassword}
+          onChangeText={(value) => handleInputChange("newPassword", value)}
           secureTextEntry={true}
           placeholder="Enter new password"
         />
         <InputField
-          label="Confirm Password"
           value={formData.confirmPassword}
+          label={"Confirm Password"}
           onChangeText={(value) => handleInputChange("confirmPassword", value)}
           secureTextEntry={true}
           placeholder="Confirm new password"
         />
       </View>
+
       <CustomButton title="Save Changes" onPress={handleSaveChange} />
       <Loader isLoading={loading} />
     </Container>
   );
 };
 
-export default NewPass;
+export default TrainerChangePass;
 
 const styles = StyleSheet.create({});

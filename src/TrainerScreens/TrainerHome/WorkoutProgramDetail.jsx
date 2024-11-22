@@ -1,20 +1,14 @@
-import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
 import React, { useState } from "react";
-import { useRoute } from "@react-navigation/native"; // Get route params
+import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
+import { colors } from "../../constants/colors";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
 import icons from "../../constants/icons";
-import { colors } from "../../constants/colors";
 import Selectable from "../../components/Selectable";
-import CustomButton from "../../components/CustomButton";
 
-const ChallengeDetail = () => {
-  const route = useRoute();
-  const { challenge } = route.params; // Access challenge data from params
-
+const WorkoutProgramDetail = ({ route }) => {
+  const { program } = route.params;
   const [selectedPeriod, setSelectedPeriod] = useState("Day 1");
-
-  console.log(challenge);
   const renderDayExercise = (dayExercises) => {
     return dayExercises.map((exercise, index) => (
       <View key={index} style={styles.exerciseContainer}>
@@ -27,33 +21,48 @@ const ChallengeDetail = () => {
   const getExercisesForDay = (day) => {
     switch (day) {
       case "Day 1":
-        return challenge.days.day1 || [];
+        return program.days.day1 || [];
       case "Day 2":
-        return challenge.days.day2 || [];
+        return program.days.day2 || [];
       case "Day 3":
-        return challenge.days.day3 || [];
+        return program.days.day3 || [];
       case "Day 4":
-        return challenge.days.day4 || [];
+        return program.days.day4 || [];
       default:
         return []; // Return an empty array if the day is not found
     }
   };
 
   const selectedExercises = getExercisesForDay(selectedPeriod);
+
   return (
     <Container>
       <Header
-        title={"Challenges & Goals"}
+        title={"Workout Program"}
         showBackButton={true}
-        rightIcon1={icons.search}
+        rightIcon1={icons.editBtn}
+        cusStyle={{ width: 58, height: 32 }}
       />
-      <ScrollView>
-        <Image source={challenge.image} style={styles.challengeImage} />
-        <Text style={styles.title}>{challenge.title}</Text>
-        <Text style={styles.cardSubtitle}>{challenge.cardSubtitle}</Text>
+      <ScrollView style={{ marginTop: 20 }}>
+        <Image source={program.image} style={styles.image} />
+        <View style={styles.content}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={styles.title}>{program.title}</Text>
+            <Text style={styles.price}>{program.price}</Text>
+          </View>
 
-        <Text style={styles.sectionTitle}>Description</Text>
-        <Text style={styles.description}>{challenge.description}</Text>
+          <Text style={styles.description}>{program.subtitle}</Text>
+
+          <Text style={styles.sectionTitle}>Description</Text>
+
+          <Text style={styles.cardDescription}>{program.description}</Text>
+        </View>
 
         <View style={styles.infoBox}>
           <View style={styles.row}>
@@ -62,10 +71,10 @@ const ChallengeDetail = () => {
                 <Text style={styles.label}>{label}</Text>
                 <Text style={styles.value}>
                   {label === "Exercises"
-                    ? challenge.exercises + " Exercises"
+                    ? program.exercises + " Exercises"
                     : label === "Calories"
-                    ? challenge.calories + " kcal"
-                    : challenge.time + ""}
+                    ? program.calories + " kcal"
+                    : program.time + " mins"}
                 </Text>
               </View>
             ))}
@@ -76,9 +85,7 @@ const ChallengeDetail = () => {
               <View style={styles.detailItem} key={index}>
                 <Text style={styles.label}>{label}</Text>
                 <Text style={styles.value}>
-                  {label === "Equipment"
-                    ? challenge.equipment
-                    : challenge.level}
+                  {label === "Equipment" ? program.equipment : program.level}
                 </Text>
               </View>
             ))}
@@ -94,35 +101,31 @@ const ChallengeDetail = () => {
         />
         {selectedExercises.length > 0 && renderDayExercise(selectedExercises)}
       </ScrollView>
-      {challenge.type === "enroll" && (
-        <CustomButton title={"Continue Challenge"} style={{ marginTop: 20 }} />
-      )}
     </Container>
   );
 };
 
 const styles = StyleSheet.create({
-  challengeImage: {
+  image: {
     width: "100%",
-    height: 175,
+    height: 250,
     borderRadius: 10,
-    marginTop: 20,
+    borderColor: colors.bgColor,
+    borderWidth: 2,
+  },
+  content: {
+    marginVertical: 20,
   },
   title: {
     fontSize: 16,
     fontFamily: "Poppins-SemiBold",
     color: colors.green,
-    marginTop: 10,
+    width: 200,
   },
-  cardSubtitle: {
-    fontSize: 14,
-    color: "#F8F8F8",
-    marginVertical: 5,
-  },
-  level: {
-    fontSize: 18,
-    color: "#F8F8F8",
+  description: {
+    fontSize: 12,
     fontFamily: "Poppins-Regular",
+    color: "#F8F8F8",
   },
   sectionTitle: {
     fontSize: 16,
@@ -130,11 +133,30 @@ const styles = StyleSheet.create({
     color: "white",
     marginTop: 20,
   },
-  description: {
-    color: "#AFAFAF",
-    marginTop: 10,
+  detailRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 5,
+  },
+  detailIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 10,
+  },
+  detailText: {
+    fontSize: 14,
     fontFamily: "Poppins-Regular",
+    color: "#F8F8F8",
+  },
+  price: {
+    fontSize: 16,
+    fontFamily: "Poppins-SemiBold",
+    color: colors.green,
+  },
+  cardDescription: {
     fontSize: 12,
+    fontFamily: "Poppins-Regular",
+    color: "#F8F8F8",
   },
   infoBox: {
     backgroundColor: colors.bgColor,
@@ -194,4 +216,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChallengeDetail;
+export default WorkoutProgramDetail;

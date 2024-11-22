@@ -1,14 +1,16 @@
 // screens/SetGoalScreen.js
 import React, { useState } from "react";
-import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import { View, TouchableOpacity, Text, StyleSheet, Image } from "react-native";
 import InputField from "../../components/InputField";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
 import CustomButton from "../../components/CustomButton";
+import icons from "../../constants/icons";
+import { colors } from "../../constants/colors";
 
 const SetWaterGoal = ({ navigation, route }) => {
   const [glassQuantity, setGlassQuantity] = useState("");
-  const [volumePerGlass, setVolumePerGlass] = useState("");
+  const [volumePerGlass, setVolumePerGlass] = useState(250);
 
   const handleSaveGoal = () => {
     if (glassQuantity && volumePerGlass) {
@@ -25,14 +27,16 @@ const SetWaterGoal = ({ navigation, route }) => {
       <Text style={styles.headerText}>Set Your Goal</Text>
       <View style={{ flex: 1 }}>
         {/* Input field for the number of glasses */}
-        <InputField
-          label="Quantity"
-          value={glassQuantity}
-          onChangeText={setGlassQuantity}
-          keyboardType="numeric"
-          placeholder="1(Glass)"
-        />
-
+        <View>
+          <InputField
+            label="Quantity"
+            value={glassQuantity}
+            onChangeText={setGlassQuantity}
+            keyboardType="numeric"
+            placeholder="1(Glass)"
+          />
+          <Image style={styles.editIcon} source={icons.edit} />
+        </View>
         {/* Input field for the volume per glass */}
         <InputField
           label="Volume per Glass (ml)"
@@ -70,6 +74,14 @@ const styles = StyleSheet.create({
     color: "#fff",
     textAlign: "center",
     fontWeight: "bold",
+  },
+  editIcon: {
+    position: "absolute",
+    tintColor: colors.green,
+    right: 15,
+    bottom: 30,
+    width: 12,
+    height: 12,
   },
 });
 
