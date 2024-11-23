@@ -57,6 +57,8 @@ const ActivityDetailScreen = () => {
             distance: distance,
             time: time,
             distanceUnit: distanceUnit,
+            heartRate: heartRate,
+            calories: calories,
           });
         } else {
           Animated.spring(pan, {
@@ -67,6 +69,9 @@ const ActivityDetailScreen = () => {
       },
     })
   ).current;
+
+  const heartRate = "96bpm";
+  const calories = "65kcal";
 
   return (
     <Container>
@@ -111,12 +116,12 @@ const ActivityDetailScreen = () => {
           <CustomCard
             label="Calories"
             icon={icons.calories}
-            message="65 kcal"
+            message={calories}
           />
           <CustomCard
             label="Heart Rate"
             icon={icons.heartRate}
-            message="96 bpm"
+            message={heartRate}
           />
         </View>
       </View>
@@ -127,7 +132,7 @@ const ActivityDetailScreen = () => {
         >
           <Image source={images.locationBg} style={{ height: 48, width: 48 }} />
         </Animated.View>
-        <Text style={styles.buttonText}>Start {`${activityName}`}</Text>
+        <Text style={styles.buttonText}>Open Map</Text>
         <Image
           source={icons.slideArrows}
           style={{ width: 35, height: 12, marginRight: 10 }}

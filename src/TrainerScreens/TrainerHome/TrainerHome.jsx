@@ -71,6 +71,51 @@ const TrainerHome = () => {
         ],
       },
     },
+    {
+      id: "2",
+      title: "30-Day Squat Challenge",
+      subtitle: "Strengthen your core with daily planks.",
+      price: "$790.99",
+      image: images.chestWorkout,
+      category: "Quadriceps",
+      level: "Intermediate",
+      exercises: 5,
+      calories: "190",
+      time: "25",
+      equipment: "Dumbbells",
+      description:
+        "A dynamic program designed to torch calories and melt away fat through intense full-body workouts. Boost your metabolism and achieve your fitness goals efficiently.",
+      days: {
+        day1: [
+          { title: "Bench Press", reps: "x10", image: images.chestWorkout },
+          { title: "Push Ups", reps: "x15", image: images.chestWorkout },
+        ],
+        day2: [
+          {
+            title: "Incline Bench Press",
+            reps: "x12",
+            image: images.chestWorkout,
+          },
+          { title: "Dumbbell Flyes", reps: "x10", image: images.chestWorkout },
+        ],
+        day3: [
+          {
+            title: "Decline Bench Press",
+            reps: "x10",
+            image: images.chestWorkout,
+          },
+          { title: "Chest Dips", reps: "x8", image: images.chestWorkout },
+        ],
+        day4: [
+          {
+            title: "Cable Crossovers",
+            reps: "x12",
+            image: images.chestWorkout,
+          },
+          { title: "Dumbbell Press", reps: "x10", image: images.chestWorkout },
+        ],
+      },
+    },
   ];
 
   const renderWorkoutCard = ({ item }) => (
@@ -120,6 +165,7 @@ const TrainerHome = () => {
               <Image source={icons.revenue} style={styles.icon} />
             </View>
             <Text style={styles.cardValue}>{stats.revenue}</Text>
+            <Image source={images.revenueGraph} style={styles.graph} />
           </View>
           <View style={styles.summaryCardColumn}>
             <View style={styles.summaryCardSmall}>
@@ -284,6 +330,11 @@ const styles = StyleSheet.create({
   icon: {
     width: 20,
     height: 20,
+  },
+  graph: {
+    margin: 16,
+    width: 110,
+    height: 72,
   },
 });
 

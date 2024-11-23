@@ -90,7 +90,6 @@ const WorkoutDetails = () => {
       calories: workout.calories,
     });
   };
-
   return (
     <Container cusStyles={{ padding: 0 }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
@@ -105,6 +104,20 @@ const WorkoutDetails = () => {
           <View>
             <Image source={workout.image} style={styles.workoutImage} />
             <Text style={styles.absoluteTitle}>{workout.title}</Text>
+
+            <View
+              style={{
+                backgroundColor: colors.bgColor,
+                borderRadius: 10,
+                width: 50,
+                padding: 5,
+                position: "absolute",
+                bottom: -25,
+                left: 20,
+              }}
+            >
+              <Text style={styles.dayTitle}>{selectedPeriod}</Text>
+            </View>
           </View>
 
           <View style={{ padding: 16 }}>
@@ -198,7 +211,7 @@ const styles = StyleSheet.create({
   },
   absoluteTitle: {
     position: "absolute",
-    bottom: 10,
+    bottom: 30,
     left: 20,
     fontSize: 28,
     fontFamily: "Poppins-Bold",
@@ -286,6 +299,12 @@ const styles = StyleSheet.create({
     color: colors.green,
     fontFamily: "Poppins-Medium",
     fontSize: 16,
+  },
+  dayTitle: {
+    fontSize: 16,
+    fontFamily: "Poppins-SemiBold",
+    color: colors.green,
+    textAlign: "center",
   },
 });
 

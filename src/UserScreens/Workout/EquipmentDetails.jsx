@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Alert,
+} from "react-native";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -17,6 +24,7 @@ const EquipmentDetails = () => {
   const [fill, setFill] = useState(0);
   const [remainingTime, setRemainingTime] = useState(0);
   const [totalDuration, setTotalDuration] = useState(0); // Total duration in seconds
+  const [isTimerRunning, setIsTimerRunning] = useState(false); // Timer state
 
   useEffect(() => {
     if (workoutDetails) {
@@ -28,7 +36,7 @@ const EquipmentDetails = () => {
 
   useEffect(() => {
     let interval;
-    if (remainingTime > 0) {
+    if (remainingTime > 0 && isTimerRunning) {
       interval = setInterval(() => {
         setRemainingTime((prev) => prev - 1);
         setFill((prev) => prev + 100 / totalDuration); // Increment fill based on total duration
@@ -36,7 +44,7 @@ const EquipmentDetails = () => {
     }
 
     return () => clearInterval(interval);
-  }, [remainingTime, totalDuration]);
+  }, [remainingTime, totalDuration, isTimerRunning]);
 
   const formattedTime = (timeInSeconds) => {
     const hours = Math.floor(timeInSeconds / 3600)
@@ -48,6 +56,33 @@ const EquipmentDetails = () => {
     const seconds = (timeInSeconds % 60).toString().padStart(2, "0");
     return `${hours}:${minutes}:${seconds}`;
   };
+
+  const handleReset = () => {
+    setRemainingTime(0); // Reset remaining time
+    setFill(0); // Reset circular progress fill
+    setIsTimerRunning(false); // Stop timer
+  };
+
+  const handleStart = () => {
+    if (
+      !workoutDetails ||
+      !workoutDetails.duration ||
+      workoutDetails.duration === "0"
+    ) {
+      Alert.alert("No Workout Time", "Please create a workout first.");
+    } else {
+      setIsTimerRunning(true); // Start the timer
+    }
+  };
+
+  const handlePause = () => {
+    setIsTimerRunning(false); // Pause the timer
+  };
+
+  const handleContinue = () => {
+    setIsTimerRunning(true); // Continue the timer
+  };
+
   return (
     <Container>
       <Header title={category.label} showBackButton={true} />
@@ -86,10 +121,12 @@ const EquipmentDetails = () => {
               style={{ flex: 1, backgroundColor: colors.bgColor, height: 40 }}
               textStyle={{ color: "white", fontSize: 14 }}
               title={"Reset"}
+              onPress={handleReset}
             />
             <CustomButton
               style={{ flex: 1, height: 40 }}
-              title={"Continue"}
+              title={isTimerRunning ? "Pause" : "Start"}
+              onPress={isTimerRunning ? handlePause : handleStart}
               textStyle={{ fontSize: 14 }}
             />
           </View>

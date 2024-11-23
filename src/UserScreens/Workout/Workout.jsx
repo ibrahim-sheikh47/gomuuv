@@ -49,6 +49,14 @@ const WorkoutScreen = () => {
       category: selectedCategoryValue,
     });
   };
+
+  const handleOnPress = (workout) => {
+    // Navigate to the WorkoutDetail screen with the selected workout data
+    navigation.navigate("WorkoutDetails", { workout });
+  };
+  const steps = 2000;
+  const km = 10.5;
+  const stepsTotal = 5000;
   return (
     <Container>
       <Header title={"Workout"} rightIcon1={icons.search} />
@@ -70,6 +78,30 @@ const WorkoutScreen = () => {
                 <Image source={icons.walking} style={styles.icon} />
                 <Text style={styles.titleText}>Steps</Text>
               </View>
+
+              <View
+                style={[
+                  styles.row,
+                  { justifyContent: "space-between", alignItems: "flex-end" },
+                ]}
+              >
+                <View>
+                  <View style={[styles.row, { marginTop: 10 }]}>
+                    <Text style={[styles.titleText, { color: colors.green }]}>
+                      {steps}
+                    </Text>
+                    <Text style={[styles.titleText]}>Today</Text>
+                  </View>
+                  <Text style={{ color: "#A4A4A4" }}>
+                    {km} | {stepsTotal} total
+                  </Text>
+                </View>
+
+                <Image
+                  source={images.stepsGraph}
+                  style={{ height: 59, width: 178 }}
+                />
+              </View>
             </View>
             <View style={[styles.row, styles.metricsContainer]}>
               <MetricBox
@@ -85,7 +117,17 @@ const WorkoutScreen = () => {
                 unit="mins"
               />
             </View>
-
+            <View>
+              <Text style={styles.sessionTitle}>Today's Session</Text>
+              <WorkoutCard
+                title="Chest Workout"
+                image={images.chestWorkout}
+                calories="190 kcal"
+                time="25 mins"
+                category="Quadriceps"
+                isTodayWorkout={true}
+              />
+            </View>
             <View>
               <Text style={styles.sessionTitle}>
                 Select Your Training Equipment

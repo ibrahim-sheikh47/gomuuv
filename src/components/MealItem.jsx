@@ -1,5 +1,12 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import React, { useState } from "react";
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../constants/colors";
 import icons from "../constants/icons";
@@ -13,39 +20,43 @@ export const MealItem = ({
   onPress,
   style,
   iconType, // New prop for icon type
+  forFinalizePlan, // New prop to check if used for Finalize Plan
+  isAdded,
+  handleAddRemove,
 }) => {
   return (
     <TouchableOpacity style={[styles.mealContainer, style]} onPress={onPress}>
       <Image source={mealImage} style={styles.mealImage} />
       <View style={styles.mealDetails}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+        <View style={styles.row}>
           <Text style={styles.mealTitle}>{mealName}</Text>
-          {iconType === "delete" && (
+          {!forFinalizePlan && iconType === "delete" && (
             <TouchableOpacity>
               <Ionicons name="trash-outline" size={15} color="#AFAFAF" />
             </TouchableOpacity>
           )}
-          {iconType === "next" && (
+          {!forFinalizePlan && iconType === "next" && (
             <TouchableOpacity>
-              <View
-                style={{
-                  backgroundColor: colors.green, // Background color
-                  borderRadius: 50, // Circular border radius
-                  padding: 5, // Padding to ensure the icon fits well
-                }}
-              >
+              <View style={styles.nextIcon}>
                 <Ionicons
                   name="chevron-forward-outline"
                   size={15}
-                  color="#121212" // Icon color
+                  color="#121212"
                 />
               </View>
+            </TouchableOpacity>
+          )}
+          {forFinalizePlan && (
+            <TouchableOpacity
+              style={[
+                styles.addRemoveButton,
+                isAdded ? styles.removeButton : styles.addButton,
+              ]}
+              onPress={handleAddRemove}
+            >
+              <Text style={styles.buttonText}>
+                {isAdded ? "Remove" : "Add"}
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -60,6 +71,17 @@ export const MealItem = ({
             <Image style={styles.statIcon} source={icons.time} />
             <Text style={styles.statText}>{time} mins</Text>
           </View>
+          {forFinalizePlan && (
+            <TouchableOpacity>
+              <View style={styles.nextIcon}>
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={15}
+                  color="#121212"
+                />
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </TouchableOpacity>
@@ -86,6 +108,11 @@ const styles = StyleSheet.create({
   mealDetails: {
     flex: 1,
     gap: 5,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   mealTitle: {
     fontFamily: "Poppins-SemiBold",
@@ -115,5 +142,25 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 12,
     marginTop: 2,
+  },
+  nextIcon: {
+    backgroundColor: colors.green,
+    borderRadius: 50,
+    padding: 5,
+  },
+  addRemoveButton: {
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  addButton: {
+    backgroundColor: colors.green,
+  },
+  removeButton: {
+    backgroundColor: "red",
+  },
+  buttonText: {
+    fontFamily: "Poppins-SemiBold",
+    fontSize: 12,
   },
 });

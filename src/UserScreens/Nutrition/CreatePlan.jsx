@@ -17,6 +17,7 @@ import CustomModal from "../../components/CustomModal";
 import icons from "../../constants/icons";
 import { colors } from "../../constants/colors";
 import { useNavigation } from "@react-navigation/native";
+import { Picker } from "@react-native-picker/picker";
 
 const CreatePlan = () => {
   const navigation = useNavigation();
@@ -32,7 +33,7 @@ const CreatePlan = () => {
   const handleClose = () => {
     setModalVisible(false);
     set2ndModalVisible(false);
-    navigation.navigate("Nutrition");
+    navigation.navigate("FinalizePlan");
   };
   const duration = [
     "Lose Weight",
@@ -57,8 +58,11 @@ const CreatePlan = () => {
   const [formData, setFormData] = useState({
     age: "",
     height: "",
+    heightUnit: "cm",
     weight: "",
+    weightUnit: "kg",
     targetWeight: "",
+    targetWeightUnit: "kg",
   });
 
   const [selectedPeriod, setSelectedPeriod] = useState(null);
@@ -161,27 +165,81 @@ const CreatePlan = () => {
             keyboardType="numeric"
             placeholder="Enter your age"
           />
-          <InputField
-            label="What's Your Height"
-            value={formData.height}
-            onChangeText={(value) => handleInputChange("height", value)}
-            keyboardType="numeric"
-            placeholder="Enter your height"
-          />
-          <InputField
-            label="What's Your Weight"
-            value={formData.weight}
-            onChangeText={(value) => handleInputChange("weight", value)}
-            keyboardType="numeric"
-            placeholder="Enter your weight"
-          />
-          <InputField
-            label="What's Your Target Weight"
-            value={formData.targetWeight}
-            onChangeText={(value) => handleInputChange("targetWeight", value)}
-            keyboardType="numeric"
-            placeholder="Enter your target weight"
-          />
+          <View style={styles.row}>
+            <View style={{ flex: 1 }}>
+              <InputField
+                label="What's Your Height"
+                value={formData.height}
+                onChangeText={(value) => handleInputChange("height", value)}
+                keyboardType="numeric"
+                placeholder="Enter your height"
+              />
+            </View>
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={formData.heightUnit}
+                style={styles.picker}
+                onValueChange={(itemValue) =>
+                  handleInputChange("heightUnit", itemValue)
+                }
+                dropdownIconColor={colors.green}
+              >
+                <Picker.Item label="cm" value="cm" />
+                <Picker.Item label="ft" value="ft" />
+              </Picker>
+            </View>
+          </View>
+          <View style={styles.row}>
+            <View style={{ flex: 1 }}>
+              <InputField
+                label="What's Your Weight"
+                value={formData.weight}
+                onChangeText={(value) => handleInputChange("weight", value)}
+                keyboardType="numeric"
+                placeholder="Enter your weight"
+              />
+            </View>
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={formData.weightUnit}
+                style={styles.picker}
+                onValueChange={(itemValue) =>
+                  handleInputChange("weightUnit", itemValue)
+                }
+                dropdownIconColor={colors.green}
+              >
+                <Picker.Item label="kg" value="kg" />
+                <Picker.Item label="lb" value="lb" />
+              </Picker>
+            </View>
+          </View>
+          <View style={styles.row}>
+            <View style={{ flex: 1 }}>
+              <InputField
+                label="What's Your Target Weight"
+                value={formData.targetWeight}
+                onChangeText={(value) =>
+                  handleInputChange("targetWeight", value)
+                }
+                keyboardType="numeric"
+                placeholder="Enter your target weight"
+              />
+            </View>
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={formData.targetWeightUnit}
+                style={styles.picker}
+                onValueChange={(itemValue) =>
+                  handleInputChange("targetWeightUnit", itemValue)
+                }
+                dropdownIconColor={colors.green}
+              >
+                <Picker.Item label="kg" value="kg" />
+                <Picker.Item label="lb" value="lb" />
+              </Picker>
+            </View>
+          </View>
+
           <Text
             style={{
               color: "white",
@@ -212,7 +270,7 @@ const CreatePlan = () => {
         visible={is2ndModalVisible}
         onClose={handleClose}
         modalIcon={icons.planAdded}
-        modalText={"Plan Added!"}
+        modalText={"Plan Created!"}
       />
     </Container>
   );
@@ -232,6 +290,24 @@ const styles = StyleSheet.create({
   },
   selectedCard: {
     backgroundColor: colors.green,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 10,
+    gap: 10,
+  },
+  pickerContainer: {
+    height: 50,
+    width: 100,
+    marginTop: 30,
+    borderRadius: 10,
+    backgroundColor: "#1A1919", // Match the input field background
+  },
+  picker: {
+    height: "100%",
+    width: "100%",
+    color: "#fff",
   },
   icon: {
     width: 32,

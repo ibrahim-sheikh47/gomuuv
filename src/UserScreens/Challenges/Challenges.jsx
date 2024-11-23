@@ -228,7 +228,6 @@ const ChallengesScreen = () => {
           onPress={() => setTargetModalVisible(true)}
         />
       </View>
-      <Text style={styles.sectionTitle}>Your BMI</Text>
     </View>
   );
 

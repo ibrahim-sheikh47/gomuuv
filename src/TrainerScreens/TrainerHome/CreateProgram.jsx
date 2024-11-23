@@ -16,7 +16,7 @@ import CustomButton from "../../components/CustomButton";
 import Selectable from "../../components/Selectable";
 import { colors } from "../../constants/colors";
 import CustomModal from "../../components/CustomModal";
-
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 const CreateProgram = () => {
   const modes = ["Strength", "Cardio", "Hill Climb", "Fat Burn", "Flexibility"];
   const equipment = [
@@ -67,7 +67,50 @@ const CreateProgram = () => {
       alert("Please select a day before saving!");
     }
   };
+  const showStartDatePicker = () => setStartDatePickerVisibility(true);
+  const hideStartDatePicker = () => setStartDatePickerVisibility(false);
 
+  const showEndDatePicker = () => setEndDatePickerVisibility(true);
+  const hideEndDatePicker = () => setEndDatePickerVisibility(false);
+
+  const [isStartDatePickerVisible, setStartDatePickerVisibility] =
+    useState(false);
+  const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
+  const handleStartDateConfirm = (date) => {
+    const today = new Date();
+    if (date < today) {
+      alert("Start date cannot be earlier than today's date.");
+      return;
+    }
+
+    setStartDate(date);
+    hideStartDatePicker();
+  };
+
+  const handleEndDateConfirm = (date) => {
+    if (!startDate) {
+      alert("Please select the start date first.");
+      return;
+    }
+    if (date <= startDate) {
+      alert("End date must be after the start date.");
+      return;
+    }
+    setEndDate(date);
+    hideEndDatePicker();
+  };
+  const [formData, setFormData] = useState({
+    title: "",
+    selectedMode: "Strength",
+    selectedSkillLevel: "Beginner",
+    selectedEquipment: modes[0],
+    price: "",
+    calories: "",
+    targetMuscle: "",
+  });
   return (
     <Container>
       <Header
@@ -76,36 +119,74 @@ const CreateProgram = () => {
         rightIcon1={icons.search}
       />
       <ScrollView>
-        <InputField label={"Title"} placeholder={"Add Your Program Title"} />
+        <InputField
+          label={"Title"}
+          placeholder={"Add Your Program Title"}
+          value={formData.title}
+          onChangeText={(text) => handleInputChange("title", text)}
+        />
 
         <Text style={styles.text}>Workout Mode</Text>
         <Selectable
           items={modes}
-          selectedItem={selectedMode}
-          setSelectedItem={setSelectedMode}
+          selectedItem={formData.selectedMode}
+          setSelectedItem={(item) => handleInputChange("selectedMode", item)}
           wrapOnLineChange={true}
         />
 
         <View style={styles.planDurationContainer}>
           <Text style={styles.text}>Plan Duration</Text>
-          <Image source={icons.calendar} style={styles.calendarIcon} />
         </View>
-        <InputField value={"TIME HERE"} />
 
+        <View style={{ flex: 1 }}>
+          <InputField
+            placeholder={"Select Start Date"}
+            value={startDate ? startDate.toLocaleDateString() : ""}
+          />
+          <TouchableOpacity onPress={showStartDatePicker}>
+            <Image source={icons.calendar} style={styles.calendarIcon} />
+          </TouchableOpacity>
+          <DateTimePickerModal
+            isVisible={isStartDatePickerVisible}
+            mode="date"
+            onConfirm={handleStartDateConfirm}
+            onCancel={hideStartDatePicker}
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <InputField
+            placeholder={"Select End Date"}
+            value={endDate ? endDate.toLocaleDateString() : ""}
+          />
+          <TouchableOpacity onPress={showEndDatePicker}>
+            <Image source={icons.calendar} style={styles.calendarIcon} />
+          </TouchableOpacity>
+          <DateTimePickerModal
+            isVisible={isEndDatePickerVisible}
+            mode="date"
+            onConfirm={handleEndDateConfirm}
+            onCancel={hideEndDatePicker}
+          />
+        </View>
         <Text style={styles.text}>Skill Level</Text>
         <Selectable
           items={["Beginner", "Intermediate", "Advance"]}
-          selectedItem={selectedSkillLevel}
-          setSelectedItem={setSelectedSkillLevel}
+          selectedItem={formData.selectedSkillLevel}
+          setSelectedItem={(item) =>
+            handleInputChange("selectedSkillLevel", item)
+          }
           wrapOnLineChange={true}
         />
-
-        <InputField label={"Price $"} value={`"price"`} />
+        <InputField
+          label={"Price $"}
+          value={formData.price}
+          onChangeText={(text) => handleInputChange("price", text)}
+        />
 
         <View style={styles.addExerciseContainer}>
           <Text style={styles.text}>Add Exercise</Text>
           <TouchableOpacity style={styles.addButton} onPress={openModal}>
-            <Text style={styles.addButtonText}>ADD</Text>
+            <Text style={styles.addButtonText}>Add + </Text>
           </TouchableOpacity>
         </View>
         {savedExercises.map((entry, index) => (
@@ -189,8 +270,17 @@ const CreateProgram = () => {
           />
         </CustomModal>
 
-        <InputField label={"Calories"} value={`"calories"`} />
-        <InputField label={"Target Muscle"} value={`"target muscle"`} />
+        <InputField
+          label={"Calories"}
+          value={formData.calories}
+          onChangeText={(text) => handleInputChange("calories", text)}
+        />
+        <InputField
+          label={"Calories"}
+          value={formData.calories}
+          onChangeText={(text) => handleInputChange("targetMuscle", text)}
+        />
+        <InputField label={"Target Muscle"} value={formData.targetMuscle} />
 
         <Text style={styles.text}>Select Main Equipment</Text>
         <Selectable
@@ -229,6 +319,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   calendarIcon: {
+    position: "absolute",
+    right: 15,
+    bottom: 30,
     width: 16,
     height: 16,
   },
@@ -239,11 +332,12 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: colors.bgColor,
-    padding: 10,
-    borderRadius: 5,
+    paddingHorizontal: 16,
+    paddingVertical: 5,
+    borderRadius: 10,
   },
   addButtonText: {
-    color: "white",
+    color: colors.green,
     fontSize: 14,
   },
   modalText: {
