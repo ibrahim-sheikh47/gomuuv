@@ -9,7 +9,7 @@ import { colors } from "../../constants/colors";
 import Selectable from "../../components/Selectable";
 import { Text } from "react-native";
 import CustomModal from "../../components/CustomModal";
-import icons from "../../constants/icons";
+import Tab2Icon from "../../assets/svgs/Tab2Icon";
 
 const NewWorkout = () => {
   const navigation = useNavigation();
@@ -113,7 +113,7 @@ const NewWorkout = () => {
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         modalText="Workout Saved!"
-        modalIcon={icons.tab2}
+        modalIcon={<Tab2Icon />}
       />
     </Container>
   );

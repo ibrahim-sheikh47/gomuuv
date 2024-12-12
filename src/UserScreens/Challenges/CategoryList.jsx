@@ -16,6 +16,7 @@ import icons from "../../constants/icons";
 import CustomButton from "../../components/CustomButton";
 import CustomModal from "../../components/CustomModal";
 import { challengesData } from "../../utils/data";
+import StrengthIcon from "../../assets/svgs/StrengthIcon";
 
 const CategoryList = () => {
   const route = useRoute();
@@ -91,7 +92,7 @@ const CategoryList = () => {
       <CustomModal
         visible={modalVisible}
         onClose={closeModal}
-        modalIcon={icons.quadriceps}
+        modalIcon={<StrengthIcon />}
         width={240}
       >
         <Text style={styles.modalText}>
@@ -143,6 +144,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "white", // Style for the text that isn't the title
     textAlign: "center",
+    marginTop: 20,
   },
   selectedTitle: {
     color: colors.green, // Style for the selected title

@@ -2,6 +2,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import icons from "../constants/icons";
 import { colors } from "../constants/colors";
 import { useNavigation } from "@react-navigation/native";
+import { IconButton } from "react-native-paper";
 
 export const FastingCard = ({ plan, selectedPlan }) => {
   const navigation = useNavigation();
@@ -27,7 +28,12 @@ export const FastingCard = ({ plan, selectedPlan }) => {
         <Text style={styles.cardTitle}>{plan.title}</Text>
         <Text style={styles.cardDescription}>{plan.description}</Text>
       </View>
-      <Image source={icons.nextBg} style={styles.cardIcon} />
+      <IconButton
+        icon="chevron-right"
+        size={20} // Adjust the size as needed
+        color="#aaa" // Adjust the color as needed
+        style={styles.nextIcon}
+      />
     </TouchableOpacity>
   );
 };
@@ -76,5 +82,11 @@ const styles = StyleSheet.create({
     marginTop: "auto",
     marginLeft: "auto",
     marginBottom: 20,
+  },
+  nextIcon: {
+    marginLeft: "auto",
+    marginTop: "auto",
+    marginBottom: 10,
+    backgroundColor: colors.green,
   },
 });

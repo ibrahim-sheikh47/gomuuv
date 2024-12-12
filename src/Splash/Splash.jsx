@@ -10,10 +10,10 @@ import {
 import { StatusBar } from "expo-status-bar";
 import Constants from "expo-constants";
 import images from "../constants/images";
-import icons from "../constants/icons";
 import { colors } from "../constants/colors";
 import { useNavigation } from "@react-navigation/native";
 import CustomButton from "../components/CustomButton";
+import LogoText from "../assets/svgs/LogoText";
 
 const Splash = () => {
   const navigation = useNavigation();
@@ -28,11 +28,12 @@ const Splash = () => {
         <View style={styles.overlay} />
 
         <View style={styles.centeredView}>
-          <Image source={icons.logoWtext} style={styles.logo} />
+          <LogoText />
           <Text style={styles.tagline}>
             Your Path to Peak Health & Wellness starts here.
           </Text>
         </View>
+        <View></View>
 
         {/* Bottom Container */}
         <View style={styles.bottomContainer}>
@@ -112,6 +113,7 @@ const styles = StyleSheet.create({
     width: 300,
     fontSize: 17,
     marginBottom: 30,
+    marginTop: 20,
   },
   bottomContainer: {
     position: "absolute",

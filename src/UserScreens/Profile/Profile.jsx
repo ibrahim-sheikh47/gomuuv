@@ -7,6 +7,8 @@ import images from "../../constants/images";
 import SettingItem from "../../components/SettingItem";
 import StatCard from "../../components/StatCard";
 import { notificationsSettings, settings } from "../../utils/data";
+import NotificationsIcon from "../../assets/svgs/NotificationsIcon";
+import DevicesIcon from "../../assets/svgs/DevicesIcon";
 
 const Profile = ({ navigation }) => {
   const height = "168cm";
@@ -36,14 +38,16 @@ const Profile = ({ navigation }) => {
         ))}
 
         <Text style={styles.accountSettingsHeader}>Notifications:</Text>
-        {notificationsSettings.map((item, index) => (
-          <SettingItem
-            key={index}
-            icon={item.icon}
-            text={item.text}
-            onPress={() => navigation.navigate(item.route)}
-          />
-        ))}
+        <SettingItem
+          icon={<NotificationsIcon />}
+          text={"Manage Notifications"}
+        />
+        <Text style={styles.accountSettingsHeader}>Devices:</Text>
+        <SettingItem
+          icon={<DevicesIcon />}
+          text={"Manage Connected Devices"}
+          onPress={() => navigation.navigate("Device")}
+        />
       </ScrollView>
 
       <CustomButton

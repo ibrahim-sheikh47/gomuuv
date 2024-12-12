@@ -5,6 +5,7 @@ import Container from "../../components/Container";
 import Header from "../../components/Header";
 import icons from "../../constants/icons";
 import Selectable from "../../components/Selectable";
+import EditIcon from "../../assets/svgs/EditIcon";
 
 const WorkoutProgramDetail = ({ route }) => {
   const { program } = route.params;
@@ -40,7 +41,7 @@ const WorkoutProgramDetail = ({ route }) => {
       <Header
         title={"Workout Program"}
         showBackButton={true}
-        rightIcon1={icons.editBtn}
+        rightIcon1={<EditIcon color="white" />}
         cusStyle={{ width: 58, height: 32 }}
       />
       <ScrollView style={{ marginTop: 20 }}>

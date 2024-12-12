@@ -8,6 +8,11 @@ import { CustomCard } from "../../components/CustomCard";
 import icons from "../../constants/icons";
 import CustomButton from "../../components/CustomButton";
 import { colors } from "../../constants/colors";
+import HeartRateIcon from "../../assets/svgs/HeartRateIcon";
+import CaloriesIcon from "../../assets/svgs/CaloriesIcon";
+import TimeIcon from "../../assets/svgs/TimeIcon";
+import DistanceIcon from "../../assets/svgs/DistanceIcon";
+import PaceIcon from "../../assets/svgs/PaceIcon";
 
 const FinishActivity = () => {
   const route = useRoute();
@@ -37,7 +42,7 @@ const FinishActivity = () => {
               borderRadius: 10,
             }}
           >
-            <Image source={icons.heartRate} style={{ width: 16, height: 16 }} />
+            <HeartRateIcon width={16} height={16} />
             <Text
               style={{
                 fontSize: 12,
@@ -58,7 +63,7 @@ const FinishActivity = () => {
               borderRadius: 10,
             }}
           >
-            <Image source={icons.calories} style={{ width: 16, height: 16 }} />
+            <CaloriesIcon width={16} height={16} />
             <Text
               style={{
                 fontSize: 12,
@@ -77,21 +82,21 @@ const FinishActivity = () => {
         <View style={styles.gridContainer}>
           <CustomCard
             label="Time Per Mile"
-            icon={icons.timePerMile}
+            icon={TimeIcon}
             message="8m:40s/mi"
           />
           <CustomCard
             label="Total Time"
-            icon={icons.time}
+            icon={TimeIcon}
             message={time}
             goal={"Goal: 30 min daily"}
           />
         </View>
         <View style={styles.gridContainer}>
-          <CustomCard label="Pace" icon={icons.pace} message="1.1mi/hr" />
+          <CustomCard label="Pace" icon={PaceIcon} message="1.1mi/hr" />
           <CustomCard
             label="Distance"
-            icon={icons.distance}
+            icon={DistanceIcon}
             goal={"Goal: 2mi daily"}
             message={`${distance} ${distanceUnit}`}
           />

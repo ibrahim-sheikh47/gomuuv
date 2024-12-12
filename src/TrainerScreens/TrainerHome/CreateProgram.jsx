@@ -17,6 +17,10 @@ import Selectable from "../../components/Selectable";
 import { colors } from "../../constants/colors";
 import CustomModal from "../../components/CustomModal";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import SearchIcon from "../../assets/svgs/SearchIcon";
+import { IconButton } from "react-native-paper";
+import StrengthIcon from "../../assets/svgs/StrengthIcon";
+
 const CreateProgram = () => {
   const modes = ["Strength", "Cardio", "Hill Climb", "Fat Burn", "Flexibility"];
   const equipment = [
@@ -104,19 +108,25 @@ const CreateProgram = () => {
   };
   const [formData, setFormData] = useState({
     title: "",
-    selectedMode: "Strength",
-    selectedSkillLevel: "Beginner",
-    selectedEquipment: modes[0],
+    selectedMode: "",
+    selectedSkillLevel: "",
+    selectedEquipment: "",
     price: "",
     calories: "",
     targetMuscle: "",
   });
+  const handleInputChange = (field, value) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      [field]: value,
+    }));
+  };
   return (
     <Container>
       <Header
         title={"Create New Program"}
         showBackButton={true}
-        rightIcon1={icons.search}
+        rightIcon1={<SearchIcon />}
       />
       <ScrollView>
         <InputField
@@ -143,8 +153,14 @@ const CreateProgram = () => {
             placeholder={"Select Start Date"}
             value={startDate ? startDate.toLocaleDateString() : ""}
           />
-          <TouchableOpacity onPress={showStartDatePicker}>
-            <Image source={icons.calendar} style={styles.calendarIcon} />
+          <TouchableOpacity>
+            <IconButton
+              icon="calendar" // Calendar icon from MaterialCommunityIcons
+              size={24}
+              iconColor={colors.green}
+              onPress={showStartDatePicker}
+              style={styles.calendarIcon}
+            />
           </TouchableOpacity>
           <DateTimePickerModal
             isVisible={isStartDatePickerVisible}
@@ -159,7 +175,13 @@ const CreateProgram = () => {
             value={endDate ? endDate.toLocaleDateString() : ""}
           />
           <TouchableOpacity onPress={showEndDatePicker}>
-            <Image source={icons.calendar} style={styles.calendarIcon} />
+            <IconButton
+              icon="calendar" // Calendar icon from MaterialCommunityIcons
+              size={24}
+              iconColor={colors.green}
+              onPress={showEndDatePicker}
+              style={styles.calendarIcon}
+            />
           </TouchableOpacity>
           <DateTimePickerModal
             isVisible={isEndDatePickerVisible}
@@ -299,7 +321,7 @@ const CreateProgram = () => {
         visible={createdModalVisible}
         onClose={closeCreatedModal}
         modalText={"Program Created !"}
-        modalIcon={icons.strength}
+        modalIcon={<StrengthIcon width={50} height={50} />}
       />
     </Container>
   );
@@ -320,10 +342,8 @@ const styles = StyleSheet.create({
   },
   calendarIcon: {
     position: "absolute",
-    right: 15,
-    bottom: 30,
-    width: 16,
-    height: 16,
+    right: 5,
+    bottom: 8,
   },
   addExerciseContainer: {
     flexDirection: "row",

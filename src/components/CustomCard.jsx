@@ -4,7 +4,7 @@ import { colors } from "../constants/colors";
 
 export const CustomCard = ({
   label,
-  icon,
+  icon: CardIcon,
   goal,
   children,
   message = "",
@@ -29,7 +29,7 @@ export const CustomCard = ({
         >
           {label}
         </Text>
-        <Image style={styles.iconImage} source={icon} />
+        <CardIcon />
       </View>
       <Text
         style={{

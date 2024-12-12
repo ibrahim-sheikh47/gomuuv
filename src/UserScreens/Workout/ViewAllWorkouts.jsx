@@ -8,6 +8,7 @@ import Container from "../../components/Container";
 import Header from "../../components/Header";
 import icons from "../../constants/icons";
 import { useNavigation } from "@react-navigation/native";
+import SearchIcon from "../../assets/svgs/SearchIcon";
 
 const ViewAllWorkouts = () => {
   const navigation = useNavigation(); // Access the navigation object
@@ -35,7 +36,7 @@ const ViewAllWorkouts = () => {
       <Header
         title={"Trending Workouts"}
         showBackButton={true}
-        rightIcon1={icons.search}
+        rightIcon1={<SearchIcon />}
       />
       <FlatList
         style={{ marginTop: 30 }}

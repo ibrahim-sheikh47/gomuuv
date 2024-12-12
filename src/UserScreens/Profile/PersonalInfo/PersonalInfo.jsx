@@ -1,4 +1,11 @@
-import { StyleSheet, Text, View, FlatList, Image } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import React, { useState } from "react";
 import Container from "../../../components/Container";
 import BackHeader from "../../../components/BackHeader";
@@ -6,6 +13,7 @@ import InputField from "../../../components/InputField";
 import CustomButton from "../../../components/CustomButton";
 import { colors } from "../../../constants/colors";
 import icons from "../../../constants/icons";
+import EditIcon from "../../../assets/svgs/EditIcon";
 
 const PersonalInfoScreen = () => {
   // State for personal information fields
@@ -52,16 +60,9 @@ const PersonalInfoScreen = () => {
                 onChangeText={(value) => handleInputChange(item.key, value)}
                 keyboardType={item.keyboardType || "default"} // Use keyboardType if specified
               />
-              <Image
-                style={{
-                  position: "absolute",
-                  right: 15,
-                  bottom: 30,
-                  width: 12,
-                  height: 12,
-                }}
-                source={icons.edit}
-              />
+              <TouchableOpacity style={styles.editIcon}>
+                <EditIcon />
+              </TouchableOpacity>
             </View>
           </View>
         )}
@@ -87,5 +88,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#fff",
     marginBottom: 8, // Add spacing between label and input field
+  },
+  editIcon: {
+    position: "absolute",
+    tintColor: colors.green,
+    right: 15,
+    bottom: 30,
+    width: 12,
+    height: 12,
   },
 });

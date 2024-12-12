@@ -16,6 +16,12 @@ import ProfileSection from "../../components/ProfileSection";
 import Header from "../../components/Header";
 import CustomButton from "../../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
+import SearchIcon from "../../assets/svgs/SearchIcon";
+import RevenueIcon from "../../assets/svgs/RevenueIcon";
+import StrengthIcon from "../../assets/svgs/StrengthIcon";
+import LevelIcon from "../../assets/svgs/LevelIcon";
+import ActiveClientsIcon from "../../assets/svgs/ActiveClientsIcon";
+import ProgramSoldIcon from "../../assets/svgs/ProgramSoldIcon";
 
 const TrainerHome = () => {
   const navigation = useNavigation();
@@ -132,11 +138,11 @@ const TrainerHome = () => {
         <View style={styles.cardDetails}>
           <View>
             <View style={styles.sessionDetail}>
-              <Image style={styles.detailIcon} source={icons.quadriceps} />
+              <StrengthIcon />
               <Text style={styles.detailText}>{item.category}</Text>
             </View>
             <View style={styles.sessionDetail}>
-              <Image style={styles.detailIcon} source={icons.level} />
+              <LevelIcon />
               <Text style={styles.detailText}>{item.level}</Text>
             </View>
           </View>
@@ -148,7 +154,7 @@ const TrainerHome = () => {
 
   return (
     <Container>
-      <Header title="Home" rightIcon1={icons.search} />
+      <Header title="Home" rightIcon1={<SearchIcon />} />
       <ScrollView>
         <TouchableOpacity style={styles.profileHeader}>
           <ProfileSection
@@ -162,7 +168,7 @@ const TrainerHome = () => {
           <View style={styles.summaryCard}>
             <View style={styles.row}>
               <Text style={styles.cardLabel}>Revenue</Text>
-              <Image source={icons.revenue} style={styles.icon} />
+              <RevenueIcon />
             </View>
             <Text style={styles.cardValue}>{stats.revenue}</Text>
             <Image source={images.revenueGraph} style={styles.graph} />
@@ -171,14 +177,14 @@ const TrainerHome = () => {
             <View style={styles.summaryCardSmall}>
               <View style={styles.row}>
                 <Text style={styles.cardLabel}>Active Clients</Text>
-                <Image source={icons.activeClients} style={styles.icon} />
+                <ActiveClientsIcon />
               </View>
               <Text style={styles.cardValue}>{stats.activeClients}</Text>
             </View>
             <View style={styles.summaryCardSmall}>
               <View style={styles.row}>
                 <Text style={styles.cardLabel}>Programs Sold</Text>
-                <Image source={icons.programSold} style={styles.icon} />
+                <ProgramSoldIcon />
               </View>
               <Text style={styles.cardValue}>{stats.programsSold}</Text>
             </View>

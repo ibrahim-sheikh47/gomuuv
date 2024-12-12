@@ -6,8 +6,12 @@ import Container from "../../components/Container";
 import Header from "../../components/Header";
 import SearchBar from "../../components/SearchBar";
 import CustomButton from "../../components/CustomButton";
-import icons from "../../constants/icons";
 import MealCategorySelector from "../../components/MealCategorySelector"; // Import the new component
+import BreakfastIcon from "../../assets/svgs/BreakfastIcon";
+import FastingIcon from "../../assets/svgs/FastingIcon";
+import EatenIcon from "../../assets/svgs/EatenIcon";
+import LunchIcon from "../../assets/svgs/LunchIcon";
+import SnacksIcon from "../../assets/svgs/SnacksIcon";
 
 const ViewAllMeals = ({ route, navigation }) => {
   const { title } = route.params;
@@ -42,10 +46,10 @@ const ViewAllMeals = ({ route, navigation }) => {
 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const mealCategories = [
-    { label: "All", icon: icons.dinner },
-    { label: "Breakfast", icon: icons.breakfast },
-    { label: "Lunch", icon: icons.lunch },
-    { label: "Snacks", icon: icons.snacks },
+    { label: "All", icon: <EatenIcon /> },
+    { label: "Breakfast", icon: <BreakfastIcon width={22} height={22} /> },
+    { label: "Lunch", icon: <LunchIcon width={24} height={24} /> },
+    { label: "Snacks", icon: <SnacksIcon width={24} height={24} /> },
   ];
 
   return (
@@ -59,7 +63,7 @@ const ViewAllMeals = ({ route, navigation }) => {
           <MealCategorySelector
             categories={mealCategories}
             selectedCategory={selectedCategory}
-            onSelect={setSelectedCategory} // Pass the state updater directly
+            onSelect={setSelectedCategory}
           />
 
           <Text
@@ -94,7 +98,7 @@ const ViewAllMeals = ({ route, navigation }) => {
           />
         )}
         contentContainerStyle={{ flex: 1 }}
-        numColumns={1} // One item per row
+        numColumns={1}
         showsVerticalScrollIndicator={false}
       />
       {title.toLowerCase() !== "recipes" && (

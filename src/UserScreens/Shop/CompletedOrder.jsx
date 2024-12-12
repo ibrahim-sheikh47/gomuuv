@@ -4,6 +4,8 @@ import Container from "../../components/Container";
 import Header from "../../components/Header";
 import icons from "../../constants/icons";
 import { colors } from "../../constants/colors";
+import CartIcon from "../../assets/svgs/CartIcon";
+import ShopIcon from "../../assets/svgs/ShopIcon";
 
 const CompletedOrder = () => {
   const steps = [
@@ -17,8 +19,8 @@ const CompletedOrder = () => {
       <Header
         title={"Confirmed"}
         showBackButton={true}
-        rightIcon1={icons.cart}
-        rightIcon2={icons.cart2}
+        rightIcon1={<CartIcon />}
+        rightIcon2={<ShopIcon fill="white" />}
       />
 
       <View style={{ marginTop: 30 }}>

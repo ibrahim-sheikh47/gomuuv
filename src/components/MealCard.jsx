@@ -1,14 +1,14 @@
 import { useNavigation } from "@react-navigation/native";
 import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 
-const MealCard = ({ icon, label, type, style, textStyle }) => {
+const MealCard = ({ icon: MealIcon, label, type, style, textStyle }) => {
   const navigation = useNavigation();
   return (
     <TouchableOpacity
       style={[styles.card, style]}
       onPress={() => navigation.navigate("AddMealDetails", { label, type })}
     >
-      <Image source={icon} style={{ width: 32, height: 32 }} />
+      <MealIcon width={46} height={46} />
       <Text style={[styles.cardText, textStyle]}>{label}</Text>
     </TouchableOpacity>
   );

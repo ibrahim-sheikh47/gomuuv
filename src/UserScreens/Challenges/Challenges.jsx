@@ -19,7 +19,15 @@ import CustomButton from "../../components/CustomButton";
 import GoalModal from "../../components/GoalModal";
 import CustomModal from "../../components/CustomModal";
 import { ProgressBar } from "../../components/ProgressBar";
-
+import EnduranceIcon from "../../assets/svgs/EnduranceIcon";
+import StrengthIcon from "../../assets/svgs/StrengthIcon";
+import ChallengesIcon from "../../assets/svgs/ChallengesIcon";
+import FlexibilityIcon from "../../assets/svgs/FlexibilityIcon";
+import HealthWellIcon from "../../assets/svgs/HealthWellIcon";
+import HabitIcon from "../../assets/svgs/HabitIcon";
+import LevelIcon from "../../assets/svgs/LevelIcon";
+import SearchIcon from "../../assets/svgs/SearchIcon";
+import WeightLossIcon from "../../assets/svgs/WeightLossIcon";
 const ChallengesScreen = () => {
   const [activeTab, setActiveTab] = useState("Challenges");
   const [weightModalVisible, setWeightModalVisible] = useState(false);
@@ -52,12 +60,12 @@ const ChallengesScreen = () => {
     navigation.navigate("ChallengeDetail", { challenge });
   };
   const categoryIcons = {
-    Endurance: icons.endurance,
-    Strength: icons.strength,
-    Flexibility: icons.flexibility,
-    "Health & Wellness": icons.healthWellness,
-    "Lifestyle & Habit": icons.habit,
-    "Skills Based": icons.challenges,
+    Endurance: <EnduranceIcon />,
+    Strength: <StrengthIcon width={24} height={24} />,
+    Flexibility: <FlexibilityIcon />,
+    "Health & Wellness": <HealthWellIcon />,
+    "Lifestyle & Habit": <HabitIcon />,
+    "Skills Based": <ChallengesIcon />,
   };
 
   const renderChallengeCard = ({ item: challenge }) => (
@@ -71,7 +79,7 @@ const ChallengesScreen = () => {
         <View style={styles.cardHeader}>
           <Text style={styles.challengeTitle}>{challenge.title}</Text>
           <View style={styles.cardHeaderTag}>
-            <Image source={icons.quadriceps} style={styles.tagIcon} />
+            <StrengthIcon />
             <Text style={styles.cardSubtitle}>{challenge.muscleGroup}</Text>
           </View>
         </View>
@@ -103,6 +111,12 @@ const ChallengesScreen = () => {
               </Text>
             </View>
             <Text style={styles.cardSubtitle}>{challenge.cardSubtitle}</Text>
+            <View style={styles.cardHeaderTag}>
+              <StrengthIcon />
+              <Text style={styles.cardSubtitle}>{challenge.muscleGroup}</Text>
+              <LevelIcon />
+              <Text style={styles.cardSubtitle}>{challenge.level}</Text>
+            </View>
           </>
         )}
         {challenge.type === "enroll" && (
@@ -261,7 +275,7 @@ const ChallengesScreen = () => {
             style={styles.card}
             onPress={() => handleCategoryPress(text)} // Navigate with selected category
           >
-            <Image source={categoryIcons[text]} style={styles.icon} />
+            {categoryIcons[text]}
             <Text style={styles.cardText}>{text}</Text>
           </TouchableOpacity>
         ))}
@@ -271,7 +285,7 @@ const ChallengesScreen = () => {
 
   return (
     <Container>
-      <Header title="Challenges & Goals" rightIcon1={icons.search} />
+      <Header title="Challenges & Goals" rightIcon1={<SearchIcon />} />
       <TabContainer
         activeTab={activeTab}
         onTabClick={setActiveTab}
@@ -304,7 +318,7 @@ const ChallengesScreen = () => {
         visible={weightUpdatedVisible}
         onClose={() => setWeightUpdatedVisible(false)}
         modalText={"Your weight has been updated!"}
-        modalIcon={icons.weightLoss}
+        modalIcon={<WeightLossIcon width={50} height={50} />}
       />
       <GoalModal
         visible={targetModalVisible}
@@ -317,7 +331,7 @@ const ChallengesScreen = () => {
         visible={targetUpdatedVisible}
         onClose={() => setTargetUpdatedVisible(false)}
         modalText={"Your target has been updated!"}
-        modalIcon={icons.challenges}
+        modalIcon={<ChallengesIcon width={50} height={50} />}
       />
     </Container>
   );

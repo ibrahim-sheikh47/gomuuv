@@ -8,7 +8,7 @@ import {
   Image,
 } from "react-native";
 import { colors } from "../constants/colors"; // Adjust the import path as needed
-import icons from "../constants/icons";
+import { IconButton } from "react-native-paper";
 
 const GoalModal = ({ visible, onClose, modalText, textStyle, onSave }) => {
   const [value, setValue] = useState(0); // State to track the current value
@@ -61,7 +61,12 @@ const GoalModal = ({ visible, onClose, modalText, textStyle, onSave }) => {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.absolute} onPress={onClose}>
-            <Image style={styles.closeBtn} source={icons.modalClose} />
+            <IconButton
+              icon="close" // Specify the icon name
+              size={24} // Icon size
+              iconColor="white"
+              style={styles.closeBtn}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -141,7 +146,6 @@ const styles = StyleSheet.create({
     right: -24,
   },
   closeBtn: {
-    width: 60,
-    height: 60,
+    backgroundColor: colors.bgColor,
   },
 });

@@ -2,7 +2,6 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons"; // Ensure you have Ionicons installed
 import IconButton from "./IconButton";
-import icons from "../constants/icons";
 
 const Header = ({
   title,
@@ -66,14 +65,14 @@ const Header = ({
         {rightIcon1 && (
           <IconButton
             cusStyle={cusStyle}
-            iconSource={rightIcon1}
+            icon={rightIcon1}
             onPress={rightIcon1Press}
           />
         )}
         {rightIcon2 && (
           <IconButton
             cusStyle={cusStyle}
-            iconSource={rightIcon2}
+            icon={rightIcon2}
             onPress={rightIcon2Press}
           />
         )}

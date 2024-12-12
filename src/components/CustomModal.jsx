@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { colors } from "../constants/colors"; // Adjust the import path as needed
 import icons from "../constants/icons";
+import { IconButton } from "react-native-paper";
 
 const CustomModal = ({
   visible,
@@ -37,7 +38,7 @@ const CustomModal = ({
           ]}
         >
           {/* Render icon only if modalIcon is provided */}
-          {modalIcon && <Image source={modalIcon} style={styles.modalIcon} />}
+          {modalIcon && <View>{modalIcon}</View>}
 
           {/* Render modalText only if it exists */}
           {modalText && (
@@ -46,7 +47,12 @@ const CustomModal = ({
 
           {/* Close button */}
           <TouchableOpacity style={styles.absolute} onPress={onClose}>
-            <Image style={styles.closeBtn} source={icons.modalClose} />
+            <IconButton
+              icon="close" // Specify the icon name
+              size={24} // Icon size
+              iconColor="white"
+              style={styles.closeBtn}
+            />
           </TouchableOpacity>
 
           {/* Render children only if they are provided */}
@@ -105,7 +111,6 @@ const styles = StyleSheet.create({
     right: -24,
   },
   closeBtn: {
-    width: 60,
-    height: 60,
+    backgroundColor: colors.bgColor,
   },
 });

@@ -7,6 +7,7 @@ import icons from "../../constants/icons";
 import { colors } from "../../constants/colors";
 import Selectable from "../../components/Selectable";
 import CustomButton from "../../components/CustomButton";
+import SearchIcon from "../../assets/svgs/SearchIcon";
 
 const ChallengeDetail = () => {
   const route = useRoute();
@@ -45,7 +46,7 @@ const ChallengeDetail = () => {
       <Header
         title={"Challenges & Goals"}
         showBackButton={true}
-        rightIcon1={icons.search}
+        rightIcon1={<SearchIcon />}
       />
       <ScrollView>
         <Image source={challenge.image} style={styles.challengeImage} />

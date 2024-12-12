@@ -10,37 +10,11 @@ const MealCategorySelector = ({ categories, selectedCategory, onSelect }) => {
       {categories.map((category, index) => (
         <TouchableOpacity
           key={index}
-          style={[
-            styles.card,
-            {
-              backgroundColor:
-                selectedCategory === index ? colors.green : "#242425",
-            },
-          ]}
-          onPress={() => onSelect(index)} // Use onPress for better UX
+          style={[styles.card]}
+          onPress={() => onSelect(index)}
         >
-          <View style={styles.iconContainer}>
-            <Image
-              source={category.icon}
-              style={[
-                styles.icon,
-                {
-                  tintColor:
-                    selectedCategory === index ? "black" : colors.green,
-                },
-              ]}
-            />
-          </View>
-          <Text
-            style={[
-              styles.cardText,
-              {
-                color: selectedCategory === index ? "black" : "white",
-              },
-            ]}
-          >
-            {category.label}
-          </Text>
+          <View style={styles.iconContainer}>{category.icon}</View>
+          <Text style={[styles.cardText]}>{category.label}</Text>
         </TouchableOpacity>
       ))}
     </View>
@@ -59,10 +33,12 @@ const styles = StyleSheet.create({
     height: 80,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#242425",
   },
   cardText: {
     fontSize: 12,
     marginBottom: 5,
+    color: "#fff",
   },
   iconContainer: {
     width: 40,

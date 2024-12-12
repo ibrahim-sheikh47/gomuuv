@@ -13,6 +13,11 @@ import CustomModal from "../../components/CustomModal"; // Import your CustomMod
 import { CustomCard } from "../../components/CustomCard";
 import { ActivityCard } from "../../components/ActivityCard";
 import { StatsHistoryCard } from "../../components/StatsHistoryCard";
+import FastingIcon from "../../assets/svgs/FastingIcon";
+import ProgressIcon from "../../assets/svgs/ProgressIcon";
+import FastTypeIcon from "../../assets/svgs/FastTypeIcon";
+import GlassIcon from "../../assets/svgs/GlassIcon";
+import SearchIcon from "../../assets/svgs/SearchIcon";
 
 const FastingScreen = () => {
   const navigation = useNavigation();
@@ -82,7 +87,7 @@ const FastingScreen = () => {
       <Header
         title={"Fasting"}
         showBackButton={true}
-        rightIcon1={icons.search}
+        rightIcon1={<SearchIcon />}
       />
 
       <TabContainer
@@ -120,10 +125,7 @@ const FastingScreen = () => {
                   >
                     Ready to Begin Your Fast?
                   </Text>
-                  <Image
-                    source={icons.fasting}
-                    style={{ width: 22, height: 22 }}
-                  />
+                  <FastingIcon />
                 </View>
                 <Text
                   style={{
@@ -255,12 +257,12 @@ const FastingScreen = () => {
               <StatsHistoryCard
                 label={"Weekly Progress"}
                 value={10}
-                icon={icons.progress}
+                icon={ProgressIcon}
               />
               <StatsHistoryCard
                 label={"Longest Fast"}
                 value={10}
-                icon={icons.progress}
+                icon={ProgressIcon}
               />
             </View>
             <View
@@ -274,12 +276,12 @@ const FastingScreen = () => {
               <StatsHistoryCard
                 label={"Water Intake"}
                 value={10}
-                icon={icons.glass}
+                icon={GlassIcon}
               />
               <StatsHistoryCard
                 label={"Fast Type"}
                 value={10}
-                icon={icons.fastType}
+                icon={FastTypeIcon}
               />
             </View>
             <Text
@@ -305,7 +307,7 @@ const FastingScreen = () => {
         visible={modalVisible}
         onClose={handleModalClose}
         modalText={"Your fast has ended!"}
-        modalIcon={icons.fasting} // Customize your success icon here
+        modalIcon={<FastingIcon />} // Customize your success icon here
       />
     </Container>
   );

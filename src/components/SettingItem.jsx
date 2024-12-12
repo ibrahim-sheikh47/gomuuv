@@ -3,7 +3,7 @@ import React from "react";
 
 const SettingItem = ({ icon, text, onPress }) => (
   <TouchableOpacity style={styles.settingContainer} onPress={onPress}>
-    <Image source={icon} style={styles.settingIcon} />
+    {icon}
     <Text style={styles.settingText}>{text}</Text>
   </TouchableOpacity>
 );

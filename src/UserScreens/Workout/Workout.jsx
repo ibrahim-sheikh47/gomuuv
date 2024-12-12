@@ -17,6 +17,14 @@ import { useNavigation } from "@react-navigation/native";
 import images from "../../constants/images";
 import MealCategorySelector from "../../components/MealCategorySelector";
 import WorkoutCard from "../../components/WorkoutCard";
+import WalkingIcon from "../../assets/svgs/WalkingIcon";
+import TreadMillIcon from "../../assets/svgs/TreadmillIcon";
+import DumbbellIcon from "../../assets/svgs/DumbbellIcon";
+import JumpRopeIcon from "../../assets/svgs/JumpRopeIcon";
+import PullupBarIcon from "../../assets/svgs/PullupBarIcon";
+import CaloriesIcon from "../../assets/svgs/CaloriesIcon";
+import TimeIcon from "../../assets/svgs/TimeIcon";
+import SearchIcon from "../../assets/svgs/SearchIcon";
 
 const WorkoutScreen = () => {
   const navigation = useNavigation();
@@ -35,11 +43,12 @@ const WorkoutScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   const sessionCategories = [
-    { label: "Treadmill", icon: icons.treadmill },
-    { label: "Dumbbells", icon: icons.dumbbell },
-    { label: "Jump Rope", icon: icons.jumpRope },
-    { label: "Pull-Up Bar", icon: icons.pullUp },
+    { label: "Treadmill", icon: <TreadMillIcon /> },
+    { label: "Dumbbells", icon: <DumbbellIcon /> },
+    { label: "Jump Rope", icon: <JumpRopeIcon /> },
+    { label: "Pull-Up Bar", icon: <PullupBarIcon /> },
   ];
+
   const handleCategorySelect = (index) => {
     setSelectedCategory(index);
 
@@ -59,7 +68,7 @@ const WorkoutScreen = () => {
   const stepsTotal = 5000;
   return (
     <Container>
-      <Header title={"Workout"} rightIcon1={icons.search} />
+      <Header title={"Workout"} rightIcon1={<SearchIcon />} />
       <TabContainer
         activeTab={activeTab}
         onTabClick={handleTabClick}
@@ -75,7 +84,7 @@ const WorkoutScreen = () => {
           <>
             <View style={styles.stepContainer}>
               <View style={styles.row}>
-                <Image source={icons.walking} style={styles.icon} />
+                <WalkingIcon />
                 <Text style={styles.titleText}>Steps</Text>
               </View>
 
@@ -106,16 +115,11 @@ const WorkoutScreen = () => {
             <View style={[styles.row, styles.metricsContainer]}>
               <MetricBox
                 label="Calories"
-                icon={icons.calories}
+                icon={CaloriesIcon}
                 value="65"
                 unit="kcal"
               />
-              <MetricBox
-                label="Time"
-                icon={icons.time}
-                value="20"
-                unit="mins"
-              />
+              <MetricBox label="Time" icon={TimeIcon} value="20" unit="mins" />
             </View>
             <View>
               <Text style={styles.sessionTitle}>Today's Session</Text>
@@ -169,11 +173,11 @@ const WorkoutScreen = () => {
   );
 };
 
-const MetricBox = ({ label, value, unit, icon }) => (
+const MetricBox = ({ label, value, unit, icon: IconComponent }) => (
   <View style={styles.metricBox}>
     <View style={styles.metricRow}>
       <Text style={styles.metricLabel}>{label}</Text>
-      <Image source={icon} style={styles.icon} />
+      <IconComponent width={16} height={16} />
     </View>
     <View style={styles.metricValueContainer}>
       <Text style={styles.metricValue}>{value}</Text>
@@ -188,7 +192,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
+    gap: 10,
   },
   stepContainer: {
     marginTop: 20,

@@ -8,13 +8,13 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import icons from "../../constants/icons";
 import images from "../../constants/images";
 import Container from "../../components/Container";
 import { colors } from "../../constants/colors";
 import Selectable from "../../components/Selectable";
 import CustomButton from "../../components/CustomButton";
 import { Switch } from "react-native-paper";
+import BackIcon from "../../assets/svgs/BackIcon";
 
 const SwitchItem = ({ label, isSwitchOn, onToggleSwitch }) => (
   <View style={styles.switchContainer}>
@@ -98,7 +98,7 @@ const WorkoutDetails = () => {
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <Image source={icons.back} style={styles.backIcon} />
+            <BackIcon />
           </TouchableOpacity>
 
           <View>

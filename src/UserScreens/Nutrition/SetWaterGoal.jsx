@@ -5,7 +5,6 @@ import InputField from "../../components/InputField";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
 import CustomButton from "../../components/CustomButton";
-import icons from "../../constants/icons";
 import { colors } from "../../constants/colors";
 
 const SetWaterGoal = ({ navigation, route }) => {
@@ -35,7 +34,9 @@ const SetWaterGoal = ({ navigation, route }) => {
             keyboardType="numeric"
             placeholder="1(Glass)"
           />
-          <Image style={styles.editIcon} source={icons.edit} />
+          <TouchableOpacity style={styles.editIcon}>
+            <EditIcon />
+          </TouchableOpacity>
         </View>
         {/* Input field for the volume per glass */}
         <InputField

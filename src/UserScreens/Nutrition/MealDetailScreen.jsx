@@ -14,6 +14,10 @@ import icons from "../../constants/icons";
 import NutrientItem from "../../components/NutrientItem";
 import CustomModal from "../../components/CustomModal";
 import { useNavigation } from "@react-navigation/native";
+import BackIcon from "../../assets/svgs/BackIcon";
+import CaloriesIcon from "../../assets/svgs/CaloriesIcon";
+import TimeIcon from "../../assets/svgs/TimeIcon";
+import MealAddedIcon from "../../assets/svgs/MealAddedIcon";
 
 const MealDetailScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -54,10 +58,7 @@ const MealDetailScreen = ({ route }) => {
             }}
             onPress={() => navigation.goBack()} // Add back navigation logic
           >
-            <Image
-              source={icons.back}
-              style={{ width: 20, height: 20, objectFit: "contain" }}
-            />
+            <BackIcon />
           </TouchableOpacity>
           <Image source={item.meal.mealImage} style={styles.image} />
           <View style={{ padding: 20 }}>
@@ -68,11 +69,11 @@ const MealDetailScreen = ({ route }) => {
             <View style={styles.mealStatsContainer}>
               <View style={styles.mealStats}>
                 <View style={styles.statItem}>
-                  <Image style={styles.statIcon} source={icons.burned} />
+                  <CaloriesIcon width={18} height={18} />
                   <Text style={styles.statText}>{item.meal.calories} kcal</Text>
                 </View>
                 <View style={styles.statItem}>
-                  <Image style={styles.statIcon} source={icons.time} />
+                  <TimeIcon />
                   <Text style={styles.statText}>{item.meal.time} mins</Text>
                 </View>
               </View>
@@ -149,7 +150,7 @@ const MealDetailScreen = ({ route }) => {
     if (item.type === "steps") {
       return (
         <View style={{ padding: 20 }}>
-          <Text style={styles.title}>How to make Step by Step</Text>
+          <Text style={styles.title}>How to make Step by Steppppp</Text>
           <FlatList
             data={item.steps}
             keyExtractor={(step) => step.id}
@@ -170,7 +171,7 @@ const MealDetailScreen = ({ route }) => {
           <CustomModal
             visible={isModalVisible}
             onClose={handleClose}
-            modalIcon={icons.mealAdded}
+            modalIcon={<MealAddedIcon />}
             modalText={"Meal Added!"}
           />
         </View>
@@ -227,6 +228,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginLeft: 15, // Adds space between stat items
+    gap: 5,
   },
   statIcon: {
     width: 15,

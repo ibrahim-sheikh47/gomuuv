@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
-import icons from "../../constants/icons";
+import Tab5Icon from "../../assets/svgs/Tab5Icon";
 import Selectable from "../../components/Selectable";
 import { colors } from "../../constants/colors";
 
@@ -12,7 +12,7 @@ const SleepScreen = () => {
     <Container>
       <Header
         title={"Sleep Tracker"}
-        rightIcon1={icons.shop}
+        rightIcon1={<Tab5Icon color="white" />}
         showBackButton={true}
       />
       <View style={{ marginTop: 20 }}>
@@ -99,6 +99,17 @@ const SleepScreen = () => {
             in <Text style={{ color: colors.green }}>6 hours and 22 min</Text>
           </Text>
         </View>
+
+        <Text
+          style={{
+            color: "white",
+            margin: 30,
+            fontFamily: "Poppins-Bold",
+            fontSize: 20,
+          }}
+        >
+          TO BE UPDATED ALONG WITH SMART WATCH
+        </Text>
       </View>
     </Container>
   );

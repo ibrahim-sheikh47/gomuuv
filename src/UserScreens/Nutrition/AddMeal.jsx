@@ -5,6 +5,10 @@ import Header from "../../components/Header";
 import icons from "../../constants/icons";
 import { useNavigation } from "@react-navigation/native";
 import MealCard from "../../components/MealCard";
+import BreakfastIcon from "../../assets/svgs/BreakfastIcon";
+import LunchIcon from "../../assets/svgs/LunchIcon";
+import SnacksIcon from "../../assets/svgs/SnacksIcon";
+import DinnerIcon from "../../assets/svgs/DinnerIcon";
 
 const AddMeal = () => {
   return (
@@ -12,10 +16,10 @@ const AddMeal = () => {
       <Header title={"Choose Meal to Add "} showBackButton={true} />
 
       <View style={styles.grid}>
-        <MealCard label="Breakfast" icon={icons.breakfast} />
-        <MealCard label="Lunch" icon={icons.lunch} />
-        <MealCard label="Dinner" icon={icons.dinner} />
-        <MealCard label="Snacks" icon={icons.snacks} />
+        <MealCard label="Breakfast" icon={BreakfastIcon} />
+        <MealCard label="Lunch" icon={LunchIcon} />
+        <MealCard label="Dinner" icon={DinnerIcon} />
+        <MealCard label="Snacks" icon={SnacksIcon} />
       </View>
     </Container>
   );

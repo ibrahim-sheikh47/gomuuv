@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Picker } from "@react-native-picker/picker";
 import Container from "../../components/Container";
@@ -8,6 +15,7 @@ import icons from "../../constants/icons";
 import InputField from "../../components/InputField";
 import CustomButton from "../../components/CustomButton";
 import { colors } from "../../constants/colors";
+import EditIcon from "../../assets/svgs/EditIcon";
 
 const ActivityScreen = () => {
   const route = useRoute();
@@ -62,12 +70,10 @@ const ActivityScreen = () => {
               onChangeText={(value) => handleInputChange("timeHours", value)}
               keyboardType="numeric"
             />
-            <Image style={styles.editIcon} source={icons.edit} />
+            <TouchableOpacity style={styles.editIcon}>
+              <EditIcon />
+            </TouchableOpacity>
           </View>
-          <Image
-            source={icons.colon}
-            style={{ width: 6, height: 18, marginTop: 30 }}
-          />
           <View style={{ flex: 1 }}>
             <InputField
               label={"(Minutes)"}
@@ -76,7 +82,9 @@ const ActivityScreen = () => {
               onChangeText={(value) => handleInputChange("timeMinutes", value)}
               keyboardType="numeric"
             />
-            <Image style={styles.editIcon} source={icons.edit} />
+            <TouchableOpacity style={styles.editIcon}>
+              <EditIcon />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -89,7 +97,9 @@ const ActivityScreen = () => {
               placeholder="Enter distance"
               keyboardType="numeric"
             />
-            <Image style={styles.editIcon} source={icons.edit} />
+            <TouchableOpacity style={styles.editIcon}>
+              <EditIcon />
+            </TouchableOpacity>
           </View>
           <View style={styles.pickerContainer}>
             <Picker

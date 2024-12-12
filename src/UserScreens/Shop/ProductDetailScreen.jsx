@@ -15,6 +15,8 @@ import { MaterialIcons } from "@expo/vector-icons"; // Importing Chevron icon (e
 import CustomButton from "../../components/CustomButton";
 import CustomModal from "../../components/CustomModal";
 import { useNavigation } from "@react-navigation/native";
+import CartIcon from "../../assets/svgs/CartIcon";
+import ShopIcon from "../../assets/svgs/ShopIcon";
 
 const ProductDetailScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -67,8 +69,8 @@ const ProductDetailScreen = ({ route }) => {
       <Header
         title={"Shop"}
         showBackButton={true}
-        rightIcon1={icons.cart}
-        rightIcon2={icons.cart2}
+        rightIcon1={<CartIcon />}
+        rightIcon2={<ShopIcon fill="white" />}
       />
 
       <ScrollView style={{ marginBottom: 30 }}>
@@ -173,7 +175,7 @@ const ProductDetailScreen = ({ route }) => {
       <CustomModal
         visible={isModalVisible}
         onClose={handleCloseModal}
-        modalIcon={icons.addedToCart}
+        modalIcon={<CartIcon width={50} height={50} />}
         modalText={"Item added to cart!"}
       />
     </Container>

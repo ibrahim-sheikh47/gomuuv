@@ -13,6 +13,7 @@ import CustomButton from "../../../components/CustomButton";
 import icons from "../../../constants/icons";
 import { colors } from "../../../constants/colors";
 import { useNavigation } from "@react-navigation/native";
+import images from "../../../constants/images";
 
 const Device = () => {
   const navigation = useNavigation();
@@ -23,7 +24,7 @@ const Device = () => {
     const newDevice = {
       id: selectedDevices.length + 1,
       name: `Device ${selectedDevices.length + 1}`,
-      image: icons.device, // Replace with the actual device image
+      image: images.device, // Replace with the actual device image
     };
     setSelectedDevices([...selectedDevices, newDevice]);
   };
@@ -52,7 +53,7 @@ const Device = () => {
       <Header title="Device" showBackButton />
 
       <View style={styles.imageContainer}>
-        <Image source={icons.device} style={styles.mainImage} />
+        <Image source={images.device} style={styles.mainImage} />
       </View>
 
       <CustomButton

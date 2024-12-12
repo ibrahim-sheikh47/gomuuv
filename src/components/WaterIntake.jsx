@@ -3,8 +3,8 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
 import { ProgressBar } from "./ProgressBar";
-import icons from "../constants/icons";
 import { colors } from "../constants/colors";
+import GlassIcon from "../assets/svgs/GlassIcon";
 
 const WaterIntake = ({ consumedGlasses, totalGlasses, onAddWater }) => {
   const waterProgress = Math.min((consumedGlasses / totalGlasses) * 100, 100);
@@ -13,7 +13,7 @@ const WaterIntake = ({ consumedGlasses, totalGlasses, onAddWater }) => {
     <TouchableOpacity style={styles.waterIntakeContainer} onPress={onAddWater}>
       <View style={styles.waterIntakeHeader}>
         <Text style={styles.waterIntakeText}>Mark Water Intake</Text>
-        <Image source={icons.glass} style={styles.glassIcon} />
+        <GlassIcon />
       </View>
       <Text style={styles.waterConsumptionText}>
         {`${consumedGlasses} of ${totalGlasses} glasses consumed`}

@@ -1,12 +1,12 @@
 import { Image, StyleSheet, Text, View } from "react-native";
 import React from "react";
-import icons from "../constants/icons";
+import Logo from "../assets/svgs/Logo";
 
 const AuthHeader = ({ header, description, customStyles = {} }) => {
   return (
     <>
       <View style={styles.headerContainer}>
-        <Image source={icons.logo} style={styles.logo} />
+        <Logo />
         <Text style={[styles.headerText, customStyles.headerText]}>
           {header}
         </Text>
@@ -27,10 +27,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 12,
     marginTop: 20,
-  },
-  logo: {
-    width: 32,
-    height: 32,
   },
   headerText: {
     fontFamily: "Poppins-Bold",

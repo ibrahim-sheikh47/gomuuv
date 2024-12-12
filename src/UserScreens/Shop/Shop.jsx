@@ -5,10 +5,10 @@ import Header from "../../components/Header";
 import SearchBar from "../../components/SearchBar";
 import Selectable from "../../components/Selectable";
 import ProductSection from "../../components/ProductSection";
-import images from "../../constants/images";
-import icons from "../../constants/icons";
 import { shopProducts } from "../../utils/data";
 import { useNavigation } from "@react-navigation/native";
+import CartIcon from "../../assets/svgs/CartIcon";
+import ShopIcon from "../../assets/svgs/ShopIcon";
 const ShopScreen = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,7 +22,11 @@ const ShopScreen = () => {
 
   return (
     <Container>
-      <Header title="Shop" rightIcon1={icons.cart} rightIcon2={icons.cart2} />
+      <Header
+        title="Shop"
+        rightIcon1={<CartIcon />}
+        rightIcon2={<ShopIcon fill="#fff" />}
+      />
 
       {/* Use ScrollView to enable scrolling for the entire screen */}
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>

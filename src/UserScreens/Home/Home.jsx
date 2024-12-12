@@ -10,6 +10,16 @@ import { ActivityCard } from "../../components/ActivityCard";
 import { CustomCard } from "../../components/CustomCard";
 import DailyReport from "../../components/DailyReport";
 import { useNavigation } from "@react-navigation/native";
+import WalkingIcon from "../../assets/svgs/WalkingIcon";
+import RunningIcon from "../../assets/svgs/RunningIcon";
+import BikingIcon from "../../assets/svgs/BikingIcon";
+import SleepIcon from "../../assets/svgs/SleepIcon";
+import ChallengesIcon from "../../assets/svgs/ChallengesIcon";
+import WorkoutsIcon from "../../assets/svgs/WorkoutsIcon";
+import NutritionIcon from "../../assets/svgs/NutritionIcon";
+import ShopIcon from "../../assets/svgs/ShopIcon";
+import Tab5Icon from "../../assets/svgs/Tab5Icon";
+import SearchIcon from "../../assets/svgs/SearchIcon";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -21,6 +31,11 @@ const HomeScreen = () => {
     if (isFirstTime) {
       setIsFirstTime(false);
     }
+  };
+  const activityIcons = {
+    Walking: WalkingIcon,
+    Running: RunningIcon,
+    Biking: BikingIcon,
   };
 
   return (
@@ -35,8 +50,8 @@ const HomeScreen = () => {
             }}
           />
           <View style={styles.iconButtonContainer}>
-            <IconButton iconSource={icons.search} />
-            <IconButton iconSource={icons.shop} />
+            <IconButton icon={<SearchIcon />} />
+            <IconButton icon={<Tab5Icon color="white" />} />
           </View>
         </View>
 
@@ -50,11 +65,11 @@ const HomeScreen = () => {
           {["Walking", "Running", "Biking"].map((activity, index) => (
             <ActivityCard
               key={activity}
-              iconSource={icons[activity.toLowerCase()]}
+              icon={activityIcons[activity]}
               label={activity}
               onPress={() => {
                 handleInteraction();
-                navigation.navigate("ActivityScreen", {
+                navigation.navigate("ActivityDetailScreen", {
                   activityType: activity,
                   activityName: activity,
                 });
@@ -68,7 +83,7 @@ const HomeScreen = () => {
         <View style={styles.cardRow}>
           <CustomCard
             label="Activity"
-            icon={icons.running}
+            icon={RunningIcon}
             message={
               isFirstTime ? `Please start Activity to see data` : "1.5 mi"
             }
@@ -77,7 +92,7 @@ const HomeScreen = () => {
           />
           <CustomCard
             label="Sleep"
-            icon={icons.tab5Filled}
+            icon={SleepIcon}
             message={isFirstTime ? `Please start Sleep to see data` : "7h 32m"}
             goal="Goal: 8 hours of sleep daily"
             value="7h 32m"
@@ -91,7 +106,7 @@ const HomeScreen = () => {
         <View style={styles.cardRow}>
           <CustomCard
             label="Challenges"
-            icon={icons.challenges}
+            icon={ChallengesIcon}
             message={
               isFirstTime ? `Please start Challenges to see data` : "100"
             }
@@ -104,7 +119,7 @@ const HomeScreen = () => {
           />
           <CustomCard
             label="Workouts"
-            icon={icons.workouts}
+            icon={WorkoutsIcon}
             message={isFirstTime ? `Please start Workouts to see data` : 3}
             goal="Goal: 4 workouts per week"
             value="3"
@@ -118,7 +133,7 @@ const HomeScreen = () => {
         <View style={styles.cardRow}>
           <CustomCard
             label="Nutrition"
-            icon={icons.nutrition}
+            icon={NutritionIcon}
             message={
               isFirstTime ? `Please start Nutrition to see data` : "64kg"
             }
@@ -131,7 +146,7 @@ const HomeScreen = () => {
           />
           <CustomCard
             label="Shop"
-            icon={icons.shop2}
+            icon={ShopIcon}
             message={isFirstTime ? `Please start Shop to see data` : 2}
             goal="items in cart"
             value="02"

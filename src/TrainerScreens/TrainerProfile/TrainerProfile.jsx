@@ -8,22 +8,23 @@ import SettingItem from "../../components/SettingItem";
 import { settings } from "../../utils/data";
 import icons from "../../constants/icons";
 import { useNavigation } from "@react-navigation/native";
+import KetoIcon from "../../assets/svgs/KetoIcon";
 
 const TrainerProfile = () => {
   const navigation = useNavigation();
   const trainerSettings = [
     {
-      icon: icons.personalInfo,
+      icon: <KetoIcon />,
       text: "Personal Information",
       route: "PersonalInfoScreen",
     },
     {
-      icon: icons.changePass,
+      icon: <KetoIcon />,
       text: "Change Password",
       route: "ChangePassScreen",
     },
     {
-      icon: icons.syncSecure,
+      icon: <KetoIcon />,
       text: "Sync and Secure Data",
       route: "SyncSecureDataScreen",
     },

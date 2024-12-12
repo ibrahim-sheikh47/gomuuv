@@ -15,6 +15,9 @@ import { SocialButton } from "../../../components/SocialButton";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
 import CustomButton from "../../../components/CustomButton";
+import GoogleLogo from "../../../assets/svgs/GoogleLogo";
+import FacebookLogo from "../../../assets/svgs/FacebookLogo";
+import AppleLogo from "../../../assets/svgs/AppleLogo";
 
 const TrainerSignup = () => {
   const navigation = useNavigation();
@@ -95,9 +98,9 @@ const TrainerSignup = () => {
         </View>
 
         <View style={styles.socialButtonContainer}>
-          <SocialButton icon={icons.google} />
-          <SocialButton icon={icons.facebook} />
-          <SocialButton icon={icons.apple} />
+          <SocialButton icon={GoogleLogo} />
+          <SocialButton icon={FacebookLogo} />
+          <SocialButton icon={AppleLogo} />
         </View>
         <View style={styles.signInRow}>
           <Text style={styles.signInText}>Already a member?</Text>

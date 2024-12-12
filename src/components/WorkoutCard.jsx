@@ -1,7 +1,11 @@
 // components/WorkoutCard.js
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import icons from "../constants/icons"; // Adjust the path according to your project structure
+import CaloriesIcon from "../assets/svgs/CaloriesIcon";
+import TimeIcon from "../assets/svgs/TimeIcon";
+import StrengthIcon from "../assets/svgs/StrengthIcon";
+import { IconButton } from "react-native-paper";
+import { colors } from "../constants/colors";
 
 const WorkoutCard = ({ title, calories, time, category, image, onPress }) => (
   <TouchableOpacity style={styles.sessionContainer} onPress={onPress}>
@@ -9,18 +13,23 @@ const WorkoutCard = ({ title, calories, time, category, image, onPress }) => (
     <Text style={styles.sessionTitleText}>{title}</Text>
     <View style={styles.sessionDetailsContainer}>
       <View style={styles.sessionDetail}>
-        <Image style={styles.detailIcon} source={icons.calories} />
-        <Text style={styles.detailText}>{calories} kcal</Text>
+        <CaloriesIcon width={15} height={15} />
+        <Text style={styles.detailText}>{calories}</Text>
       </View>
       <View style={styles.sessionDetail}>
-        <Image style={styles.detailIcon} source={icons.time} />
-        <Text style={styles.detailText}>{time} mins</Text>
+        <TimeIcon />
+        <Text style={styles.detailText}>{time}</Text>
       </View>
       <View style={styles.sessionDetail}>
-        <Image style={styles.detailIcon} source={icons.quadriceps} />
+        <StrengthIcon />
         <Text style={styles.detailText}>{category}</Text>
       </View>
-      <Image source={icons.nextBg} style={styles.nextIcon} />
+      <IconButton
+        icon="chevron-right"
+        size={20} // Adjust the size as needed
+        color="#aaa" // Adjust the color as needed
+        style={styles.nextIcon}
+      />
     </View>
   </TouchableOpacity>
 );
@@ -68,8 +77,10 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   nextIcon: {
-    width: 30,
-    height: 30,
+    marginLeft: "auto",
+    marginTop: "auto",
+    marginBottom: 10,
+    backgroundColor: colors.green,
   },
 });
 

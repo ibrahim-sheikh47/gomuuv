@@ -1,7 +1,11 @@
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "../constants/colors";
 
-export const ActivityCard = ({ iconSource, label, onPress }) => (
+export const ActivityCard = ({
+  icon: ActivityIconComponent,
+  label,
+  onPress,
+}) => (
   <TouchableOpacity
     onPress={onPress}
     style={{
@@ -14,7 +18,7 @@ export const ActivityCard = ({ iconSource, label, onPress }) => (
       gap: 10,
     }}
   >
-    <Image style={{ width: 30, height: 30 }} source={iconSource} />
+    <ActivityIconComponent />
     <Text style={{ color: "white" }}>{label}</Text>
   </TouchableOpacity>
 );

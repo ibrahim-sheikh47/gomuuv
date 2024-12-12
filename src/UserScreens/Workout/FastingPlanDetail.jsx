@@ -6,9 +6,9 @@ import Container from "../../components/Container";
 import Header from "../../components/Header";
 import CustomButton from "../../components/CustomButton";
 import CustomModal from "../../components/CustomModal";
-import icons from "../../constants/icons";
 import { MealItem } from "../../components/MealItem";
 import { fastingMeals } from "../../utils/data";
+import FastingIcon from "../../assets/svgs/FastingIcon";
 
 const FastingPlanDetail = () => {
   const navigation = useNavigation();
@@ -179,7 +179,7 @@ const FastingPlanDetail = () => {
       <CustomModal
         visible={modalVisible}
         onClose={closeModal}
-        modalIcon={icons.fasting}
+        modalIcon={<FastingIcon />}
         modalText={"Your fast has started!"}
       />
     </Container>

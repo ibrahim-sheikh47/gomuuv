@@ -13,6 +13,9 @@ import { colors } from "../../constants/colors";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
 import Selectable from "../../components/Selectable";
+import SearchIcon from "../../assets/svgs/SearchIcon";
+import StrengthIcon from "../../assets/svgs/StrengthIcon";
+import LevelIcon from "../../assets/svgs/LevelIcon";
 
 const WorkoutProgramsList = ({ navigation, route }) => {
   const trainerWorkoutData = route.params?.trainerWorkoutData || [];
@@ -39,11 +42,11 @@ const WorkoutProgramsList = ({ navigation, route }) => {
         <View style={styles.cardDetails}>
           <View>
             <View style={styles.sessionDetail}>
-              <Image style={styles.detailIcon} source={icons.quadriceps} />
+              <StrengthIcon />
               <Text style={styles.detailText}>{item.category}</Text>
             </View>
             <View style={styles.sessionDetail}>
-              <Image style={styles.detailIcon} source={icons.level} />
+              <LevelIcon />
               <Text style={styles.detailText}>{item.level}</Text>
             </View>
           </View>
@@ -57,7 +60,7 @@ const WorkoutProgramsList = ({ navigation, route }) => {
       <Header
         title={"Your Program"}
         showBackButton={true}
-        rightIcon1={icons.search}
+        rightIcon1={<SearchIcon />}
       />
       <Selectable
         items={["All", "Recent", "Popular", "Inactive", "Active"]}

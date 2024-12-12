@@ -1,11 +1,19 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, Image, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import Container from "../../components/Container";
 import BackHeader from "../../components/BackHeader";
 import InputField from "../../components/InputField";
 import CustomButton from "../../components/CustomButton";
 import { colors } from "../../constants/colors";
 import icons from "../../constants/icons";
+import EditIcon from "../../assets/svgs/EditIcon";
 
 const TrainerInfo = () => {
   // State to hold dynamic values for each input field
@@ -42,11 +50,12 @@ const TrainerInfo = () => {
             onChangeText={(text) => setFirstName(text)}
             editable={isEditing.firstName}
           />
-          <Image
+          <TouchableOpacity
             style={styles.editIcon}
-            source={icons.edit}
-            onTouchEnd={() => handleEdit("firstName")}
-          />
+            onPress={() => handleEdit("firstName")}
+          >
+            <EditIcon />
+          </TouchableOpacity>
         </View>
         <View style={styles.fieldContainer}>
           <InputField
@@ -55,11 +64,12 @@ const TrainerInfo = () => {
             onChangeText={(text) => setLastName(text)}
             editable={isEditing.lastName}
           />
-          <Image
+          <TouchableOpacity
             style={styles.editIcon}
-            source={icons.edit}
-            onTouchEnd={() => handleEdit("lastName")}
-          />
+            onPress={() => handleEdit("lastName")}
+          >
+            <EditIcon />
+          </TouchableOpacity>
         </View>
         <View style={styles.fieldContainer}>
           <InputField
@@ -68,11 +78,12 @@ const TrainerInfo = () => {
             onChangeText={(text) => setProfession(text)}
             editable={isEditing.profession}
           />
-          <Image
+          <TouchableOpacity
             style={styles.editIcon}
-            source={icons.edit}
-            onTouchEnd={() => handleEdit("profession")}
-          />
+            onPress={() => handleEdit("profession")}
+          >
+            <EditIcon />
+          </TouchableOpacity>
         </View>
       </ScrollView>
       <CustomButton title={"Save Changes"} onPress={handleSaveChanges} />

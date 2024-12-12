@@ -1,7 +1,12 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "../constants/colors";
 
-export const StatsHistoryCard = ({ label, icon, value, onPress }) => (
+export const StatsHistoryCard = ({
+  label,
+  icon: StatsIcon,
+  value,
+  onPress,
+}) => (
   <TouchableOpacity style={styles.activityCard} onPress={onPress}>
     <View style={styles.activityCardContent}>
       <Text
@@ -9,7 +14,7 @@ export const StatsHistoryCard = ({ label, icon, value, onPress }) => (
       >
         {label}
       </Text>
-      <Image style={styles.iconImage} source={icon} />
+      <StatsIcon width={20} height={20} />
     </View>
 
     <View>

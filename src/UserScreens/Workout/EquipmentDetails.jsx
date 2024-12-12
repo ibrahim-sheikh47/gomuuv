@@ -15,6 +15,11 @@ import { colors } from "../../constants/colors";
 import CustomButton from "../../components/CustomButton";
 import icons from "../../constants/icons";
 import images from "../../constants/images";
+import EditIcon from "../../assets/svgs/EditIcon";
+import CaloriesIcon from "../../assets/svgs/CaloriesIcon";
+import TimeIcon from "../../assets/svgs/TimeIcon";
+import StrengthIcon from "../../assets/svgs/StrengthIcon";
+import { IconButton } from "react-native-paper";
 
 const EquipmentDetails = () => {
   const navigation = useNavigation();
@@ -149,7 +154,7 @@ const EquipmentDetails = () => {
             Saved Workout
           </Text>
           <TouchableOpacity>
-            <Image source={icons.edit} style={{ width: 12, height: 12 }} />
+            <EditIcon />
           </TouchableOpacity>
         </View>
         {workoutDetails ? (
@@ -160,18 +165,24 @@ const EquipmentDetails = () => {
             </Text>
             <View style={styles.sessionDetailsContainer}>
               <View style={styles.sessionDetail}>
-                <Image style={styles.detailIcon} source={icons.calories} />
+                <CaloriesIcon width={20} height={20} />
                 <Text style={styles.detailText}>{workoutDetails.speed}</Text>
               </View>
               <View style={styles.sessionDetail}>
-                <Image style={styles.detailIcon} source={icons.time} />
+                <TimeIcon />
                 <Text style={styles.detailText}>{workoutDetails.incline}</Text>
               </View>
               <View style={styles.sessionDetail}>
-                <Image style={styles.detailIcon} source={icons.quadriceps} />
+                <StrengthIcon />
                 <Text style={styles.detailText}>Quadriceps</Text>
               </View>
-              <Image source={icons.nextBg} style={styles.nextIcon} />
+
+              <IconButton
+                icon="arrow-right"
+                size={20} // Adjust the size as needed
+                color="#aaa" // Adjust the color as needed
+                style={styles.nextIcon}
+              />
             </View>
           </TouchableOpacity>
         ) : (
@@ -256,7 +267,7 @@ const styles = StyleSheet.create({
   sessionDetail: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 3,
+    gap: 10,
   },
   detailIcon: {
     width: 15,
@@ -271,5 +282,6 @@ const styles = StyleSheet.create({
   nextIcon: {
     width: 30,
     height: 30,
+    backgroundColor: colors.green,
   },
 });

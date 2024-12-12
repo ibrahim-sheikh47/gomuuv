@@ -1,17 +1,22 @@
 import * as React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Image, View, Text } from "react-native";
-import icons from "../../constants/icons"; // Import your icons
+import { View, Text } from "react-native";
 import { colors } from "../../constants/colors"; // Import your color palette
 import HomeScreen from "../../UserScreens/Home/Home";
 import ShopScreen from "../../UserScreens/Shop/Shop";
 import NutritionScreen from "../../UserScreens/Nutrition/Nutrition";
 import WorkoutScreen from "../../UserScreens/Workout/Workout";
 import ChallengesScreen from "../../UserScreens/Challenges/Challenges";
+import Tab1Icon from "../../assets/svgs/Tab1Icon";
+import Tab2Icon from "../../assets/svgs/Tab2Icon";
+import Tab3Icon from "../../assets/svgs/Tab3Icon";
+import Tab4Icon from "../../assets/svgs/Tab4Icon";
+import Tab5Icon from "../../assets/svgs/Tab5Icon";
 
 const Tab = createBottomTabNavigator();
 
-const TabIcon = ({ focused, icon, iconOutline, label }) => {
+const TabIcon = ({ focused, IconFilled, IconOutlined, label }) => {
+  const icon = focused ? IconFilled : IconOutlined; // Choose based on focus
   return (
     <View
       style={{
@@ -23,11 +28,7 @@ const TabIcon = ({ focused, icon, iconOutline, label }) => {
         borderRadius: 12, // Optional: Add border radius for rounded corners
       }}
     >
-      <Image
-        source={focused ? icon : iconOutline}
-        style={{ width: 24, height: 24, resizeMode: "contain" }}
-      />
-      {/* Render the label only when the tab is focused */}
+      {icon}
       {focused && (
         <Text
           style={{
@@ -46,24 +47,24 @@ const TabIcon = ({ focused, icon, iconOutline, label }) => {
 
 const iconMapping = {
   Challenges: {
-    filled: icons.tab1Filled,
-    outlined: icons.tab1,
+    filled: <Tab1Icon color={colors.green} />,
+    outlined: <Tab1Icon />,
   },
   Workout: {
-    filled: icons.tab2Filled,
-    outlined: icons.tab2,
+    filled: <Tab2Icon color={colors.green} />,
+    outlined: <Tab2Icon />,
   },
   Home: {
-    filled: icons.tab3Filled,
-    outlined: icons.tab3,
+    filled: <Tab3Icon color={colors.green} />,
+    outlined: <Tab3Icon />,
   },
   Nutrition: {
-    filled: icons.tab4Filled,
-    outlined: icons.tab4,
+    filled: <Tab4Icon color={colors.green} />,
+    outlined: <Tab4Icon />,
   },
   Shop: {
-    filled: icons.shopTabFilled,
-    outlined: icons.shopTab,
+    filled: <Tab5Icon color={colors.green} />,
+    outlined: <Tab5Icon />,
   },
 };
 
@@ -88,8 +89,8 @@ export default function TabNavigator() {
             return (
               <TabIcon
                 focused={focused}
-                icon={filled}
-                iconOutline={outlined}
+                IconFilled={filled}
+                IconOutlined={outlined}
                 label={route.name}
               />
             );

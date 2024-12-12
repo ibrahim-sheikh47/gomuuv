@@ -7,6 +7,7 @@ import icons from "../../../constants/icons";
 import { colors } from "../../../constants/colors";
 import InputField from "../../../components/InputField";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import images from "../../../constants/images";
 
 const AddDevice = () => {
   const navigation = useNavigation();
@@ -14,9 +15,9 @@ const AddDevice = () => {
   const { onAddDevice } = route.params || {}; // Callback to send selected devices back
 
   const [devices, setDevices] = useState([
-    { id: 1, name: "Device 1", image: icons.device },
-    { id: 2, name: "Device 2", image: icons.device },
-    { id: 3, name: "Device 3", image: icons.device },
+    { id: 1, name: "Device 1", image: images.device },
+    { id: 2, name: "Device 2", image: images.device },
+    { id: 3, name: "Device 3", image: images.device },
   ]); // Simulated device list
 
   const [searchText, setSearchText] = useState(""); // Track search input
@@ -24,8 +25,8 @@ const AddDevice = () => {
   const handleSearchAgain = () => {
     console.log("Searching for devices...");
     setDevices([
-      { id: 4, name: "Device 4", image: icons.device },
-      { id: 5, name: "Device 5", image: icons.device },
+      { id: 4, name: "Device 4", image: images.device },
+      { id: 5, name: "Device 5", image: images.device },
     ]);
   };
 

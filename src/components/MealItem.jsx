@@ -9,7 +9,8 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../constants/colors";
-import icons from "../constants/icons";
+import CaloriesIcon from "../assets/svgs/CaloriesIcon";
+import TimeIcon from "../assets/svgs/TimeIcon";
 
 export const MealItem = ({
   title,
@@ -64,11 +65,11 @@ export const MealItem = ({
         <Text style={styles.mealName}>{title}</Text>
         <View style={styles.mealStats}>
           <View style={styles.statItem}>
-            <Image style={styles.statIcon} source={icons.burned} />
+            <CaloriesIcon width={16} height={16} />
             <Text style={styles.statText}>{calories} kcal</Text>
           </View>
           <View style={styles.statItem}>
-            <Image style={styles.statIcon} source={icons.time} />
+            <TimeIcon />
             <Text style={styles.statText}>{time} mins</Text>
           </View>
           {forFinalizePlan && (
@@ -130,6 +131,7 @@ const styles = StyleSheet.create({
   },
   statItem: {
     flexDirection: "row",
+    gap: 3,
     alignItems: "center",
   },
   statIcon: {

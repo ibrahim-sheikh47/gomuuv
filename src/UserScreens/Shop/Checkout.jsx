@@ -15,6 +15,8 @@ import { colors } from "../../constants/colors";
 import CustomButton from "../../components/CustomButton";
 import CustomModal from "../../components/CustomModal";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import CartIcon from "../../assets/svgs/CartIcon";
+import ShopIcon from "../../assets/svgs/ShopIcon";
 
 const Checkout = () => {
   const navigation = useNavigation();
@@ -90,8 +92,8 @@ const Checkout = () => {
       <Header
         title={"Checkout"}
         showBackButton={true}
-        rightIcon1={icons.cart}
-        rightIcon2={icons.cart2}
+        rightIcon1={<CartIcon />}
+        rightIcon2={<ShopIcon fill="white" />}
       />
       <ScrollView style={{ marginBottom: 30 }}>
         <Text style={[styles.paymentMethodTitle, { marginTop: 10 }]}>
@@ -227,7 +229,7 @@ const Checkout = () => {
       <CustomModal
         visible={isModalVisible}
         onClose={() => setModalVisible(false)}
-        modalIcon={icons.cart}
+        modalIcon={<CartIcon width={50} height={50} />}
         modalText={"Your order has been placed!"}
       />
       <CustomButton title={"Complete Order"} onPress={handleOrder} />

@@ -13,6 +13,8 @@ import icons from "../../constants/icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { colors } from "../../constants/colors";
 import CustomButton from "../../components/CustomButton";
+import CartIcon from "../../assets/svgs/CartIcon";
+import ShopIcon from "../../assets/svgs/ShopIcon";
 
 const Cart = () => {
   const navigation = useNavigation();
@@ -51,8 +53,8 @@ const Cart = () => {
         <Header
           title={"Cart"}
           showBackButton={true}
-          rightIcon1={icons.cart}
-          rightIcon2={icons.cart2}
+          rightIcon1={<CartIcon />}
+          rightIcon2={<ShopIcon fill="white" />}
         />
         <Text
           style={{ color: colors.white, textAlign: "center", marginTop: 20 }}
@@ -68,8 +70,8 @@ const Cart = () => {
       <Header
         title={"Cart"}
         showBackButton={true}
-        rightIcon1={icons.cart}
-        rightIcon2={icons.cart2}
+        rightIcon1={<CartIcon />}
+        rightIcon2={<ShopIcon fill="white" />}
       />
       <ScrollView>
         <View>

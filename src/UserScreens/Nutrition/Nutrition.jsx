@@ -10,12 +10,11 @@ import {
 import React, { useState } from "react";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
-import icons from "../../constants/icons";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { colors } from "../../constants/colors";
 import { ProgressBar } from "../../components/ProgressBar";
 import NutrientItem from "../../components/NutrientItem";
-import images from "../../constants/images";
+import CaloriesIcon from "../../assets/svgs/CaloriesIcon";
 import { MealItem } from "../../components/MealItem";
 import {
   dailyPlanData,
@@ -27,6 +26,8 @@ import {
 import CustomButton from "../../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
 import WaterIntake from "../../components/WaterIntake";
+import EatenIcon from "../../assets/svgs/EatenIcon";
+import GoalIcon from "../../assets/svgs/GoalIcon";
 
 // Meal Item Component
 
@@ -77,7 +78,7 @@ const NutritionScreen = () => {
         <View style={styles.rowContainer}>
           {/* Eaten Section */}
           <View style={styles.columnContainer}>
-            <Image style={styles.icon} source={icons.eaten} />
+            <EatenIcon />
             <Text style={styles.valueText}>{eatenCalories}</Text>
             <Text style={styles.labelText}>Eaten</Text>
           </View>
@@ -104,7 +105,7 @@ const NutritionScreen = () => {
 
           {/* Burned Section */}
           <View style={styles.columnContainer}>
-            <Image style={styles.icon} source={icons.burned} />
+            <CaloriesIcon />
             <Text style={styles.valueText}>{burnedCalories}</Text>
             <Text style={styles.labelText}>Burned</Text>
           </View>
@@ -133,7 +134,7 @@ const NutritionScreen = () => {
         <View style={styles.intakeHeader}>
           <Text style={styles.title}>Water Tracker</Text>
           <TouchableOpacity style={styles.goalButton} onPress={handleSetGoal}>
-            <Image source={icons.goal} style={styles.goalIcon} />
+            <GoalIcon />
             <Text style={styles.goalText}>Set Goal</Text>
           </TouchableOpacity>
         </View>
@@ -225,7 +226,7 @@ const NutritionScreen = () => {
                 })
               }
             >
-              <Image source={plan.icon} style={styles.nutritionPlanIcon} />
+              {plan.icon}
               <Text style={styles.nutritionPlanText}>{plan.title}</Text>
             </TouchableOpacity>
           ))}

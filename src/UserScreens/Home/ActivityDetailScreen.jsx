@@ -20,18 +20,29 @@ import { colors } from "../../constants/colors";
 import icons from "../../constants/icons";
 import { CustomCard } from "../../components/CustomCard";
 import images from "../../constants/images";
+import RunningIcon from "../../assets/svgs/RunningIcon";
+import DistanceIcon from "../../assets/svgs/DistanceIcon";
+import TimeIcon from "../../assets/svgs/TimeIcon";
+import CaloriesIcon from "../../assets/svgs/CaloriesIcon";
+import HeartRateIcon from "../../assets/svgs/HeartRateIcon";
+import GoalIcon from "../../assets/svgs/GoalIcon";
 
 const ActivityDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { activityName, distance, time, distanceUnit } = route.params; // Get the additional params
+  const {
+    activityName = null,
+    distance = null,
+    time = null,
+    distanceUnit = null,
+  } = route.params || {};
 
   const duration = ["Today", "Weekly", "Monthly", "Quarterly", "Yearly"];
-  const [selectedPeriod, setSelectedPeriod] = useState(null);
+  const [selectedPeriod, setSelectedPeriod] = useState("Today");
 
   const pan = useRef(new Animated.ValueXY()).current;
   const buttonWidth = 300; // Adjust this to match your button width
-  const dragThreshold = buttonWidth * 0.7; // Trigger navigation when dragged 70% of the button width
+  const dragThreshold = buttonWidth * 0.8; // Trigger navigation when dragged 70% of the button width
 
   // Reset position when the screen comes into focus
   useFocusEffect(
@@ -51,7 +62,7 @@ const ActivityDetailScreen = () => {
         useNativeDriver: false,
       }),
       onPanResponderRelease: (_, gestureState) => {
-        if ((gestureState.dx = dragThreshold)) {
+        if (gestureState.dx > dragThreshold) {
           navigation.navigate("FinishActivity", {
             activityName: activityName,
             distance: distance,
@@ -92,7 +103,7 @@ const ActivityDetailScreen = () => {
               navigation.navigate("ActivityScreen", { activityName })
             }
           >
-            <Image source={icons.goal} style={styles.goalIcon} />
+            <GoalIcon />
             <Text style={styles.goalText}>Set Goal</Text>
           </TouchableOpacity>
         </View>
@@ -100,27 +111,23 @@ const ActivityDetailScreen = () => {
         <View style={styles.gridContainer}>
           <CustomCard
             label="Distance"
-            icon={icons.distance}
+            icon={DistanceIcon}
             goal={"Goal: 2mi daily"}
             message={`${distance} ${distanceUnit}`}
           />
           <CustomCard
             label="Time"
-            icon={icons.time}
+            icon={TimeIcon}
             goal={"Goal: 45min"}
             message={time}
           />
         </View>
 
         <View style={styles.gridContainer}>
-          <CustomCard
-            label="Calories"
-            icon={icons.calories}
-            message={calories}
-          />
+          <CustomCard label="Calories" icon={CaloriesIcon} message={calories} />
           <CustomCard
             label="Heart Rate"
-            icon={icons.heartRate}
+            icon={HeartRateIcon}
             message={heartRate}
           />
         </View>
@@ -196,6 +203,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-SemiBold",
     fontSize: 18,
     color: "white",
+    zIndex: -1,
   },
 });
 

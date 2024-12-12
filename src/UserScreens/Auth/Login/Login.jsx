@@ -17,6 +17,9 @@ import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
 import Loader from "../../../components/Loader";
 import CustomButton from "../../../components/CustomButton";
+import GoogleLogo from "../../../assets/svgs/GoogleLogo";
+import FacebookLogo from "../../../assets/svgs/FacebookLogo";
+import AppleLogo from "../../../assets/svgs/AppleLogo";
 
 const Login = () => {
   const navigation = useNavigation();
@@ -99,9 +102,9 @@ const Login = () => {
 
         <View style={styles.socialButtonContainer}>
           {/** Repeated styles are now combined */}
-          <SocialButton icon={icons.google} />
-          <SocialButton icon={icons.facebook} />
-          <SocialButton icon={icons.apple} />
+          <SocialButton icon={GoogleLogo} />
+          <SocialButton icon={FacebookLogo} />
+          <SocialButton icon={AppleLogo} />
         </View>
         <View
           style={{

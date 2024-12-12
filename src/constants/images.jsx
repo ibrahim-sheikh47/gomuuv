@@ -26,8 +26,10 @@ import habit1 from "../assets/images/habit1.png";
 import wikipedia from "../assets/images/wikipedia.png";
 import masterChef from "../assets/images/masterChef.png";
 import ratatouille from "../assets/images/ratatouille.png";
+import device from "../assets/images/device.png";
 
 export default {
+  device,
   ratatouille,
   masterChef,
   wikipedia,
