@@ -1,42 +1,81 @@
+import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
   FlatList,
+  Image,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from "react-native";
-import Container from "../../components/Container";
-import CustomButton from "../../components/CustomButton";
-import { colors } from "../../constants/colors";
-import icons from "../../constants/icons";
-import NutrientItem from "../../components/NutrientItem";
-import CustomModal from "../../components/CustomModal";
-import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
 import BackIcon from "../../assets/svgs/BackIcon";
 import CaloriesIcon from "../../assets/svgs/CaloriesIcon";
-import TimeIcon from "../../assets/svgs/TimeIcon";
 import MealAddedIcon from "../../assets/svgs/MealAddedIcon";
+import TimeIcon from "../../assets/svgs/TimeIcon";
+import Container from "../../components/Container";
+import CustomButton from "../../components/CustomButton";
+import CustomModal from "../../components/CustomModal";
+import NutrientItem from "../../components/NutrientItem";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import { colors } from "../../constants/colors";
+import images from "../../constants/images";
+import { setDailyPlans } from "../../redux/reducers/NutritionSlice";
 
 const MealDetailScreen = ({ route }) => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const [isModalVisible, setModalVisible] = useState(false);
   const { meal } = route.params; // Extract meal data from route params
-  const [carbs, setCarbs] = useState({ current: 20, total: 30 });
-  const [proteins, setProteins] = useState({ current: 10, total: 30 });
-  const [fats, setFats] = useState({ current: 30, total: 30 });
+  const [carbs, setCarbs] = useState({ current: meal?.carbs || 0, total: 30 });
+  const [proteins, setProteins] = useState({
+    current: meal?.protein || 0,
+    total: 30,
+  });
+  const [fats, setFats] = useState({ current: meal?.fats || 0, total: 30 });
+  const { token } = useSelector((state) => ({
+    token: state.Auth?.token,
+  }));
 
   // Combine meal details and ingredients into one array
   const renderData = [
     { type: "mealInfo", id: "mealInfo", meal },
-    { type: "ingredients", id: "ingredients", ingredients: meal.ingredients },
-    { type: "steps", id: "steps", steps: meal.steps },
+    {
+      type: "ingredients",
+      id: "ingredients",
+      ingredients: meal.ingredients.map((ingredient, index) => ({
+        id: index.toString(), // Generate a unique key
+        name: ingredient,
+        quantity: "", // Add quantity if available
+      })),
+    },
+    {
+      type: "steps",
+      id: "steps",
+      steps: meal.recipe.map((step, index) => ({
+        id: index.toString(), // Generate a unique key
+        step: step,
+      })),
+    },
   ];
 
-  const [isModalVisible, setModalVisible] = useState(false);
-  const handleAddToPlan = () => {
-    setModalVisible(true);
+  const handleAddToPlan = async () => {
+    try {
+      const payload = {
+        mealId: meal._id,
+      };
+      const res = await API.post(END_POINTS.ADD_DAILY_PLAN, payload, token);
+      if (res.data.success) {
+        dispatch(setDailyPlans(res.data?.data?.meals || []));
+        setModalVisible(true);
+        // dispatch(setNutritionMeals(res?.data?.data || []));
+      }
+    } catch (error) {
+      console.error("Error adding daily plan:", error);
+    }
   };
+
   const handleClose = () => {
     setModalVisible(false);
     setTimeout(() => {
@@ -46,6 +85,12 @@ const MealDetailScreen = ({ route }) => {
 
   const renderItem = ({ item }) => {
     if (item.type === "mealInfo") {
+      // Check if the mealImage is a valid URL or an object with a URI
+      const imageSource =
+        item.meal.image &&
+        (typeof item.meal.image === "string" || item.meal.image?.uri)
+          ? { uri: item.meal.image?.uri || item.meal.image }
+          : images.lunch;
       return (
         <View style={{ position: "relative" }}>
           {/* Back Button */}
@@ -60,10 +105,10 @@ const MealDetailScreen = ({ route }) => {
           >
             <BackIcon />
           </TouchableOpacity>
-          <Image source={item.meal.mealImage} style={styles.image} />
+          <Image source={imageSource} style={styles.image} />
           <View style={{ padding: 20 }}>
-            <Text style={styles.mealName}>{item.meal.mealName}</Text>
-            <Text style={styles.title}>{item.meal.title}</Text>
+            <Text style={styles.mealName}>{item.meal?.name}</Text>
+            <Text style={styles.title}>{item.meal?.title}</Text>
 
             {/* Meal Stats Container */}
             <View style={styles.mealStatsContainer}>
@@ -74,7 +119,9 @@ const MealDetailScreen = ({ route }) => {
                 </View>
                 <View style={styles.statItem}>
                   <TimeIcon />
-                  <Text style={styles.statText}>{item.meal.time} mins</Text>
+                  <Text style={styles.statText}>
+                    {item.meal.preparationTime}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -115,7 +162,7 @@ const MealDetailScreen = ({ route }) => {
               style={{
                 borderTopColor: "#69696952",
                 borderTopWidth: 1,
-                marginVertical: 12,
+                marginTop: 12,
               }}
             />
           </View>
@@ -256,7 +303,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 10,
+    // paddingVertical: 10,
     paddingHorizontal: 24,
   },
   ingredientText: {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useLayoutEffect } from "react";
 import {
   View,
   Image,
@@ -14,9 +14,31 @@ import { colors } from "../constants/colors";
 import { useNavigation } from "@react-navigation/native";
 import CustomButton from "../components/CustomButton";
 import LogoText from "../assets/svgs/LogoText";
+import { useSelector } from "react-redux";
 
 const Splash = () => {
   const navigation = useNavigation();
+
+  const { isLoggedIn } = useSelector((state) => ({
+    isLoggedIn: state.Auth?.isLoggedIn,
+  }));
+
+  useLayoutEffect(() => {
+    if (isLoggedIn) {
+      navigation.reset({
+        index: 0, // Ensures TabNavigator is at the top
+        routes: [
+          {
+            name: "UserApp", // Parent navigator (UserApp)
+            state: {
+              routes: [{ name: "TabNavigator" }], // Navigate to TabNavigator within UserApp
+            },
+          },
+        ],
+      });
+    }
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000" />
@@ -32,6 +54,8 @@ const Splash = () => {
           <Text style={styles.tagline}>
             Your Path to Peak Health & Wellness starts here.
           </Text>
+
+          <Text style={styles.tagline}>{isLoggedIn ? "Fuck" : "You"}</Text>
         </View>
         <View></View>
 
@@ -58,7 +82,11 @@ const Splash = () => {
             }}
           >
             <Text style={styles.signInText}>Already a member?</Text>
-            <TouchableOpacity onPress={() => navigation.navigate("UserApp")}>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("UserApp", { screen: "Login" })
+              }
+            >
               <Text style={styles.signInLink}>Sign in</Text>
             </TouchableOpacity>
           </View>

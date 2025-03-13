@@ -1,11 +1,16 @@
-import React, { useEffect } from "react";
 import { useFonts } from "expo-font";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as SplashScreen from "expo-splash-screen";
+import React, { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Toast from "react-native-toast-message";
+import { Provider } from "react-redux";
 
 // APP NAVIGATOR
 import { NavigationContainer } from "@react-navigation/native";
+import { PersistGate } from "redux-persist/integration/react";
 import AppNavigator from "./src/navigation/AppNavigator/AppNavigator";
+import { persistor, store } from "./src/redux/store";
+import { LogBox } from "react-native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -21,6 +26,7 @@ export default function App() {
   });
 
   useEffect(() => {
+    LogBox.ignoreAllLogs();
     if (fontsLoaded) {
       SplashScreen.hideAsync();
     }
@@ -32,9 +38,14 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <NavigationContainer>
-        <AppNavigator />
-      </NavigationContainer>
+      <Provider store={store}>
+        <PersistGate persistor={persistor}>
+          <NavigationContainer>
+            <AppNavigator />
+            <Toast topOffset={60} />
+          </NavigationContainer>
+        </PersistGate>
+      </Provider>
     </GestureHandlerRootView>
   );
 }

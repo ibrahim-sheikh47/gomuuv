@@ -1,31 +1,34 @@
+import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import { ScrollView, Text, View, StyleSheet } from "react-native";
-import Container from "../../components/Container";
-import images from "../../constants/images";
-import { colors } from "../../constants/colors";
-import icons from "../../constants/icons";
-import ProfileSection from "../../components/ProfileSection";
-import IconButton from "../../components/IconButton";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSelector } from "react-redux";
+import BikingIcon from "../../assets/svgs/BikingIcon";
+import ChallengesIcon from "../../assets/svgs/ChallengesIcon";
+import NutritionIcon from "../../assets/svgs/NutritionIcon";
+import RunningIcon from "../../assets/svgs/RunningIcon";
+import SearchIcon from "../../assets/svgs/SearchIcon";
+import ShopIcon from "../../assets/svgs/ShopIcon";
+import SleepIcon from "../../assets/svgs/SleepIcon";
+import Tab5Icon from "../../assets/svgs/Tab5Icon";
+import WalkingIcon from "../../assets/svgs/WalkingIcon";
+import WorkoutsIcon from "../../assets/svgs/WorkoutsIcon";
 import { ActivityCard } from "../../components/ActivityCard";
+import Container from "../../components/Container";
 import { CustomCard } from "../../components/CustomCard";
 import DailyReport from "../../components/DailyReport";
-import { useNavigation } from "@react-navigation/native";
-import WalkingIcon from "../../assets/svgs/WalkingIcon";
-import RunningIcon from "../../assets/svgs/RunningIcon";
-import BikingIcon from "../../assets/svgs/BikingIcon";
-import SleepIcon from "../../assets/svgs/SleepIcon";
-import ChallengesIcon from "../../assets/svgs/ChallengesIcon";
-import WorkoutsIcon from "../../assets/svgs/WorkoutsIcon";
-import NutritionIcon from "../../assets/svgs/NutritionIcon";
-import ShopIcon from "../../assets/svgs/ShopIcon";
-import Tab5Icon from "../../assets/svgs/Tab5Icon";
-import SearchIcon from "../../assets/svgs/SearchIcon";
+import IconButton from "../../components/IconButton";
+import ProfileSection from "../../components/ProfileSection";
+import images from "../../constants/images";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
-
   const completionPercentage = 75;
   const [isFirstTime, setIsFirstTime] = useState(true); // Track if it's the user's first time
+
+  // Combine all useSelector Hooks
+  const { userData } = useSelector((state) => ({
+    userData: state.Auth?.data,
+  }));
 
   const handleInteraction = () => {
     if (isFirstTime) {
@@ -43,7 +46,9 @@ const HomeScreen = () => {
       <ScrollView onScroll={handleInteraction}>
         <View style={styles.header}>
           <ProfileSection
-            userName="*username here*"
+            userName={
+              (userData?.firstName || "") + " " + (userData?.lastName || "")
+            }
             imageSource={images.dp}
             onPress={() => {
               navigation.navigate("Profile");

@@ -1,55 +1,112 @@
-import React, { useState, useEffect } from "react";
-import { FlatList, StyleSheet, Text } from "react-native";
-import { MealItem } from "../../components/MealItem";
-import { dailyPlanData, popularRecipesData } from "../../utils/data"; // Import both data sources
-import Container from "../../components/Container";
-import Header from "../../components/Header";
-import SearchBar from "../../components/SearchBar";
-import CustomButton from "../../components/CustomButton";
-import MealCategorySelector from "../../components/MealCategorySelector"; // Import the new component
+import React, { useEffect, useState } from "react";
+import { FlatList, StyleSheet, Text, View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import BreakfastIcon from "../../assets/svgs/BreakfastIcon";
-import FastingIcon from "../../assets/svgs/FastingIcon";
 import EatenIcon from "../../assets/svgs/EatenIcon";
 import LunchIcon from "../../assets/svgs/LunchIcon";
 import SnacksIcon from "../../assets/svgs/SnacksIcon";
+import Container from "../../components/Container";
+import CustomButton from "../../components/CustomButton";
+import Header from "../../components/Header";
+import MealCategorySelector from "../../components/MealCategorySelector";
+import { MealItem } from "../../components/MealItem";
+import SearchBar from "../../components/SearchBar";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import {
+  setDailyPlans,
+  setNutritionMeals,
+} from "../../redux/reducers/NutritionSlice";
 
 const ViewAllMeals = ({ route, navigation }) => {
+  const dispatch = useDispatch();
   const { title } = route.params;
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredData, setFilteredData] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("All"); // Default to 'All'
 
-  // Determine which data source to use based on the title
+  const { token, dailyPlans, nutritionMeals } = useSelector((state) => ({
+    token: state.Auth?.token,
+    nutritionMeals: state.Nutrition.data,
+    dailyPlans: state.Nutrition.dailyPlans,
+  }));
+
   useEffect(() => {
-    if (title.toLowerCase() === "recipes") {
-      setFilteredData(popularRecipesData);
+    if (title === "Recipes") {
+      getNutritionMeals();
     } else {
-      setFilteredData(dailyPlanData);
+      getDailyPlans();
     }
-  }, [title]);
+  }, []);
 
-  const onChangeSearch = (query) => {
-    setSearchQuery(query);
+  useEffect(() => {
+    filterMeals(searchQuery, selectedCategory);
+  }, [searchQuery, selectedCategory, nutritionMeals]);
 
-    // Filter data based on the currently selected dataset
-    const dataToFilter =
-      title.toLowerCase() === "recipes" ? popularRecipesData : dailyPlanData;
-
-    if (query) {
-      const filtered = dataToFilter.filter((item) =>
-        item.title.toLowerCase().includes(query.toLowerCase())
-      );
-      setFilteredData(filtered);
-    } else {
-      setFilteredData(dataToFilter);
+  const getNutritionMeals = async () => {
+    try {
+      const res = await API.get(END_POINTS.NUTRITION_MEALS, null, token);
+      if (res.data.success) {
+        dispatch(setNutritionMeals(res?.data?.data || []));
+      }
+    } catch (error) {
+      console.error("Error fetching meals:", error);
     }
   };
 
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const getDailyPlans = async () => {
+    try {
+      const res = await API.get(END_POINTS.DAILY_PLANS, null, token);
+      if (res.data.success) {
+        dispatch(setDailyPlans(res?.data?.data?.meals || []));
+      }
+    } catch (error) {
+      console.error("Error fetching meals:", error);
+    }
+  };
+
+  const onChangeSearch = (query) => {
+    setSearchQuery(query);
+    filterMeals(query, selectedCategory);
+  };
+
+  const filterMeals = (query, category) => {
+    let dataToFilter = title === "Recipes" ? nutritionMeals : dailyPlans;
+
+    // Filter by category
+    if (category !== "All") {
+      dataToFilter = dataToFilter.filter(
+        (item) => item?.category.toLowerCase() === category.toLowerCase()
+      );
+    }
+
+    // Filter by search query
+    if (query) {
+      dataToFilter = dataToFilter.filter((item) =>
+        item.name.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+
+    setFilteredData(dataToFilter);
+  };
+
   const mealCategories = [
-    { label: "All", icon: <EatenIcon /> },
-    { label: "Breakfast", icon: <BreakfastIcon width={22} height={22} /> },
-    { label: "Lunch", icon: <LunchIcon width={24} height={24} /> },
-    { label: "Snacks", icon: <SnacksIcon width={24} height={24} /> },
+    { label: "All", icon: <EatenIcon />, value: "All" },
+    {
+      label: "Breakfast",
+      icon: <BreakfastIcon width={22} height={22} />,
+      value: "Breakfast",
+    },
+    {
+      label: "Lunch",
+      icon: <LunchIcon width={24} height={24} />,
+      value: "Lunch",
+    },
+    {
+      label: "Snacks",
+      icon: <SnacksIcon width={24} height={24} />,
+      value: "Snacks",
+    },
   ];
 
   return (
@@ -63,20 +120,12 @@ const ViewAllMeals = ({ route, navigation }) => {
           <MealCategorySelector
             categories={mealCategories}
             selectedCategory={selectedCategory}
-            onSelect={setSelectedCategory}
+            onSelect={(index) =>
+              setSelectedCategory(mealCategories[index].value)
+            }
           />
 
-          <Text
-            style={{
-              color: "white",
-              fontFamily: "Poppins-Bold",
-              fontSize: 16,
-              marginBottom: 5,
-              marginTop: 20,
-            }}
-          >
-            Popular Recipes
-          </Text>
+          <Text style={styles.title}>Popular Recipes</Text>
         </>
       )}
 
@@ -86,21 +135,21 @@ const ViewAllMeals = ({ route, navigation }) => {
         renderItem={({ item }) => (
           <MealItem
             style={styles.ViewAll}
-            title={item.title}
-            mealName={item.mealName}
-            mealImage={item.mealImage}
-            calories={item.calories}
-            time={item.time}
+            mealName={item?.name}
+            mealImage={item?.image}
+            calories={item?.calories}
+            time={item?.preparationTime}
             iconType="next"
             onPress={() =>
               navigation.navigate("MealDetailScreen", { meal: item })
             }
           />
         )}
-        contentContainerStyle={{ flex: 1 }}
         numColumns={1}
         showsVerticalScrollIndicator={false}
+        ListFooterComponent={<View style={{ marginBottom: 25 }} />}
       />
+
       {title.toLowerCase() !== "recipes" && (
         <CustomButton
           title={"Add Meal"}
@@ -120,5 +169,12 @@ const styles = StyleSheet.create({
   },
   ViewAll: {
     width: "100%",
+  },
+  title: {
+    color: "white",
+    fontFamily: "Poppins-Bold",
+    fontSize: 16,
+    marginBottom: 5,
+    marginTop: 20,
   },
 });

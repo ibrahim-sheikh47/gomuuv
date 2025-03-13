@@ -10,9 +10,14 @@ const CustomButton = ({
   textStyle,
   btnIcon,
   iconStyle,
+  disabled,
 }) => {
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.button, style]}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={[styles.button, style]}
+      disabled={disabled}
+    >
       <Image style={iconStyle} source={btnIcon} />
       <Text style={[styles.buttonText, textStyle]}>{title}</Text>
     </TouchableOpacity>

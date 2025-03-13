@@ -1,3 +1,6 @@
+import { Picker } from "@react-native-picker/picker";
+import { useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
 import {
   Image,
   ScrollView,
@@ -6,35 +9,24 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import Toast from "react-native-toast-message";
 import Container from "../../components/Container";
-import Header from "../../components/Header";
-import Selectable from "../../components/Selectable";
-import MealCard from "../../components/MealCard";
-import InputField from "../../components/InputField"; // Import InputField
 import CustomButton from "../../components/CustomButton";
 import CustomModal from "../../components/CustomModal";
-import icons from "../../constants/icons";
+import Header from "../../components/Header";
+import InputField from "../../components/InputField"; // Import InputField
+import Selectable from "../../components/Selectable";
 import { colors } from "../../constants/colors";
-import { useNavigation } from "@react-navigation/native";
-import { Picker } from "@react-native-picker/picker";
+import icons from "../../constants/icons";
+import { useSelector } from "react-redux";
 
 const CreatePlan = () => {
   const navigation = useNavigation();
   const [isModalVisible, setModalVisible] = useState(false);
   const [is2ndModalVisible, set2ndModalVisible] = useState(false);
-  const handleSave = () => {
-    setModalVisible(true);
-    setTimeout(() => {
-      setModalVisible(false);
-      set2ndModalVisible(true);
-    }, 2000);
-  };
-  const handleClose = () => {
-    setModalVisible(false);
-    set2ndModalVisible(false);
-    navigation.navigate("FinalizePlan");
-  };
+  const { userData } = useSelector((state) => ({
+    userData: state.Auth?.data,
+  }));
   const duration = [
     "Lose Weight",
     "Gain Weight",
@@ -79,6 +71,134 @@ const CreatePlan = () => {
 
   const handleGenderSelection = (gender) => {
     setSelectedGender(gender);
+  };
+
+  const handleClose = (payload) => {
+    setModalVisible(false);
+    set2ndModalVisible(false);
+    navigation.navigate("FinalizePlan", { planData: payload });
+  };
+
+  const handleSave = async () => {
+    if (!selectedPeriod) {
+      Toast.show({
+        type: "error",
+        text1: "Alert!",
+        text2: "Please select a goal (e.g., lose weight, gain weight, etc.).",
+      });
+      return;
+    }
+
+    if (!selectedGender) {
+      Toast.show({
+        type: "error",
+        text1: "Alert!",
+        text2: "Please select a gender.",
+      });
+      return;
+    }
+
+    if (!formData.age || isNaN(formData.age) || formData.age <= 0) {
+      Toast.show({
+        type: "error",
+        text1: "Alert!",
+        text2: "Please enter a valid age.",
+      });
+      return;
+    }
+
+    if (!formData.height || isNaN(formData.height) || formData.height <= 0) {
+      Toast.show({
+        type: "error",
+        text1: "Alert!",
+        text2: "Please enter a valid height.",
+      });
+      return;
+    }
+
+    if (!formData.weight || isNaN(formData.weight) || formData.weight <= 0) {
+      Toast.show({
+        type: "error",
+        text1: "Alert!",
+        text2: "Please enter a valid weight.",
+      });
+      return;
+    }
+
+    if (
+      !formData.targetWeight ||
+      isNaN(formData.targetWeight) ||
+      formData.targetWeight <= 0
+    ) {
+      Toast.show({
+        type: "error",
+        text1: "Alert!",
+        text2: "Please enter a valid target weight.",
+      });
+      return;
+    }
+
+    if (
+      formData.targetWeight >= formData.weight &&
+      selectedPeriod === "lose weight"
+    ) {
+      Toast.show({
+        type: "error",
+        text1: "Alert!",
+        text2:
+          "Target weight must be less than the current weight to lose weight.",
+      });
+      return;
+    }
+
+    if (
+      formData.targetWeight <= formData.weight &&
+      selectedPeriod === "gain weight"
+    ) {
+      Toast.show({
+        type: "error",
+        text1: "Alert!",
+        text2:
+          "Target weight must be greater than the current weight to gain weight.",
+      });
+      return;
+    }
+
+    if (!selectedDiet) {
+      Toast.show({
+        type: "error",
+        text1: "Alert!",
+        text2: "Please select a dietary preference.",
+      });
+      return;
+    }
+
+    // Prepare Payload
+    const createPlanPayload = {
+      user: userData?._id,
+      goal: selectedPeriod?.toLowerCase(),
+      gender: selectedGender?.toLowerCase(),
+      age: parseInt(formData.age, 10),
+      height: parseFloat(formData.height),
+      weight: parseFloat(formData.weight),
+      targetWeight: parseFloat(formData.targetWeight),
+      dietaryPreferences: [selectedDiet?.toLowerCase()],
+    };
+
+    try {
+      setModalVisible(true);
+      setTimeout(() => {
+        setModalVisible(false);
+        set2ndModalVisible(true);
+
+        setTimeout(() => {
+          set2ndModalVisible(false);
+          handleClose(createPlanPayload); // Pass the payload when navigating
+        }, 2000);
+      }, 2000);
+    } catch (error) {
+      console.error("Error creating plan:", error);
+    }
   };
 
   return (

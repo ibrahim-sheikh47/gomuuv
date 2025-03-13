@@ -1,3 +1,5 @@
+import { useNavigation, useRoute } from "@react-navigation/native";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Image,
   ScrollView,
@@ -6,61 +8,156 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
-import Container from "../../components/Container";
-import Header from "../../components/Header";
-import icons from "../../constants/icons";
-import InputField from "../../components/InputField";
-import { colors } from "../../constants/colors";
-import CustomButton from "../../components/CustomButton";
-import CustomModal from "../../components/CustomModal";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { debounce } from "lodash";
+import { useDispatch, useSelector } from "react-redux";
 import CartIcon from "../../assets/svgs/CartIcon";
 import ShopIcon from "../../assets/svgs/ShopIcon";
+import Container from "../../components/Container";
+import CustomButton from "../../components/CustomButton";
+import CustomModal from "../../components/CustomModal";
+import Header from "../../components/Header";
+import InputField from "../../components/InputField";
+import { colors } from "../../constants/colors";
+import images from "../../constants/images";
+import { setCartData } from "../../redux/reducers/CartSlice";
+import { END_POINTS } from "../../config/routes";
+import { API } from "../../config/apiClient";
+import Toast from "react-native-toast-message";
 
 const Checkout = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
-  const route = useRoute();
+  const { cartItems, token } = useSelector((state) => ({
+    token: state.Auth?.token,
+    cartItems: state.Cart?.data,
+  }));
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
 
-  const {
-    productImage,
-    title,
-    weight,
-    price: initialPrice,
-  } = route.params || {};
+  useEffect(() => {
+    if (selectedPaymentMethod === null) handlePaymentMethodSelect(0);
+  }, []);
 
-  const [quantity, setQuantity] = useState(route.params?.quantity || 1);
-  const [price, setPrice] = useState(initialPrice);
-
-  const updatePrice = (newQuantity) => {
-    const updatedPrice = initialPrice * newQuantity;
-    setPrice(updatedPrice);
+  // Handle increment and decrement for quantity based on item id
+  const incrementQuantity = (itemId) => {
+    const updatedCartItems = cartItems.map((item) =>
+      item?.product?._id === itemId
+        ? {
+            ...item,
+            quantity:
+              item?.quantity < item?.product?.stock
+                ? item?.quantity + 1
+                : item?.quantity, // Prevent incrementing beyond stock
+          }
+        : item
+    );
+    // Only update the Redux state and call the API if the quantity has actually changed
+    const updatedItem = updatedCartItems.find(
+      (item) => item?.product?._id === itemId
+    );
+    if (updatedItem && updatedItem?.quantity < updatedItem?.product?.stock) {
+      dispatch(setCartData(updatedCartItems));
+      // Call the debounced API function
+      debouncedUpdateProductQuantity(updatedCartItems, itemId);
+    } else {
+      dispatch(setCartData(updatedCartItems)); // Still update Redux without calling API
+    }
   };
 
-  // Handle increment and decrement for quantity
-  const incrementQuantity = () => {
-    const newQuantity = quantity + 1;
-    setQuantity(newQuantity);
-    updatePrice(newQuantity);
+  // Define debounced API call using useCallback to ensure it's created only once
+  const debouncedUpdateProductQuantity = useCallback(
+    debounce((updatedCartItems, itemId) => {
+      // Find the updated item to make the API call
+      const updatedItem = updatedCartItems.find(
+        (item) => item?.product?._id === itemId
+      );
+      if (updatedItem) {
+        // Call the API to update the product on the server
+        callProductUpdateApi(updatedItem?.product?._id, updatedItem?.quantity);
+      }
+    }, 1000), // Wait for 2 seconds before making the API call
+    [] // Empty dependency array ensures that the debounced function is created only once
+  );
+
+  const decrementQuantity = (itemId) => {
+    // Find the item in the cart
+    const updatedCartItems = cartItems.map((item) =>
+      item?.product?._id === itemId && item?.quantity > 1
+        ? { ...item, quantity: item?.quantity - 1 }
+        : item
+    );
+    // Only update the Redux state and call the API if the quantity has actually changed
+    const updatedItem = updatedCartItems.find(
+      (item) => item?.product?._id === itemId
+    );
+    if (updatedItem && updatedItem?.quantity > 1) {
+      dispatch(setCartData(updatedCartItems));
+      // Call the debounced API function
+      debouncedUpdateProductQuantity(updatedCartItems, itemId);
+    } else {
+      dispatch(setCartData(updatedCartItems)); // Still update Redux without calling API
+    }
   };
 
-  const decrementQuantity = () => {
-    const newQuantity = quantity > 1 ? quantity - 1 : 1;
-    setQuantity(newQuantity);
-    updatePrice(newQuantity);
+  const callProductUpdateApi = async (productId, newQuantity) => {
+    try {
+      const payload = {
+        products: [
+          {
+            id: productId,
+            quantity: newQuantity,
+          },
+        ],
+      };
+      // Make your API request here to update the product quantity
+      await API.post(END_POINTS.ADD_TO_CART, payload, token);
+      console.log("Product quantity updated successfully");
+    } catch (error) {
+      console.error("Error updating product quantity", error);
+    }
   };
+
+  const callProductRemoveApi = async (productId) => {
+    try {
+      const payload = {
+        products: [
+          {
+            id: productId,
+            quantity: 0,
+          },
+        ],
+      };
+      // Make your API request here to update the product quantity
+      const response = await API.post(
+        END_POINTS.REMOVE_FROM_CART,
+        payload,
+        token
+      );
+      if (response?.data?.success) {
+        dispatch(setCartData(response.data?.data?.items));
+        console.log("Product removed successfully");
+      }
+    } catch (error) {
+      console.error("Error removing product", error);
+    }
+  };
+
+  const paymentMethods = [
+    { name: "Cash On Delivery (COD)" },
+    { name: "Credit / Debit Card", component: <CreditCardPayment /> },
+    { name: "Bank Deposit / Transfer", component: <BankTransfer /> },
+  ];
 
   // Consolidate all input values into a single state object
   const [formData, setFormData] = useState({
-    contact: "",
+    contact: "Test@gmail.com",
     country: "",
     firstName: "",
     lastName: "",
-    address: "",
+    address: "House# 232, Model Town, Lahore",
     city: "",
     postalCode: "",
+    paymentMethod: "",
     shippingMethod: "",
     cardNumber: "",
     cardName: "",
@@ -76,15 +173,124 @@ const Checkout = () => {
   };
 
   const handlePaymentMethodSelect = (index) => {
-    setSelectedPaymentMethod(selectedPaymentMethod === index ? null : index);
+    setSelectedPaymentMethod((prev) => {
+      if (prev === index) {
+        // If the same payment method is clicked again, unselect it
+        resetPaymentMethodFields();
+        return null;
+      } else {
+        // Otherwise, select the new payment method
+        updatePaymentMethodFields(index);
+        return index;
+      }
+    });
+  };
+
+  const updatePaymentMethodFields = (index) => {
+    const paymentMethod = paymentMethods[index];
+    if (paymentMethod.name === "Credit / Debit Card") {
+      // Set form data related to Credit Card payment
+      setFormData((prev) => ({
+        ...prev,
+        paymentMethod: "card",
+        cardNumber: "",
+        cardName: "",
+        expiryDate: "",
+        cvv: "",
+      }));
+    } else if (paymentMethod.name === "Bank Deposit / Transfer") {
+      // Set form data related to Bank Transfer
+      setFormData((prev) => ({
+        ...prev,
+        paymentMethod: "online",
+        bankName: "",
+        accountHolder: "",
+        accountNumber: "",
+      }));
+    } else {
+      // Set form data for Cash On Delivery (COD)
+      setFormData((prev) => ({
+        ...prev,
+        paymentMethod: "cash-on-delivery",
+        cardNumber: "",
+        cardName: "",
+        expiryDate: "",
+        cvv: "",
+        bankName: "",
+        accountHolder: "",
+        accountNumber: "",
+      }));
+    }
+  };
+
+  const resetPaymentMethodFields = () => {
+    // Reset payment-related fields when unselected
+    setFormData((prev) => ({
+      ...prev,
+      paymentMethod: "",
+      cardNumber: "",
+      cardName: "",
+      expiryDate: "",
+      cvv: "",
+      bankName: "",
+      accountHolder: "",
+      accountNumber: "",
+    }));
   };
 
   const handleOrder = () => {
-    setModalVisible(true);
-    setTimeout(() => {
-      setModalVisible(false);
-      navigation.navigate("CompletedOrder");
-    }, 2000);
+    // setTimeout(() => {
+    //   setModalVisible(false);
+    //   navigation.navigate("CompletedOrder");
+    // }, 2000);
+  };
+
+  // Calculate subtotal for a single item
+  const getSubtotal = (price, quantity) => {
+    return price * quantity;
+  };
+
+  const handlePlaceOrder = async () => {
+    try {
+      const payload = {
+        contact: {
+          email: formData.contact,
+          address: formData.address,
+          phone: formData.phone || "0332-3232322",
+        },
+        shipping: {
+          charges: 0, // Shipping charges can be dynamically calculated
+        },
+        payment: {
+          method: formData.paymentMethod, // 'cash-on-delivery', 'online', or 'card'
+        },
+      };
+      console.log(JSON.stringify(payload, null, 2));
+      // Send API request to place the order
+      const response = await API.post(END_POINTS.PLACE_ORDER, payload, token);
+
+      if (response?.data?.success) {
+        setModalVisible(true);
+        setTimeout(() => {
+          dispatch(setCartData([])); // Clear the cart after placing the order
+          setModalVisible(false);
+          navigation.replace("CompletedOrder");
+        }, 2000);
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "Something went wrong. Please try again.",
+        });
+      }
+    } catch (error) {
+      console.error("Error placing order:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Unable to place order. Please try again.",
+      });
+    }
   };
 
   return (
@@ -95,47 +301,77 @@ const Checkout = () => {
         rightIcon1={<CartIcon />}
         rightIcon2={<ShopIcon fill="white" />}
       />
-      <ScrollView style={{ marginBottom: 30 }}>
+      <ScrollView
+        style={{ marginBottom: 30 }}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={[styles.paymentMethodTitle, { marginTop: 10 }]}>
           Show Order Summary
         </Text>
-        <View style={styles.productContainer}>
-          <Image source={productImage} style={styles.image} />
-          <View style={styles.productDetails}>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "start",
-              }}
-            >
-              <View>
-                <Text style={styles.productTitle}>{title}</Text>
-                <Text style={styles.productQuantity}>Weight: {weight}</Text>
+        {/* Iterate over cartItems to show each item */}
+        {cartItems.map((item, index) => (
+          <View key={index} style={styles.productContainer}>
+            <Image
+              source={item?.product?.image || images.product1}
+              style={styles.image}
+            />
+            <View style={styles.productDetails}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "start",
+                }}
+              >
+                <View>
+                  <Text
+                    style={styles.productTitle}
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                  >
+                    {item?.product?.name}
+                  </Text>
+                  <Text style={styles.productQuantity}>
+                    Weight: {item?.product?.weight}
+                  </Text>
+                </View>
+                <View style={styles.quantityContainer}>
+                  <TouchableOpacity
+                    onPress={() => decrementQuantity(item?.product?._id)} // Pass item id
+                    style={styles.quantityButton}
+                  >
+                    <Text style={styles.quantityButtonText}>-</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.quantity}>{item?.quantity}</Text>
+                  <TouchableOpacity
+                    onPress={() => incrementQuantity(item?.product?._id)} // Pass item id
+                    style={styles.quantityButton}
+                  >
+                    <Text style={styles.quantityButtonText}>+</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={styles.quantityContainer}>
+              <View style={styles.priceContainer}>
+                <Text style={styles.summaryText}>
+                  Price: $
+                  {getSubtotal(item?.product?.price, item?.quantity).toFixed(2)}
+                </Text>
                 <TouchableOpacity
-                  onPress={decrementQuantity}
-                  style={styles.quantityButton}
+                  onPress={() => {
+                    const updateCartItems = cartItems.filter(
+                      (item) => item?.product?._id !== item?.product?._id
+                    );
+                    dispatch(setCartData(updateCartItems));
+                    callProductRemoveApi(item?.product?._id);
+                    navigation.goBack();
+                  }}
                 >
-                  <Text style={styles.quantityButtonText}>-</Text>
-                </TouchableOpacity>
-                <Text style={styles.quantity}>{quantity}</Text>
-                <TouchableOpacity
-                  onPress={incrementQuantity}
-                  style={styles.quantityButton}
-                >
-                  <Text style={styles.quantityButtonText}>+</Text>
+                  <Text style={styles.removeText}>Remove</Text>
                 </TouchableOpacity>
               </View>
-            </View>
-            <View style={styles.priceContainer}>
-              <Text style={styles.summaryText}>Price: ${price}</Text>
-
-              <Text style={styles.removeText}>Remove</Text>
             </View>
           </View>
-        </View>
+        ))}
         <InputField
           label={"Contact"}
           placeholder={"Email"}
@@ -232,7 +468,7 @@ const Checkout = () => {
         modalIcon={<CartIcon width={50} height={50} />}
         modalText={"Your order has been placed!"}
       />
-      <CustomButton title={"Complete Order"} onPress={handleOrder} />
+      <CustomButton title={"Complete Order"} onPress={handlePlaceOrder} />
     </Container>
   );
 };
@@ -294,12 +530,6 @@ const BankTransfer = ({ formData, handleInputChange }) => (
     />
   </>
 );
-
-const paymentMethods = [
-  { name: "Cash On Delivery (COD)" },
-  { name: "Credit / Debit Card", component: <CreditCardPayment /> },
-  { name: "Bank Deposit / Transfer", component: <BankTransfer /> },
-];
 
 const styles = StyleSheet.create({
   paymentMethodTitle: {
@@ -389,6 +619,7 @@ const styles = StyleSheet.create({
   quantityContainer: {
     flexDirection: "column",
     alignItems: "center",
+    width: 24,
   },
   quantityButton: {
     backgroundColor: "#2D2D2F",

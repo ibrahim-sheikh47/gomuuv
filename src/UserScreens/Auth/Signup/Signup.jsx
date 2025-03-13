@@ -1,26 +1,33 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Picker } from "@react-native-picker/picker"; // Import Picker
+import { useNavigation } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
+import React, { useState } from "react";
 import {
+  ScrollView,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
-  ScrollView,
+  View,
 } from "react-native";
-import React, { useState } from "react";
-import Container from "../../../components/Container";
-import AuthHeader from "../../../components/AuthHeader";
-import InputField from "../../../components/InputField";
-import { colors } from "../../../constants/colors";
-import icons from "../../../constants/icons";
-import { SocialButton } from "../../../components/SocialButton";
-import { StatusBar } from "expo-status-bar";
-import { useNavigation } from "@react-navigation/native";
-import CustomButton from "../../../components/CustomButton";
-import { Picker } from "@react-native-picker/picker"; // Import Picker
-import GoogleLogo from "../../../assets/svgs/GoogleLogo";
-import FacebookLogo from "../../../assets/svgs/FacebookLogo";
+import Toast from "react-native-toast-message";
+import { useDispatch } from "react-redux";
 import AppleLogo from "../../../assets/svgs/AppleLogo";
+import FacebookLogo from "../../../assets/svgs/FacebookLogo";
+import GoogleLogo from "../../../assets/svgs/GoogleLogo";
+import AuthHeader from "../../../components/AuthHeader";
+import Container from "../../../components/Container";
+import CustomButton from "../../../components/CustomButton";
+import InputField from "../../../components/InputField";
+import Loader from "../../../components/Loader";
+import { SocialButton } from "../../../components/SocialButton";
+import { API } from "../../../config/apiClient";
+import { END_POINTS } from "../../../config/routes";
+import { colors } from "../../../constants/colors";
+import { setAuthData } from "../../../redux/reducers/AuthSlice";
 
-const Signup = () => {
+const Signup = (props) => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
 
   // Single state for all form fields
@@ -30,12 +37,13 @@ const Signup = () => {
     height: "",
     heightUnit: "cm", // Default unit
     weight: "",
-    age: "",
     weightUnit: "kg", // Default unit
+    age: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (field, value) => {
     setForm((prevState) => ({
@@ -44,14 +52,115 @@ const Signup = () => {
     }));
   };
 
-  const handleSignup = () => {
-    // Add your signup logic here
-    console.log("Name:", form.firstName, form.lastName);
-    console.log("Height:", form.height, form.heightUnit);
-    console.log("Weight:", form.weight, form.weightUnit);
-    console.log("Email:", form.email);
-    console.log("Password:", form.password);
-    navigation.navigate("TabNavigator");
+  const validateForm = () => {
+    // Check if all fields are filled
+    if (
+      !form.firstName ||
+      !form.lastName ||
+      !form.height ||
+      !form.weight ||
+      !form.age ||
+      !form.email ||
+      !form.password ||
+      !form.confirmPassword
+    ) {
+      Toast.show({
+        type: "error",
+        text1: "All fields are required",
+        text2: "Please fill in all fields.",
+      });
+      return false;
+    }
+
+    // Check if email is valid
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      Toast.show({
+        type: "error",
+        text1: "Invalid Email",
+        text2: "Please enter a valid email address.",
+      });
+      return false;
+    }
+
+    // Check if passwords match
+    if (form.password !== form.confirmPassword) {
+      Toast.show({
+        type: "error",
+        text1: "Password Mismatch",
+        text2: "Passwords do not match.",
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSignup = async () => {
+    if (!validateForm()) return; // Stop if validation fails
+
+    setLoading(true);
+
+    try {
+      const response = await API.post(END_POINTS.SIGNUP, form);
+      setLoading(false);
+      if (response?.data?.success) {
+        dispatch(
+          setAuthData({
+            token: response?.data?.token,
+            data: response?.data?.data,
+          })
+        );
+
+        setForm({
+          firstName: "",
+          lastName: "",
+          height: "",
+          heightUnit: "cm", // Default unit
+          weight: "",
+          age: "",
+          weightUnit: "kg", // Default unit
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+
+        Toast.show({
+          type: "success",
+          text1: "Signup Successful",
+          text2: "Welcome! Redirecting to dashboard.",
+        });
+        navigation.reset({
+          index: 0, // Ensures TabNavigator is at the top
+          routes: [
+            {
+              name: "UserApp", // Parent navigator (UserApp)
+              state: {
+                routes: [{ name: "TabNavigator" }], // Navigate to TabNavigator within UserApp
+              },
+            },
+          ],
+        });
+        // navigation.replace("UserApp", { screen: "TabNavigator" });
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Signup Failed",
+          text2:
+            response.data?.message || "Something went wrong. Please try again.",
+        });
+      }
+    } catch (error) {
+      setLoading(false);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2:
+          error.response?.data?.message ||
+          error ||
+          "Failed to complete signup. Please try again.",
+      });
+    }
   };
 
   return (
@@ -162,6 +271,7 @@ const Signup = () => {
           style={{ marginTop: 50 }}
           title="Join now"
           onPress={handleSignup}
+          disabled={loading}
         />
 
         <View style={styles.dividerContainer}>
@@ -182,6 +292,7 @@ const Signup = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <Loader isLoading={loading} message="Processing your request..." />
     </Container>
   );
 };

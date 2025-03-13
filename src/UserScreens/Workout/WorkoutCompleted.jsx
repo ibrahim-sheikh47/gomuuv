@@ -10,10 +10,24 @@ import { useNavigation } from "@react-navigation/native";
 import Container from "../../components/Container";
 import { colors } from "../../constants/colors";
 import CustomButton from "../../components/CustomButton";
+import { useSelector } from "react-redux";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
 
 const WorkoutCompleted = ({ route }) => {
   const navigation = useNavigation();
-  const { title, duration, image, level, calories } = route.params;
+  const {
+    title,
+    duration,
+    image,
+    level,
+    calories,
+    lastExerciseId,
+    workoutSessionId,
+  } = route.params;
+  const { token } = useSelector((state) => ({
+    token: state.Auth?.token,
+  }));
 
   // Navigate back to home or workouts list
   const handleNavigate = () => {

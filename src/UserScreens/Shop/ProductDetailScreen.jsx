@@ -17,10 +17,23 @@ import CustomModal from "../../components/CustomModal";
 import { useNavigation } from "@react-navigation/native";
 import CartIcon from "../../assets/svgs/CartIcon";
 import ShopIcon from "../../assets/svgs/ShopIcon";
+import images from "../../constants/images";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import { useDispatch, useSelector } from "react-redux";
+import { setCartData } from "../../redux/reducers/CartSlice";
+import Toast from "react-native-toast-message";
 
 const ProductDetailScreen = ({ route }) => {
+  const dispatch = useDispatch(); // Initialize dispatch
   const navigation = useNavigation();
   const { product } = route.params;
+
+  const { token, cartItems } = useSelector((state) => ({
+    token: state.Auth?.token,
+    cartItems: state.Cart?.data,
+  }));
+  let items = Array.isArray(cartItems) ? [...cartItems] : [];
 
   // State to manage quantity
   const [quantity, setQuantity] = useState(1);
@@ -45,23 +58,60 @@ const ProductDetailScreen = ({ route }) => {
     setShowSpecifications((prevState) => !prevState);
   };
   const handleAddToCart = () => {
-    setModalVisible(true); // Show the modal
-    setTimeout(() => {
-      navigation.navigate("Cart", { product, quantity });
-    }, 3000);
+    items.push({ product: product });
+    dispatch(setCartData(items));
+    addToCart(product);
   };
   const handleCloseModal = () => {
     setModalVisible(false);
-    navigation.navigate("Cart", { product, quantity });
+  };
+
+  const addToCart = async (item) => {
+    const payload = {
+      products: [
+        {
+          id: item?._id,
+          quantity: quantity,
+        },
+      ],
+    };
+
+    try {
+      const response = await API.post(END_POINTS.ADD_TO_CART, payload, token);
+
+      if (response?.data?.success) {
+        setModalVisible(true);
+        const cartItems = response?.data?.data?.items;
+        dispatch(setCartData(cartItems));
+        setTimeout(() => {
+          setModalVisible(false);
+          navigation.navigate("Cart");
+        }, 1000);
+      } else {
+        // Show error toast if success is false
+        Toast.show({
+          type: "error",
+          text1: "Add to Cart Failed",
+          text2: response?.data?.message || "Something went wrong.",
+        });
+      }
+    } catch (error) {
+      // Show error toast if there's an error in the API request
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: error?.response?.data?.message || error || "An error occurred.",
+      });
+    }
   };
 
   const handleCheckout = () => {
     navigation.navigate("Checkout", {
-      productImage: product.productImage,
-      title: product.title,
+      productImage: product?.image || images.product1,
+      title: product?.name,
       quantity: quantity,
-      weight: product.weight,
-      price: product.amount,
+      weight: product?.weight,
+      price: product?.price,
     });
   };
   return (
@@ -73,16 +123,22 @@ const ProductDetailScreen = ({ route }) => {
         rightIcon2={<ShopIcon fill="white" />}
       />
 
-      <ScrollView style={{ marginBottom: 30 }}>
-        <Image source={product.productImage} style={styles.image} />
+      <ScrollView
+        style={{ marginBottom: 30 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <Image
+          source={product?.image || images.product1}
+          style={styles.image}
+        />
 
         <View style={styles.productInfo}>
-          <Text style={styles.title}>{product.title}</Text>
+          <Text style={styles.title}>{product?.name}</Text>
           <Text style={[styles.title, { color: colors.green }]}>
-            {`$${product.amount}`}
+            {`$${product?.price}`}
           </Text>
         </View>
-        <Text style={styles.description}>{product.description}</Text>
+        <Text style={styles.description}>{product?.description}</Text>
 
         <View style={styles.quantityContainer}>
           <Text style={styles.title}>Quantity</Text>
@@ -98,7 +154,7 @@ const ProductDetailScreen = ({ route }) => {
         </View>
         <Text style={[styles.title, { marginBottom: 0 }]}>Features</Text>
         <View style={styles.featuresList}>
-          {product.features.map((feature, index) => (
+          {product?.features.map((feature, index) => (
             <Text key={index} style={styles.detailText}>
               • {feature}
             </Text>
@@ -106,7 +162,7 @@ const ProductDetailScreen = ({ route }) => {
         </View>
         <View style={styles.detailRow}>
           <Text style={styles.detailHeading}>Dimensions:</Text>
-          <Text style={styles.detailText}>{product.dimensions}</Text>
+          <Text style={styles.detailText}>{product?.dimensions}</Text>
         </View>
         <View style={styles.detailRow}>
           <Text style={styles.detailHeading}>Weight:</Text>
@@ -143,19 +199,27 @@ const ProductDetailScreen = ({ route }) => {
             >
               <View style={styles.detailRow}>
                 <Text style={styles.detailHeading}>Weight Range:</Text>
-                <Text style={styles.detailText}>{product.weightRange}</Text>
+                <Text style={styles.detailText}>
+                  {product?.detailedSpecifications?.weightRange}
+                </Text>
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.detailHeading}>Audience:</Text>
-                <Text style={styles.detailText}>{product.audience}</Text>
+                <Text style={styles.detailText}>
+                  {product?.detailedSpecifications?.audience}
+                </Text>
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.detailHeading}>Warranty:</Text>
-                <Text style={styles.detailText}>{product.warranty}</Text>
+                <Text style={styles.detailText}>
+                  {product?.detailedSpecifications?.warranty}
+                </Text>
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.detailHeading}>Manufacturer:</Text>
-                <Text style={styles.detailText}>{product.manufacturer}</Text>
+                <Text style={styles.detailText}>
+                  {product?.detailedSpecifications?.manufacturer}
+                </Text>
               </View>
             </View>
           )}

@@ -1,53 +1,80 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Modal, FlatList } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
 import DateTimePicker from "@react-native-community/datetimepicker"; // Ensure you have this library installed
+import { useNavigation, useRoute } from "@react-navigation/native";
+import React, { useState } from "react";
+import { FlatList, Modal, StyleSheet, Text, View } from "react-native";
+import FastingIcon from "../../assets/svgs/FastingIcon";
 import Container from "../../components/Container";
-import Header from "../../components/Header";
 import CustomButton from "../../components/CustomButton";
 import CustomModal from "../../components/CustomModal";
+import Header from "../../components/Header";
 import { MealItem } from "../../components/MealItem";
-import { fastingMeals } from "../../utils/data";
-import FastingIcon from "../../assets/svgs/FastingIcon";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import { useSelector } from "react-redux";
 
 const FastingPlanDetail = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { duration, title, remain, description } = route.params;
+  const { title, type, description, selectedPlan } = route.params;
 
   const [startTime, setStartTime] = useState(null);
   const [showPicker, setShowPicker] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const { token, userData } = useSelector((state) => ({
+    token: state.Auth?.token,
+    userData: state.Auth?.data,
+  }));
 
-  const [filteredMeals, setFilteredMeals] = useState([]);
-
-  // Use useEffect to filter meals based on the selected duration
-  useEffect(() => {
-    const filtered = fastingMeals.filter((meal) => meal.duration === duration);
-    setFilteredMeals(filtered);
-  }, [duration, fastingMeals]); // Run the effect whenever the duration or meals change
+  const [filteredMeals, setFilteredMeals] = useState(
+    selectedPlan?.mealsToBreakFast || []
+  );
 
   // Function to calculate end time based on duration
   const calculateEndTime = (start) => {
     if (!start) return null; // Check if start time is defined
     const end = new Date(start);
-    end.setHours(end.getHours() + duration); // Add duration hours to start time
+    end.setHours(end.getHours() + extractNumberBeforeColon(selectedPlan?.type)); // Add duration hours to start time
     return end;
   };
+
+  function extractNumberBeforeColon(timeString) {
+    const parts = timeString.split(":");
+    return parseInt(parts[0], 10);
+  }
 
   // Calculate endTime based on startTime and duration
   const endTime = calculateEndTime(startTime);
 
+  const startFastingSession = async () => {
+    try {
+      let payload = { user: userData?._id, fastingPlan: selectedPlan?._id };
+      const res = await API.post(
+        END_POINTS.GET_ALL_FASTING_HISTORY,
+        payload,
+        token
+      );
+      if (res.data.success) {
+        console.log("Session Start", JSON.stringify(res.data, null, 2));
+        const currentTime = new Date();
+        openModal();
+        setStartTime(currentTime); // Set current time as start time
+        setShowPicker(false); // Close the picker if it was open
+
+        navigation.navigate("FastingScreen", {
+          selectedPlan,
+          title,
+          type,
+          description,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // Function to handle starting now
   const handleStartNow = () => {
-    const currentTime = new Date();
-    openModal();
-    setStartTime(currentTime); // Set current time as start time
-    setShowPicker(false); // Close the picker if it was open
-
-    navigation.navigate("FastingScreen", {
-      selectedPlan: { duration, title, remain, description },
-    });
+    startFastingSession();
   };
 
   const handleStartTimeChange = (event, selectedTime) => {
@@ -76,12 +103,13 @@ const FastingPlanDetail = () => {
   const closeModal = () => {
     setModalVisible(false);
   };
-
   return (
     <Container style={styles.container}>
-      <Header title={`${duration}:${remain} ${title}`} showBackButton={true} />
+      <Header title={`${title}`} showBackButton={true} />
 
-      <Text style={styles.elapsedTimeText}>Elapsed Time: {duration} hrs</Text>
+      <Text style={styles.elapsedTimeText}>
+        Elapsed Time: {selectedPlan?.duration?.value} hrs
+      </Text>
 
       <View style={styles.buttonContainer}>
         <View>
@@ -94,7 +122,9 @@ const FastingPlanDetail = () => {
           <View>
             <Text style={styles.timeText}>Start Time:</Text>
             <Text style={styles.timeDetail}>
-              {startTime ? formatDateTime(startTime) : "Not Set"}
+              {selectedPlan?.fastingTime?.start
+                ? formatDateTime(new Date(selectedPlan?.fastingTime?.start))
+                : "Not Set"}
               {/* Display formatted start time */}
             </Text>
           </View>
@@ -140,21 +170,20 @@ const FastingPlanDetail = () => {
         }}
       >
         Meals to break your {""}
-        {duration}:{remain} fast
+        {type} fast
       </Text>
 
       <FlatList
         vertical
         data={filteredMeals} // Use the filtered meals here
-        keyExtractor={(item) => item.id.toString()} // Ensure the id is a string
+        keyExtractor={(item) => item._id?.toString()} // Ensure the id is a string
         renderItem={({ item }) => (
           <MealItem
             style={{ width: "100%" }}
-            title={item.title}
-            mealName={item.mealName}
+            mealName={item.name}
             mealImage={item.mealImage}
             calories={item.calories}
-            time={item.time}
+            time={item?.preparationTime}
           />
         )}
         contentContainerStyle={{ gap: 10, marginBottom: 20 }}

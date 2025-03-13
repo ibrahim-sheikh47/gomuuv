@@ -1,37 +1,37 @@
+import { useNavigation } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
 import {
-  Image,
   FlatList,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  ScrollView,
 } from "react-native";
-import React, { useState } from "react";
-import Container from "../../components/Container";
-import Header from "../../components/Header";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
-import { colors } from "../../constants/colors";
-import { ProgressBar } from "../../components/ProgressBar";
-import NutrientItem from "../../components/NutrientItem";
+import { useDispatch, useSelector } from "react-redux";
 import CaloriesIcon from "../../assets/svgs/CaloriesIcon";
-import { MealItem } from "../../components/MealItem";
-import {
-  dailyPlanData,
-  mealData,
-  nutritionPlans,
-  popularRecipes,
-  popularRecipesData,
-} from "../../utils/data";
-import CustomButton from "../../components/CustomButton";
-import { useNavigation } from "@react-navigation/native";
-import WaterIntake from "../../components/WaterIntake";
 import EatenIcon from "../../assets/svgs/EatenIcon";
 import GoalIcon from "../../assets/svgs/GoalIcon";
+import Container from "../../components/Container";
+import CustomButton from "../../components/CustomButton";
+import Header from "../../components/Header";
+import { MealItem } from "../../components/MealItem";
+import NutrientItem from "../../components/NutrientItem";
+import WaterIntake from "../../components/WaterIntake";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import { colors } from "../../constants/colors";
+import {
+  setDailyPlans,
+  setNutritionMeals,
+} from "../../redux/reducers/NutritionSlice";
+import { nutritionPlans } from "../../utils/data";
 
 // Meal Item Component
 
 const NutritionScreen = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
   const [eatenCalories, setEatenCalories] = useState(200);
   const [burnedCalories, setBurnedCalories] = useState(200);
@@ -39,6 +39,11 @@ const NutritionScreen = () => {
   const [consumedGlasses, setConsumedGlasses] = useState(0);
   const [totalGlasses, setTotalGlasses] = useState(0); // Default to 8 glasses
   const [totalIntakeGoal, setTotalIntakeGoal] = useState(0);
+  const { token, dailyPlans, nutritionMeals } = useSelector((state) => ({
+    token: state.Auth?.token,
+    dailyPlans: state.Nutrition.dailyPlans,
+    nutritionMeals: state.Nutrition.data,
+  }));
 
   // State for nutrients (carbs, proteins, fats)
   const [carbs, setCarbs] = useState({ current: 30, total: 30 });
@@ -52,6 +57,36 @@ const NutritionScreen = () => {
   const fillPercentage = (remainingCalories / totalCalories) * 100;
 
   const waterProgress = (consumedGlasses / totalGlasses) * 100;
+
+  useEffect(() => {
+    getNutritionMeals();
+    getDailyPlans();
+  }, []);
+
+  const getNutritionMeals = async () => {
+    try {
+      const res = await API.get(END_POINTS.NUTRITION_MEALS, null, token);
+      if (res.data.success) {
+        console.log(
+          "res?.data?.data",
+          JSON.stringify(res?.data?.data, null, 2)
+        );
+        dispatch(setNutritionMeals(res?.data?.data || []));
+      }
+    } catch (error) {
+      console.error("Error fetching meals:", error);
+    }
+  };
+  const getDailyPlans = async () => {
+    try {
+      const res = await API.get(END_POINTS.DAILY_PLANS, null, token);
+      if (res.data.success) {
+        dispatch(setDailyPlans(res?.data?.data?.meals || []));
+      }
+    } catch (error) {
+      console.error("Error fetching meals:", error);
+    }
+  };
 
   const handleAddWater = () => {
     // Check if consumed glasses have reached the total glasses limit
@@ -148,24 +183,25 @@ const NutritionScreen = () => {
           <Text style={styles.title}>Your Daily Plan</Text>
           <TouchableOpacity
             onPress={() =>
-              navigation.navigate("ViewAllMeals", { title: "My Daily Plan" })
+              navigation.navigate("ViewAllMeals", {
+                title: "My Daily Plan",
+              })
             }
           >
             <Text style={styles.greenText}>View all</Text>
           </TouchableOpacity>
         </View>
-
         <FlatList
           horizontal
-          data={dailyPlanData}
+          data={dailyPlans.slice(0, 4)}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <MealItem
-              title={item.title}
-              mealName={item.mealName}
-              mealImage={item.mealImage}
-              calories={item.calories}
-              time={item.time}
+              mealName={item?.name}
+              mealImage={item?.image}
+              calories={item?.calories}
+              time={item?.preparationTime}
+              mealItemOrientation={"Horizontal"}
               onPress={() =>
                 navigation.navigate("MealDetailScreen", { meal: item })
               }
@@ -194,15 +230,15 @@ const NutritionScreen = () => {
         </View>
         <FlatList
           horizontal
-          data={popularRecipesData}
+          data={nutritionMeals.slice(0, 4)}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <MealItem
-              title={item.title}
-              mealName={item.mealName}
-              mealImage={item.mealImage}
-              calories={item.calories}
-              time={item.time}
+              mealName={item?.name}
+              mealImage={item?.image}
+              calories={item?.calories}
+              time={item?.preparationTime}
+              mealItemOrientation={"Horizontal"}
               onPress={() =>
                 navigation.navigate("MealDetailScreen", { meal: item })
               }

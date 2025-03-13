@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,12 +13,21 @@ import Container from "../../../components/Container";
 import AuthHeader from "../../../components/AuthHeader";
 import { colors } from "../../../constants/colors";
 import Loader from "../../../components/Loader";
+import CustomButton from "../../../components/CustomButton";
+import Toast from "react-native-toast-message";
+import { API } from "../../../config/apiClient";
+import { END_POINTS } from "../../../config/routes";
 
-const Verify = () => {
+const Verify = (props) => {
   const navigation = useNavigation();
+  const params = props.route.params;
   const [code, setCode] = useState(["", "", "", ""]);
   const [loading, setLoading] = useState(false); // Loader state
   const inputRefs = useRef([]);
+
+  useEffect(() => {
+    console.log("params", params?.code);
+  }, [params]);
 
   const handleCodeChange = (index, value) => {
     if (value.length <= 1) {
@@ -36,6 +45,41 @@ const Verify = () => {
     }
   };
 
+  const resendOtp = async (email) => {
+    setLoading(true);
+    try {
+      const response = await API.post(END_POINTS.FORGOT_PASSWORD, { email });
+      setLoading(false);
+
+      if (response?.data?.success) {
+        Toast.show({
+          type: "success",
+          text1: "OTP Sent",
+          text2:
+            response?.data?.message || "OTP has been resent to your email.",
+        });
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2:
+            response?.data?.message ||
+            "Failed to resend OTP. Please try again.",
+        });
+      }
+    } catch (error) {
+      setLoading(false);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2:
+          error.response?.data?.message ||
+          error ||
+          "Something went wrong. Please try again later.",
+      });
+    }
+  };
+
   const isCodeComplete = code.every((digit) => digit !== "");
 
   const handleVerify = () => {
@@ -43,7 +87,7 @@ const Verify = () => {
       setLoading(true); // Show the loader
       setTimeout(() => {
         setLoading(false); // Hide the loader after verification
-      }, 2000); // Simulate a network request delay
+      }, 20000); // Simulate a network request delay
     }
   };
 
@@ -67,7 +111,9 @@ const Verify = () => {
               textAlign: "center",
             }}
           >
-            We have sent a code to your email@gmail.com
+            {`We have sent a code to your ${
+              params?.email || "email@gmail.com"
+            }`}
           </Text>
         </View>
         <View>
@@ -97,7 +143,7 @@ const Verify = () => {
             }}
           >
             <Text style={styles.signInText}>Didn't received the OTP?</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => resendOtp(params?.email)}>
               <Text style={styles.signInLink}>click here to resend</Text>
             </TouchableOpacity>
           </View>
@@ -105,12 +151,13 @@ const Verify = () => {
         <CustomButton
           title="Continue"
           onPress={() => {
-            navigation.navigate("NewPass");
+            handleVerify();
+            // navigation.navigate("NewPass");
           }}
         />
 
         {/* Loader while verifying */}
-        <Loader isLoading={loading} />
+        <Loader isLoading={loading} message="Processing your request..." />
       </ScrollView>
     </Container>
   );

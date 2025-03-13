@@ -789,6 +789,11 @@ export const challengesData = [
   },
 ];
 
+export const extractNumberBeforeColon = (timeString) => {
+  const parts = timeString.split(":");
+  return parseInt(parts[0], 10);
+};
+
 export const fastingMeals = [
   {
     id: "1",

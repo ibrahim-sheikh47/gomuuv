@@ -1,8 +1,8 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import icons from "../constants/icons";
-import { colors } from "../constants/colors";
 import { useNavigation } from "@react-navigation/native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { IconButton } from "react-native-paper";
+import { colors } from "../constants/colors";
+import { useEffect } from "react";
 
 export const FastingCard = ({ plan, selectedPlan }) => {
   const navigation = useNavigation();
@@ -10,9 +10,8 @@ export const FastingCard = ({ plan, selectedPlan }) => {
     event.persist();
     navigation.navigate("FastingPlanDetail", {
       selectedPlan: plan,
-      title: plan.title,
-      duration: plan.duration,
-      remain: plan.remain,
+      title: plan.name,
+      type: plan.type,
       description: plan.description,
     });
   };
@@ -20,13 +19,13 @@ export const FastingCard = ({ plan, selectedPlan }) => {
   return (
     <TouchableOpacity style={styles.card} onPress={handlePlanSelect}>
       <View style={styles.cardDurationContainer}>
-        <Text style={styles.cardDuration}>
-          {plan.duration}:{plan.remain}
-        </Text>
+        <Text style={styles.cardDuration}>{plan?.type}</Text>
       </View>
       <View style={styles.cardDetails}>
-        <Text style={styles.cardTitle}>{plan.title}</Text>
-        <Text style={styles.cardDescription}>{plan.description}</Text>
+        <Text style={styles.cardTitle} numberOfLines={2}>
+          {plan?.name}
+        </Text>
+        <Text style={styles.cardDescription}>{plan?.description}</Text>
       </View>
       <IconButton
         icon="chevron-right"

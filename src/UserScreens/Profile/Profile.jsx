@@ -1,19 +1,30 @@
 import React from "react";
-import { Image, StyleSheet, Text, View, ScrollView } from "react-native";
-import Container from "../../components/Container";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import DevicesIcon from "../../assets/svgs/DevicesIcon";
+import NotificationsIcon from "../../assets/svgs/NotificationsIcon";
 import BackHeader from "../../components/BackHeader";
+import Container from "../../components/Container";
 import CustomButton from "../../components/CustomButton";
-import images from "../../constants/images";
 import SettingItem from "../../components/SettingItem";
 import StatCard from "../../components/StatCard";
-import { notificationsSettings, settings } from "../../utils/data";
-import NotificationsIcon from "../../assets/svgs/NotificationsIcon";
-import DevicesIcon from "../../assets/svgs/DevicesIcon";
+import images from "../../constants/images";
+import { clearUserData } from "../../redux/reducers/AuthSlice";
+import { settings } from "../../utils/data";
 
 const Profile = ({ navigation }) => {
-  const height = "168cm";
-  const weight = "57kg";
-  const age = 20;
+  const dispatch = useDispatch();
+
+  // Combine all useSelector Hooks
+  const { userData } = useSelector((state) => ({
+    userData: state.Auth?.data,
+  }));
+
+  // Destructure height, weight, and age from userData
+  const height = userData?.height || "0";
+  const weight = userData?.weight || "0";
+  const age = userData?.age || 0;
+
   return (
     <Container>
       <BackHeader title="Profile" showBackButton={true} />
@@ -52,7 +63,21 @@ const Profile = ({ navigation }) => {
 
       <CustomButton
         title="Log Out"
-        onPress={() => navigation.navigate("Login")}
+        onPress={async () => {
+          dispatch(clearUserData());
+          navigation.reset({
+            index: 0, // Ensures TabNavigator is at the top
+            routes: [
+              {
+                name: "Splash", // Parent navigator (UserApp)
+                // state: {
+                //   routes: [{ name: "Login" }], // Navigate to TabNavigator within UserApp
+                // },
+              },
+            ],
+          });
+          // navigation.navigate("Login")
+        }}
       />
     </Container>
   );

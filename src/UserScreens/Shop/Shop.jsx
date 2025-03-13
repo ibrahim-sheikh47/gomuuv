@@ -1,30 +1,88 @@
-import { StyleSheet, View, ScrollView } from "react-native";
-import React, { useState } from "react";
-import Container from "../../components/Container";
-import Header from "../../components/Header";
-import SearchBar from "../../components/SearchBar";
-import Selectable from "../../components/Selectable";
-import ProductSection from "../../components/ProductSection";
-import { shopProducts } from "../../utils/data";
 import { useNavigation } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
+import { ScrollView, StyleSheet } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import CartIcon from "../../assets/svgs/CartIcon";
 import ShopIcon from "../../assets/svgs/ShopIcon";
+import Container from "../../components/Container";
+import CustomModal from "../../components/CustomModal";
+import Header from "../../components/Header";
+import ProductSection from "../../components/ProductSection";
+import SearchBar from "../../components/SearchBar";
+import Selectable from "../../components/Selectable";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import {
+  setCategoriesData,
+  setProductsData,
+} from "../../redux/reducers/ShopSlice";
 const ShopScreen = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
+  // Combine all useSelector Hooks
+  const { token, categoriesArr, productsArr } = useSelector((state) => ({
+    token: state.Auth?.token,
+    categoriesArr: state.Shop?.categories,
+    productsArr: state.Shop?.products,
+  }));
   const [searchQuery, setSearchQuery] = useState("");
   const onChangeSearch = (query) => setSearchQuery(query);
 
-  const duration = ["All", "Fitness Gear", "Supplements"];
-  const [selectedPeriod, setSelectedPeriod] = useState(null);
+  const [categories, setCategories] = useState(categoriesArr || []);
+  const [products, setProducts] = useState(productsArr || []);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const filterProductsByType = (type) =>
-    shopProducts.filter((shopProduct) => shopProduct.type === type);
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (selectedCategory === "All") {
+      setFilteredProducts(products);
+    } else {
+      setFilteredProducts(
+        products.filter((product) => product.category.name === selectedCategory)
+      );
+    }
+  }, [selectedCategory, products]);
+
+  const fetchData = async () => {
+    try {
+      const [categoriesResponse, productsResponse] = await Promise.all([
+        API.get(END_POINTS.GET_CATEGORIES, undefined, token),
+        API.get(END_POINTS.GET_ALL_PRODUCTS, undefined, token),
+      ]);
+
+      if (categoriesResponse?.data?.success) {
+        dispatch(setCategoriesData(categoriesResponse?.data?.data));
+        setCategories(categoriesResponse?.data?.data);
+      }
+
+      if (productsResponse?.data?.success) {
+        dispatch(setProductsData(productsResponse?.data?.data));
+        setProducts(productsResponse?.data?.data);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    // navigation.navigate("Cart", { product, quantity });
+  };
 
   return (
     <Container>
       <Header
         title="Shop"
         rightIcon1={<CartIcon />}
+        rightIcon2Press={() => {
+          navigation.navigate("Cart");
+        }}
         rightIcon2={<ShopIcon fill="#fff" />}
       />
 
@@ -33,32 +91,43 @@ const ShopScreen = () => {
         {/* Search Bar */}
         <SearchBar searchQuery={searchQuery} onChangeSearch={onChangeSearch} />
 
+        {/* Categories Filter */}
         <Selectable
-          items={duration}
-          selectedItem={selectedPeriod}
-          setSelectedItem={setSelectedPeriod}
-          label="Discount Offer"
-          description="Choose discount on your portfolio"
+          items={["All", ...categories.map((cat) => cat.name)]}
+          selectedItem={selectedCategory}
+          setSelectedItem={setSelectedCategory}
+          label="Categories"
+          description="Filter by category"
         />
 
-        {/* Recommended Products Section */}
-        <ProductSection
-          title="Recommended for You"
-          products={filterProductsByType("recommended")}
-        />
-
-        {/* Fitness Gear Section */}
-        <ProductSection
-          title="Fitness Gear"
-          products={filterProductsByType("fitness")}
-        />
-
-        {/* Supplements Section */}
-        <ProductSection
-          title="Supplements"
-          products={filterProductsByType("supplements")}
-        />
+        {/* Render Product Sections */}
+        {categories
+          .filter(
+            (category) =>
+              selectedCategory === "All" || category?.name === selectedCategory
+          )
+          .filter((category) =>
+            products.some((product) => product?.category?._id === category?._id)
+          )
+          .map((category) => (
+            <ProductSection
+              key={category?._id}
+              title={category?.name}
+              products={products.filter(
+                (product) =>
+                  product?.category?._id === category?._id &&
+                  (selectedCategory === "All" ||
+                    product?.category?.name === selectedCategory)
+              )}
+            />
+          ))}
       </ScrollView>
+      <CustomModal
+        visible={isModalVisible}
+        onClose={handleCloseModal}
+        modalIcon={<CartIcon width={50} height={50} />}
+        modalText={"Item added to cart!"}
+      />
     </Container>
   );
 };

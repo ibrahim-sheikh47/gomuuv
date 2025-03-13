@@ -5,6 +5,7 @@ import InputField from "../../components/InputField";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
 import CustomButton from "../../components/CustomButton";
+import EditIcon from "../../assets/svgs/EditIcon";
 import { colors } from "../../constants/colors";
 
 const SetWaterGoal = ({ navigation, route }) => {

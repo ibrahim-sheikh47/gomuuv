@@ -1,34 +1,56 @@
+import { useNavigation } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
+import React, { useState } from "react";
 import {
+  Alert,
+  ScrollView,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
-  Image,
-  ScrollView,
+  View,
 } from "react-native";
-import React, { useState } from "react";
-import Container from "../../../components/Container";
-import AuthHeader from "../../../components/AuthHeader";
-import InputField from "../../../components/InputField";
-import { colors } from "../../../constants/colors";
-import icons from "../../../constants/icons";
-import { SocialButton } from "../../../components/SocialButton";
-import { StatusBar } from "expo-status-bar";
-import { useNavigation } from "@react-navigation/native";
-import Loader from "../../../components/Loader";
-import CustomButton from "../../../components/CustomButton";
-import GoogleLogo from "../../../assets/svgs/GoogleLogo";
-import FacebookLogo from "../../../assets/svgs/FacebookLogo";
+import Toast from "react-native-toast-message";
 import AppleLogo from "../../../assets/svgs/AppleLogo";
+import FacebookLogo from "../../../assets/svgs/FacebookLogo";
+import GoogleLogo from "../../../assets/svgs/GoogleLogo";
+import AuthHeader from "../../../components/AuthHeader";
+import Container from "../../../components/Container";
+import CustomButton from "../../../components/CustomButton";
+import InputField from "../../../components/InputField";
+import Loader from "../../../components/Loader";
+import { SocialButton } from "../../../components/SocialButton";
+import { colors } from "../../../constants/colors";
+import { END_POINTS } from "../../../config/routes";
+import { API } from "../../../config/apiClient";
+import { setAuthData } from "../../../redux/reducers/AuthSlice";
+import { useDispatch } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: "ahmadmuzaffar6228@gmail.com",
+    password: "abcd1234",
     rememberMe: false,
   });
+
+  const validateForm = () => {
+    if (!formData.email) {
+      return "Email is required.";
+    }
+    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email)) {
+      return "Please enter a valid email address.";
+    }
+    if (!formData.password) {
+      return "Password is required.";
+    }
+    if (formData.password.length < 6) {
+      return "Password must be at least 6 characters.";
+    }
+    return null; // No errors
+  };
 
   const handleInputChange = (field, value) => {
     setFormData((prevData) => ({
@@ -36,15 +58,69 @@ const Login = () => {
       [field]: value,
     }));
   };
-  const handleLogin = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
 
-      alert("Login Successfully!");
-      navigation.navigate("TabNavigator");
-    }, 2000);
+  const handleLogin = async () => {
+    // Validate the form
+    const validationError = validateForm();
+    if (validationError) {
+      setLoading(false);
+      Toast.show({
+        type: "error",
+        text1: "Validation Error",
+        text2: validationError,
+      });
+      return; // Stop further execution
+    }
+
+    setLoading(true);
+    try {
+      const response = await API.post(END_POINTS.LOGIN, {
+        email: formData.email,
+        password: formData.password,
+      });
+      console.log("response", response?.status);
+      console.log("response", response?.data);
+      if (response?.data?.success) {
+        dispatch(
+          setAuthData({
+            token: response?.data?.token,
+            data: response?.data?.data,
+          })
+        );
+        // Successful login
+        Toast.show({
+          type: "success",
+          text1: "Login Successful!",
+          text2: "Welcome back 👋",
+        });
+
+        navigation.reset({
+          index: 0, // Ensures TabNavigator is at the top
+          routes: [
+            {
+              name: "UserApp", // Parent navigator (UserApp)
+              state: {
+                routes: [{ name: "TabNavigator" }], // Navigate to TabNavigator within UserApp
+              },
+            },
+          ],
+        });
+      }
+    } catch (error) {
+      // Handle error response
+      Toast.show({
+        type: "error",
+        text1: "Login Failed",
+        text2:
+          error.response?.data?.message ||
+          error ||
+          "Login failed. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
+
   return (
     <Container>
       <StatusBar style="light" backgroundColor="#121212" />
@@ -121,7 +197,7 @@ const Login = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <Loader isLoading={loading} />
+      <Loader isLoading={loading} message="Processing your request..." />
     </Container>
   );
 };

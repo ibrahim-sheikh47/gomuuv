@@ -11,7 +11,7 @@ const Loader = ({ isLoading, message }) => {
   return (
     <View style={styles.container}>
       <ActivityIndicator size={80} color={colors.green} />
-      <Text style={styles.loaderText}>{message}</Text>
+      <Text style={styles.loaderText}>{message || "Loading..."}</Text>
     </View>
   );
 };

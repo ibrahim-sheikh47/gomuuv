@@ -1,11 +1,33 @@
-import { StyleSheet, Text, View, FlatList } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import Container from "../../components/Container";
-import Header from "../../components/Header";
-import { fastingPlans } from "../../utils/data";
 import { FastingCard } from "../../components/FastingCard";
+import Header from "../../components/Header";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import { useSelector } from "react-redux";
 
-const FastingPlans = () => {
+const FastingPlans = (props) => {
+  const [fastingPlans, setFastingPlans] = useState([]);
+  const { token } = useSelector((state) => ({
+    token: state.Auth?.token,
+  }));
+
+  useEffect(() => {
+    getAllFastingPlans();
+  }, []);
+
+  const getAllFastingPlans = async () => {
+    try {
+      const res = await API.get(END_POINTS.FASTING_PLANS, null, token);
+      if (res?.data?.success) {
+        setFastingPlans(res.data.data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching history", error);
+    }
+  };
+
   const renderItem = ({ item }) => <FastingCard plan={item} />;
 
   return (

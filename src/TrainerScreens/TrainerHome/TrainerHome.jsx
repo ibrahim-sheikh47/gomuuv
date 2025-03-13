@@ -22,6 +22,7 @@ import StrengthIcon from "../../assets/svgs/StrengthIcon";
 import LevelIcon from "../../assets/svgs/LevelIcon";
 import ActiveClientsIcon from "../../assets/svgs/ActiveClientsIcon";
 import ProgramSoldIcon from "../../assets/svgs/ProgramSoldIcon";
+import { useSelector } from "react-redux";
 
 const TrainerHome = () => {
   const navigation = useNavigation();
@@ -30,6 +31,11 @@ const TrainerHome = () => {
     activeClients: 6,
     programsSold: 25,
   });
+
+  // Combine all useSelector Hooks
+  const { userData } = useSelector((state) => ({
+    userData: state.Auth?.data,
+  }));
 
   const trainerWorkoutData = [
     {
@@ -158,7 +164,9 @@ const TrainerHome = () => {
       <ScrollView>
         <TouchableOpacity style={styles.profileHeader}>
           <ProfileSection
-            userName="*username here*"
+            userName={
+              (userData?.firstName || "") + " " + (userData?.lastName || "")
+            }
             imageSource={images.dp}
             onPress={() => navigation.navigate("TrainerProfile")}
           />

@@ -1,33 +1,38 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, FlatList } from "react-native";
-import Header from "../../components/Header";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import Container from "../../components/Container";
-import SearchBar from "../../components/SearchBar";
-import NutrientItem from "../../components/NutrientItem";
 import CustomButton from "../../components/CustomButton";
-import icons from "../../constants/icons";
+import Header from "../../components/Header";
+import NutrientItem from "../../components/NutrientItem";
+import SearchBar from "../../components/SearchBar";
 import { colors } from "../../constants/colors";
+import icons from "../../constants/icons";
 // Import the new meal data arrays
-import { dailyPlanData, popularRecipesData } from "../../utils/data";
-import { MealItem } from "../../components/MealItem";
 import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import { MealItem } from "../../components/MealItem";
 
 const AddMealDetails = ({ route }) => {
   const navigation = useNavigation();
   const { label } = route.params; // Label passed from MealCard (e.g., "Breakfast", "Lunch")
-  const [carbs, setCarbs] = useState({ current: 10, total: 30 });
-  const [proteins, setProteins] = useState({ current: 10, total: 30 });
-  const [fats, setFats] = useState({ current: 30, total: 30 });
+  const [carbs, setCarbs] = useState({ current: 0, total: 30 });
+  const [proteins, setProteins] = useState({ current: 0, total: 30 });
+  const [fats, setFats] = useState({ current: 0, total: 30 });
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredData, setFilteredData] = useState([]);
 
+  const { token, nutritionMeals } = useSelector((state) => ({
+    token: state.Auth?.token,
+    nutritionMeals: state.Nutrition.data,
+  }));
+
   // Combine dailyPlanData and popularRecipesData
-  const mealData = [...dailyPlanData, ...popularRecipesData];
+  const mealData = [...nutritionMeals];
 
   // Filter meal data based on type
   useEffect(() => {
     const filtered = mealData.filter(
-      (meal) => meal.type.toLowerCase() === label.toLowerCase()
+      (meal) => meal.category.toLowerCase() === label.toLowerCase()
     );
     setFilteredData(filtered);
   }, [label]);
@@ -64,11 +69,10 @@ const AddMealDetails = ({ route }) => {
         renderItem={({ item }) => (
           <MealItem
             style={styles.ViewAll}
-            title={item.title}
-            mealName={item.mealName}
-            mealImage={item.mealImage}
+            mealName={item.name}
+            mealImage={item.image}
             calories={item.calories}
-            time={item.time}
+            time={item.preparationTime}
             showDelIcon={true}
           />
         )}

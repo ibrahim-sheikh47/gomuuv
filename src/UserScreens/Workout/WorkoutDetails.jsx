@@ -15,6 +15,10 @@ import Selectable from "../../components/Selectable";
 import CustomButton from "../../components/CustomButton";
 import { Switch } from "react-native-paper";
 import BackIcon from "../../assets/svgs/BackIcon";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import { useDispatch, useSelector } from "react-redux";
+import { setTodaySessions } from "../../redux/reducers/WorkoutSlice";
 
 const SwitchItem = ({ label, isSwitchOn, onToggleSwitch }) => (
   <View style={styles.switchContainer}>
@@ -28,68 +32,90 @@ const SwitchItem = ({ label, isSwitchOn, onToggleSwitch }) => (
 );
 
 const WorkoutDetails = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
   const { workout } = useRoute().params;
   const [selectedPeriod, setSelectedPeriod] = useState("Day 1");
   const [isWarmUpVisible, setIsWarmUpVisible] = useState(false);
   const [isStretchVisible, setIsStretchVisible] = useState(false);
+  const { token, userData } = useSelector((state) => ({
+    token: state.Auth?.token,
+    userData: state.Auth?.data,
+  }));
+  const getExercisesForDay = (day) => {
+    const dayData = workout.days.find((d) => d.shortName === day);
+    return {
+      exercises: dayData ? dayData.exercises : [],
+      warmupExercises:
+        dayData && dayData.startWithWarmup ? dayData.warmupExercises : [],
+      stretchExercises:
+        dayData && dayData.stretchAfterWorkout ? dayData.stretchExercises : [],
+    };
+  };
 
-  console.log(workout);
+  const selectedDayData = getExercisesForDay(selectedPeriod);
+  const {
+    exercises: selectedExercises,
+    warmupExercises,
+    stretchExercises,
+  } = selectedDayData;
 
-  // Existing function to render exercises
   const renderExercise = (heading, exercises) => (
     <>
       <Text style={styles.exerciseHeading}>{heading}</Text>
-      {exercises.map((exercise, index) => (
-        <View key={index} style={styles.exerciseContainer}>
-          <Image source={exercise.image} style={styles.exerciseImage} />
-          <Text style={styles.exerciseTitle}>{exercise.title}</Text>
+      {exercises.map((exercise) => (
+        <View key={exercise._id} style={styles.exerciseContainer}>
+          <Image source={images.chestWorkout} style={styles.exerciseImage} />
+          <Text style={styles.exerciseTitle}>{exercise.name}</Text>
           <Text style={styles.exerciseReps}>{exercise.reps}</Text>
         </View>
       ))}
     </>
   );
 
-  // New function to render exercises for the selected week
   const renderDayExercise = (dayExercises) => {
-    return dayExercises.map((exercise, index) => (
-      <View key={index} style={styles.exerciseContainer}>
-        <Image source={exercise.image} style={styles.exerciseImage} />
-        <Text style={styles.exerciseTitle}>{exercise.title}</Text>
+    return dayExercises.map((exercise) => (
+      <View key={exercise._id} style={styles.exerciseContainer}>
+        <Image source={images.chestWorkout} style={styles.exerciseImage} />
+        <Text style={styles.exerciseTitle}>{exercise.name}</Text>
         <Text style={styles.exerciseReps}>{exercise.reps}</Text>
       </View>
     ));
   };
 
-  // Function to get exercises for the selected week
-  // Function to get exercises for the selected day
-  const getExercisesForDay = (day) => {
-    switch (day) {
-      case "Day 1":
-        return workout.days.day1 || [];
-      case "Day 2":
-        return workout.days.day2 || [];
-      case "Day 3":
-        return workout.days.day3 || [];
-      case "Day 4":
-        return workout.days.day4 || [];
-      default:
-        return [];
+  const deleteWorkoutSession = async (id) => {
+    try {
+      const res = await API.delete(
+        END_POINTS.WORKOUT_SESSIONS + `/${id}`,
+        token
+      );
+      if (res?.data.success) {
+      }
+    } catch (error) {}
+  };
+
+  const handleStartWorkout = async () => {
+    try {
+      // deleteWorkoutSession();
+      let payload = { user: userData?._id, workout: workout?._id };
+      const res = await API.post(END_POINTS.WORKOUT_SESSIONS, payload, token);
+      if (res.data.success) {
+        dispatch(setTodaySessions([res?.data?.data]));
+        navigation.navigate("StartWorkout", {
+          title: workout.name,
+          image: images.chestWorkout,
+          time: workout.workoutTime,
+          exercises: selectedExercises,
+          level: workout.level,
+          calories: workout.calories,
+          workoutSessionId: res?.data?.data?._id,
+        });
+      }
+    } catch (error) {
+      console.error("Error starting session:", error);
     }
   };
 
-  const selectedExercises = getExercisesForDay(selectedPeriod);
-
-  const handleStartWorkout = () => {
-    navigation.navigate("StartWorkout", {
-      title: workout.title,
-      image: workout.image,
-      time: workout.time,
-      exercises: selectedExercises,
-      level: workout.level,
-      calories: workout.calories,
-    });
-  };
   return (
     <Container cusStyles={{ padding: 0 }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
@@ -102,8 +128,8 @@ const WorkoutDetails = () => {
           </TouchableOpacity>
 
           <View>
-            <Image source={workout.image} style={styles.workoutImage} />
-            <Text style={styles.absoluteTitle}>{workout.title}</Text>
+            <Image source={images.chestWorkout} style={styles.workoutImage} />
+            <Text style={styles.absoluteTitle}>{workout.name}</Text>
 
             <View
               style={{
@@ -128,10 +154,10 @@ const WorkoutDetails = () => {
                     <Text style={styles.label}>{label}</Text>
                     <Text style={styles.value}>
                       {label === "Exercises"
-                        ? workout.exercises + " Exercises"
+                        ? `${selectedExercises.length} Exercises`
                         : label === "Calories"
                         ? workout.calories + " kcal"
-                        : workout.time + " mins"}
+                        : workout.workoutTime + " mins"}
                     </Text>
                   </View>
                 ))}
@@ -143,7 +169,7 @@ const WorkoutDetails = () => {
                     <Text style={styles.label}>{label}</Text>
                     <Text style={styles.value}>
                       {label === "Equipment"
-                        ? workout.equipment
+                        ? workout.equipments.join(", ")
                         : workout.level}
                     </Text>
                   </View>
@@ -164,9 +190,8 @@ const WorkoutDetails = () => {
               onToggleSwitch={() => setIsStretchVisible(!isStretchVisible)}
             />
             {isWarmUpVisible &&
-              renderExercise("Warm Up", [
-                { title: "Push Ups", reps: "x10", image: images.chestWorkout },
-              ])}
+              warmupExercises.length > 0 &&
+              renderExercise("Warm Up", warmupExercises)}
             <Text style={styles.sectionTitle}>Exercises</Text>
             <Selectable
               items={["Day 1", "Day 2", "Day 3", "Day 4"]}
@@ -176,13 +201,8 @@ const WorkoutDetails = () => {
             {selectedExercises.length > 0 &&
               renderDayExercise(selectedExercises)}
             {isStretchVisible &&
-              renderExercise("Stretch", [
-                {
-                  title: "Leg Stretch",
-                  reps: "x10",
-                  image: images.chestWorkout,
-                },
-              ])}
+              stretchExercises.length > 0 &&
+              renderExercise("Stretch", stretchExercises)}
           </View>
         </View>
       </ScrollView>
@@ -293,6 +313,7 @@ const styles = StyleSheet.create({
     color: "#F8F8F8",
     fontFamily: "Poppins-Regular",
     fontSize: 16,
+    maxWidth: "65%",
   },
   exerciseReps: {
     marginLeft: "auto",

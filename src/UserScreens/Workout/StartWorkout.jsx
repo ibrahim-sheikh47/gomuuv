@@ -1,26 +1,35 @@
-import React, { useState, useEffect } from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  ImageBackground,
   Image,
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from "react-native";
-import { useRoute, useNavigation } from "@react-navigation/native";
-import Container from "../../components/Container";
-import Header from "../../components/Header";
-import { colors } from "../../constants/colors";
-import CustomButton from "../../components/CustomButton";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { useSelector } from "react-redux";
+import Container from "../../components/Container";
+import CustomButton from "../../components/CustomButton";
+import Header from "../../components/Header";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import { colors } from "../../constants/colors";
+import images from "../../constants/images";
 
 const StartWorkout = () => {
-  const { level, calories, title, time, exercises, image } = useRoute().params;
+  const { level, calories, title, time, exercises, image, workoutSessionId } =
+    useRoute().params;
   const navigation = useNavigation();
   const [secondsRemaining, setSecondsRemaining] = useState(time * 60);
   const [isRunning, setIsRunning] = useState(true);
   const [isWorkoutComplete, setIsWorkoutComplete] = useState(false);
+  const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
+  const { token } = useSelector((state) => ({
+    token: state.Auth?.token,
+  }));
 
   // Format seconds into MM:SS
   const formatTime = (seconds) => {
@@ -45,16 +54,46 @@ const StartWorkout = () => {
     setIsRunning((prev) => !prev);
   };
 
-  // Handle button press
   // Format seconds into minutes (without seconds)
   const formatMinutes = (seconds) => {
     const mins = Math.floor(seconds / 60); // Get total minutes
     return `${mins} min`; // Return in the format "X min"
   };
 
+  const exerciseCompleted = async (exerciseId) => {
+    try {
+      const payload = {
+        exerciseId,
+        workoutSessionId,
+      };
+      const res = await API.post(END_POINTS.EXERCISE_COMPLETED, payload, token);
+      if (res.data.success) {
+        console.log("Exercise Completed");
+      }
+    } catch (error) {
+      console.log("Workout exercises error", error);
+    }
+  };
+
+  const sessionCompleted = async (exerciseId) => {
+    try {
+      const payload = {
+        lastExerciseId: exerciseId,
+        workoutSessionId,
+      };
+      const res = await API.post(END_POINTS.SESSION_COMPLETED, payload, token);
+      if (res.data.success) {
+        console.log("Session Completed");
+      }
+    } catch (error) {
+      console.log("Workout session error", error);
+    }
+  };
+
   // Handle button press
   const handleButtonPress = () => {
     if (isWorkoutComplete) {
+      sessionCompleted(exercises[currentExerciseIndex]._id);
       // Calculate the total time spent
       const workoutDuration = time * 60 - secondsRemaining; // Total time - remaining time
       const formattedDuration = formatMinutes(workoutDuration); // Format to show only minutes
@@ -66,10 +105,22 @@ const StartWorkout = () => {
         title: title,
         level: level,
         calories: calories,
+        lastExerciseId: exercises[currentExerciseIndex]._id,
+        workoutSessionId: workoutSessionId,
       });
     } else {
-      // Mark workout as complete
-      setIsWorkoutComplete(true);
+      // Check if the current exercise is the last one
+      if (currentExerciseIndex < exercises.length - 1) {
+        // Move to the next exercise
+        setCurrentExerciseIndex((prevIndex) => prevIndex + 1);
+        // Mark the current exercise as complete
+        exerciseCompleted(exercises[currentExerciseIndex]._id);
+      } else {
+        // Mark workout as complete if all exercises are done
+        setIsWorkoutComplete(true);
+        // Mark the last exercise as complete
+        exerciseCompleted(exercises[currentExerciseIndex]._id);
+      }
     }
   };
 
@@ -79,13 +130,24 @@ const StartWorkout = () => {
       <View style={styles.imageContainer}>
         <ImageBackground source={image} style={styles.backgroundImage}>
           <ScrollView contentContainerStyle={styles.overlayContent}>
-            {/* Display the first exercise title at the top */}
+            {/* Display the current exercise title at the top */}
             {exercises.length > 0 && (
               <View style={styles.firstExerciseTitle}>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("VideoPlayerScreen", {
+                      videoUrl: exercises[currentExerciseIndex].videoUrl, // Assuming each exercise has a videoUrl property
+                    })
+                  }
+                >
+                  <Icon name="play-circle" size={24} color={colors.green} />
+                </TouchableOpacity>
                 <Text style={[styles.title, { color: colors.green }]}>
-                  {exercises[0].title}
+                  {exercises[currentExerciseIndex].name}
                 </Text>
-                <Text style={[styles.title]}>{exercises[0].reps}</Text>
+                <Text style={[styles.title]}>
+                  {exercises[currentExerciseIndex].reps}
+                </Text>
               </View>
             )}
 
@@ -110,18 +172,19 @@ const StartWorkout = () => {
             {!isWorkoutComplete && (
               <View style={{ marginTop: 20 }}>
                 <Text style={styles.title}>Next Exercise</Text>
-
-                {/* Display the remaining exercises below the first title */}
-                {exercises.slice(1).map((exercise, index) => (
-                  <View key={index} style={styles.exerciseContainer}>
-                    <Image
-                      source={exercise.image}
-                      style={styles.exerciseImage}
-                    />
-                    <Text style={styles.exerciseTitle}>{exercise.title}</Text>
-                    <Text style={styles.exerciseReps}>{exercise.reps}</Text>
-                  </View>
-                ))}
+                {/* Display the remaining exercises below the current one */}
+                {exercises
+                  .slice(currentExerciseIndex + 1)
+                  .map((exercise, index) => (
+                    <View key={index} style={styles.exerciseContainer}>
+                      <Image
+                        source={images.chestWorkout}
+                        style={styles.exerciseImage}
+                      />
+                      <Text style={styles.exerciseTitle}>{exercise.name}</Text>
+                      <Text style={styles.exerciseReps}>{exercise.reps}</Text>
+                    </View>
+                  ))}
               </View>
             )}
           </ScrollView>

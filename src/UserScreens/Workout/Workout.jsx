@@ -1,3 +1,5 @@
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import React, { useCallback, useState } from "react";
 import {
   Image,
   ScrollView,
@@ -6,32 +8,71 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
-import Container from "../../components/Container";
-import { colors } from "../../constants/colors";
-import Header from "../../components/Header";
-import icons from "../../constants/icons";
-import TabContainer from "../../components/TabContainer";
-import Selectable from "../../components/Selectable";
-import { useNavigation } from "@react-navigation/native";
-import images from "../../constants/images";
-import MealCategorySelector from "../../components/MealCategorySelector";
-import WorkoutCard from "../../components/WorkoutCard";
-import WalkingIcon from "../../assets/svgs/WalkingIcon";
-import TreadMillIcon from "../../assets/svgs/TreadmillIcon";
+import { useDispatch, useSelector } from "react-redux";
+import CaloriesIcon from "../../assets/svgs/CaloriesIcon";
 import DumbbellIcon from "../../assets/svgs/DumbbellIcon";
 import JumpRopeIcon from "../../assets/svgs/JumpRopeIcon";
 import PullupBarIcon from "../../assets/svgs/PullupBarIcon";
-import CaloriesIcon from "../../assets/svgs/CaloriesIcon";
-import TimeIcon from "../../assets/svgs/TimeIcon";
 import SearchIcon from "../../assets/svgs/SearchIcon";
+import TimeIcon from "../../assets/svgs/TimeIcon";
+import TreadMillIcon from "../../assets/svgs/TreadmillIcon";
+import WalkingIcon from "../../assets/svgs/WalkingIcon";
+import Container from "../../components/Container";
+import Header from "../../components/Header";
+import MealCategorySelector from "../../components/MealCategorySelector";
+import Selectable from "../../components/Selectable";
+import TabContainer from "../../components/TabContainer";
+import WorkoutCard from "../../components/WorkoutCard";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import { colors } from "../../constants/colors";
+import images from "../../constants/images";
+import {
+  setTodaySessions,
+  setTrendingWorkouts,
+} from "../../redux/reducers/WorkoutSlice";
 
 const WorkoutScreen = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState("Workout");
   const tabs = ["Workout", "Fasting"];
   const duration = ["Today", "Weekly", "Monthly", "Quarterly", "Yearly"];
   const [selectedPeriod, setSelectedPeriod] = useState("Today");
+  const { token, trendingData, todaySessions } = useSelector((state) => ({
+    token: state.Auth?.token,
+    trendingData: state.Workout.trendingData,
+    todaySessions: state.Workout.todaySessions,
+  }));
+
+  useFocusEffect(
+    useCallback(() => {
+      getTrendingWorkouts();
+      getTodaySessions();
+    }, [])
+  );
+
+  const getTrendingWorkouts = async () => {
+    try {
+      const res = await API.get(END_POINTS.WORKOUTS, null, token);
+      if (res.data.success) {
+        dispatch(setTrendingWorkouts(res?.data?.data));
+      }
+    } catch (error) {
+      console.error("Error fetching workouts:", error);
+    }
+  };
+
+  const getTodaySessions = async () => {
+    try {
+      const res = await API.get(END_POINTS.WORKOUT_SESSIONS, null, token);
+      if (res.data.success) {
+        dispatch(setTodaySessions(res?.data?.data ? [res.data.data] : []));
+      }
+    } catch (error) {
+      console.error("Error fetching workouts:", error);
+    }
+  };
 
   const handleTabClick = (tab) => setActiveTab(tab);
 
@@ -66,6 +107,28 @@ const WorkoutScreen = () => {
   const steps = 2000;
   const km = 10.5;
   const stepsTotal = 5000;
+
+  const workout = trendingData?.[0];
+
+  function getIncompleteExercisesForDay(
+    workoutData,
+    exercisesCompleted,
+    dayName
+  ) {
+    const completedIds = exercisesCompleted.map((exercise) => exercise._id);
+
+    const day = workoutData.days.find((day) => day.shortName === dayName);
+    if (!day) {
+      return [];
+    }
+
+    const incompleteExercises = day.exercises.filter(
+      (exercise) => !completedIds.includes(exercise._id)
+    );
+
+    return incompleteExercises;
+  }
+
   return (
     <Container>
       <Header title={"Workout"} rightIcon1={<SearchIcon />} />
@@ -121,17 +184,36 @@ const WorkoutScreen = () => {
               />
               <MetricBox label="Time" icon={TimeIcon} value="20" unit="mins" />
             </View>
-            <View>
-              <Text style={styles.sessionTitle}>Today's Session</Text>
-              <WorkoutCard
-                title="Chest Workout"
-                image={images.chestWorkout}
-                calories="190 kcal"
-                time="25 mins"
-                category="Quadriceps"
-                isTodayWorkout={true}
-              />
-            </View>
+            {todaySessions?.length > 0 ? (
+              <View>
+                <Text style={styles.sessionTitle}>Today's Session</Text>
+                <WorkoutCard
+                  title={todaySessions[0]?.workout?.name}
+                  image={images.chestWorkout}
+                  calories={todaySessions[0]?.workout?.calories}
+                  time={todaySessions[0]?.workout?.workoutTime}
+                  isTodayWorkout={true}
+                  onPress={async () => {
+                    const incompleteExercises =
+                      await getIncompleteExercisesForDay(
+                        todaySessions[0]?.workout,
+                        todaySessions[0]?.exercisesCompleted,
+                        "Day 1"
+                      );
+                    navigation.navigate("StartWorkout", {
+                      title: todaySessions[0]?.workout?.name,
+                      image: images.chestWorkout,
+                      time: todaySessions[0]?.workout?.workoutTime,
+                      exercises: incompleteExercises,
+                      level: todaySessions[0]?.workout?.level,
+                      calories: todaySessions[0]?.workout?.calories,
+                      workoutSessionId: todaySessions[0]?._id,
+                      exercisesCompleted: todaySessions[0]?.exercisesCompleted,
+                    });
+                  }}
+                />
+              </View>
+            ) : null}
             <View>
               <Text style={styles.sessionTitle}>
                 Select Your Training Equipment
@@ -158,12 +240,18 @@ const WorkoutScreen = () => {
                 </TouchableOpacity>
               </View>
               <WorkoutCard
-                title="Chest Workout"
+                title={workout?.name ?? "Chest Workout"}
                 image={images.chestWorkout}
-                calories="190 kcal"
-                time="25 mins"
+                calories={workout?.calories ?? "190 kcal"}
+                time={
+                  workout?.workoutTime ? `${workout.workoutTime}` : "25 mins"
+                }
                 category="Quadriceps"
+                onPress={() =>
+                  workout && navigation.navigate("WorkoutDetails", { workout })
+                }
               />
+              ;
             </View>
           </>
         )}

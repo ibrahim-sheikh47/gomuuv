@@ -1,15 +1,76 @@
 // ProductSection.js
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import ShopItem from "./ShopItem";
+import images from "../constants/images";
+import CustomModal from "./CustomModal";
+import CartIcon from "../assets/svgs/CartIcon";
+import { API } from "../config/apiClient";
+import { END_POINTS } from "../config/routes";
+import { useDispatch, useSelector } from "react-redux";
+import Toast from "react-native-toast-message";
+import { setCartData } from "../redux/reducers/CartSlice";
 
 const ProductSection = ({ title, products }) => {
+  const dispatch = useDispatch();
+  const [isModalVisible, setModalVisible] = useState(false);
+  // Combine all useSelector Hooks
+  const { token, cartItems } = useSelector((state) => ({
+    token: state.Auth?.token,
+    cartItems: state.Cart?.data,
+  }));
+
+  let items = Array.isArray(cartItems) ? [...cartItems] : [];
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
+
+  const addToCart = async (item) => {
+    const payload = {
+      products: [
+        {
+          id: item?._id,
+          quantity: 1,
+        },
+      ],
+    };
+
+    try {
+      const response = await API.post(END_POINTS.ADD_TO_CART, payload, token);
+
+      if (response?.data?.success) {
+        const cartItems = response?.data?.data?.items;
+        dispatch(setCartData(cartItems));
+      } else {
+        // Show error toast if success is false
+        Toast.show({
+          type: "error",
+          text1: "Add to Cart Failed",
+          text2: response?.data?.message || "Something went wrong.",
+        });
+      }
+    } catch (error) {
+      // Show error toast if there's an error in the API request
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: error?.response?.data?.message || error || "An error occurred.",
+      });
+    }
+  };
+
   const renderItem = ({ item }) => (
     <ShopItem
-      productImage={item.productImage}
-      title={item.title}
-      amount={item.amount}
-      onPress={() => console.log(`${item.title} pressed`)} // Optional, can be removed
+      productImage={item?.productImage || images.product1}
+      title={item.name}
+      amount={item?.price}
+      onPress={() => {
+        items.push({ product: item });
+        dispatch(setCartData(items));
+        setModalVisible(true);
+        addToCart(item);
+      }} // Optional, can be removed
       product={item} // Pass the entire product object
     />
   );
@@ -19,13 +80,21 @@ const ProductSection = ({ title, products }) => {
       <Text style={styles.sectionTitle}>{title}</Text>
       <View style={styles.horizontalList}>
         <FlatList
-          data={products}
+          data={products || []}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item, index) =>
+            item?._id?.toString() || index.toString()
+          }
           horizontal
           showsHorizontalScrollIndicator={false}
         />
       </View>
+      <CustomModal
+        visible={isModalVisible}
+        onClose={handleCloseModal}
+        modalIcon={<CartIcon width={50} height={50} />}
+        modalText={"Item added to cart!"}
+      />
     </View>
   );
 };

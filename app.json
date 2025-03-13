@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "frontend",
+    "name": "gomuuv",
     "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -19,7 +19,7 @@
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.gomuuv.frontend"
+      "package": "com.gomuuv.android"
     },
     "web": {
       "favicon": "./src/assets/favicon.png"
@@ -37,7 +37,9 @@
       "url": "https://u.expo.dev/043ba87c-8b62-411c-91de-265476701a7e"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      "react-native-video",
+      "expo-video"
     ]
   }
 }

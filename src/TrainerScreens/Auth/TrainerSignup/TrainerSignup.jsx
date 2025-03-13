@@ -1,23 +1,22 @@
+import { useNavigation } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
+import React, { useState } from "react";
 import {
+  ScrollView,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
-  ScrollView,
+  View,
 } from "react-native";
-import React, { useState } from "react";
-import Container from "../../../components/Container";
-import AuthHeader from "../../../components/AuthHeader";
-import InputField from "../../../components/InputField";
-import { colors } from "../../../constants/colors";
-import icons from "../../../constants/icons";
-import { SocialButton } from "../../../components/SocialButton";
-import { StatusBar } from "expo-status-bar";
-import { useNavigation } from "@react-navigation/native";
-import CustomButton from "../../../components/CustomButton";
-import GoogleLogo from "../../../assets/svgs/GoogleLogo";
-import FacebookLogo from "../../../assets/svgs/FacebookLogo";
 import AppleLogo from "../../../assets/svgs/AppleLogo";
+import FacebookLogo from "../../../assets/svgs/FacebookLogo";
+import GoogleLogo from "../../../assets/svgs/GoogleLogo";
+import AuthHeader from "../../../components/AuthHeader";
+import Container from "../../../components/Container";
+import CustomButton from "../../../components/CustomButton";
+import InputField from "../../../components/InputField";
+import { SocialButton } from "../../../components/SocialButton";
+import { colors } from "../../../constants/colors";
 
 const TrainerSignup = () => {
   const navigation = useNavigation();

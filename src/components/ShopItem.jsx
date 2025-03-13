@@ -1,14 +1,70 @@
 // ShopItem.js
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { colors } from "../constants/colors";
 import { useNavigation } from "@react-navigation/native"; // Import useNavigation
+import { useDispatch, useSelector } from "react-redux";
+import { setCartData } from "../redux/reducers/CartSlice";
+import { API } from "../config/apiClient";
+import { END_POINTS } from "../config/routes";
 
 const ShopItem = ({ productImage, title, amount, onPress, product }) => {
+  const dispatch = useDispatch(); // Initialize dispatch
   const navigation = useNavigation(); // Initialize navigation
+  const [itemAddedToCart, setItemAddedToCart] = useState(false);
+
+  const { token, cartItems } = useSelector((state) => ({
+    token: state.Auth?.token,
+    cartItems: state.Cart?.data,
+  }));
+
+  useEffect(() => {
+    // Check if product exists and cartItems is not empty
+    if (cartItems.length > 0) {
+      checkItemInCart(product._id);
+    }
+  }, [cartItems]); // Dependency on cartItems and product
+
+  // Function to check if item is in cart
+  const checkItemInCart = (itemId) => {
+    const itemInCart = cartItems.some(
+      (cartItem) => cartItem?.product?._id === itemId
+    );
+    setItemAddedToCart(itemInCart);
+  };
+
+  const callProductRemoveApi = async (productId) => {
+    try {
+      const payload = {
+        products: [
+          {
+            id: productId,
+            quantity: 0,
+          },
+        ],
+      };
+      const updateCartItems = cartItems.filter(
+        (item) => item.product._id !== productId
+      );
+      dispatch(setCartData(updateCartItems));
+      // Make your API request here to update the product quantity
+      await API.post(END_POINTS.REMOVE_FROM_CART, payload, token);
+      console.log("Product removed successfully");
+    } catch (error) {
+      console.error("Error removing product", error);
+    }
+  };
+
+  const handleAddToCartPress = () => {
+    if (itemAddedToCart) {
+      callProductRemoveApi(product._id); // Call API to remove item if already added to cart
+    } else {
+      onPress(); // Add to cart if not added
+    }
+  };
 
   const handlePress = () => {
-    onPress(); // Call the passed onPress function
+    // onPress(); // Call the passed onPress function
     navigation.navigate("ProductDetail", { product }); // Navigate to ProductDetail screen
   };
 
@@ -28,9 +84,11 @@ const ShopItem = ({ productImage, title, amount, onPress, product }) => {
       {/* Add to Cart Button */}
       <TouchableOpacity
         style={styles.addToCartButton}
-        onPress={() => navigation.navigate("Cart", { product, quantity: 1 })}
+        onPress={handleAddToCartPress}
       >
-        <Text style={styles.buttonText}>Add to Cart</Text>
+        <Text style={styles.buttonText}>
+          {itemAddedToCart ? "Remove" : "Add to Cart"}
+        </Text>
       </TouchableOpacity>
     </View>
   );

@@ -11,6 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../constants/colors";
 import CaloriesIcon from "../assets/svgs/CaloriesIcon";
 import TimeIcon from "../assets/svgs/TimeIcon";
+import images from "../constants/images";
 
 export const MealItem = ({
   title,
@@ -24,13 +25,30 @@ export const MealItem = ({
   forFinalizePlan, // New prop to check if used for Finalize Plan
   isAdded,
   handleAddRemove,
+  mealItemOrientation,
 }) => {
+  // Check if the mealImage is a valid URL or an object with a URI
+  const imageSource =
+    mealImage && (typeof mealImage === "string" || mealImage?.uri)
+      ? { uri: mealImage?.uri || mealImage }
+      : images.lunch;
+
   return (
     <TouchableOpacity style={[styles.mealContainer, style]} onPress={onPress}>
-      <Image source={mealImage} style={styles.mealImage} />
+      <Image source={imageSource} style={styles.mealImage} />
       <View style={styles.mealDetails}>
         <View style={styles.row}>
-          <Text style={styles.mealTitle}>{mealName}</Text>
+          <Text
+            style={[
+              styles.mealTitle,
+              {
+                maxWidth: mealItemOrientation === "Horizontal" ? "100%" : "80%",
+              },
+            ]}
+            numberOfLines={2}
+          >
+            {mealName}
+          </Text>
           {!forFinalizePlan && iconType === "delete" && (
             <TouchableOpacity>
               <Ionicons name="trash-outline" size={15} color="#AFAFAF" />
@@ -62,7 +80,7 @@ export const MealItem = ({
           )}
         </View>
 
-        <Text style={styles.mealName}>{title}</Text>
+        <Text style={styles.mealName}>{title || ""}</Text>
         <View style={styles.mealStats}>
           <View style={styles.statItem}>
             <CaloriesIcon width={16} height={16} />
@@ -70,7 +88,7 @@ export const MealItem = ({
           </View>
           <View style={styles.statItem}>
             <TimeIcon />
-            <Text style={styles.statText}>{time} mins</Text>
+            <Text style={styles.statText}>{time}</Text>
           </View>
           {forFinalizePlan && (
             <TouchableOpacity>
@@ -119,6 +137,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-SemiBold",
     color: colors.green,
     fontSize: 12,
+    maxWidth: "80%",
   },
   mealName: {
     fontFamily: "Poppins-Regular",

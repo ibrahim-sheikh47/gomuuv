@@ -1,37 +1,46 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useState, useEffect } from "react";
-import Container from "../../components/Container";
-import { colors } from "../../constants/colors";
-import Header from "../../components/Header";
-import icons from "../../constants/icons";
-import TabContainer from "../../components/TabContainer";
 import { useNavigation, useRoute } from "@react-navigation/native"; // Import useRoute
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
-import CustomButton from "../../components/CustomButton";
-import { FastingCard } from "../../components/FastingCard";
-import CustomModal from "../../components/CustomModal"; // Import your CustomModal
-import { CustomCard } from "../../components/CustomCard";
-import { ActivityCard } from "../../components/ActivityCard";
-import { StatsHistoryCard } from "../../components/StatsHistoryCard";
 import FastingIcon from "../../assets/svgs/FastingIcon";
-import ProgressIcon from "../../assets/svgs/ProgressIcon";
 import FastTypeIcon from "../../assets/svgs/FastTypeIcon";
 import GlassIcon from "../../assets/svgs/GlassIcon";
+import ProgressIcon from "../../assets/svgs/ProgressIcon";
 import SearchIcon from "../../assets/svgs/SearchIcon";
+import Container from "../../components/Container";
+import CustomButton from "../../components/CustomButton";
+import CustomModal from "../../components/CustomModal"; // Import your CustomModal
+import { FastingCard } from "../../components/FastingCard";
+import Header from "../../components/Header";
+import { StatsHistoryCard } from "../../components/StatsHistoryCard";
+import TabContainer from "../../components/TabContainer";
+import { colors } from "../../constants/colors";
+import { useDispatch, useSelector } from "react-redux";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
 
 const FastingScreen = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
   const route = useRoute(); // Use route to access navigation parameters
   const [activeTab, setActiveTab] = useState("Current Fast");
   const tabs = ["Current Fast", "Stats and History"];
+  const { token, userData } = useSelector((state) => ({
+    token: state.Auth?.token,
+    userData: state.Auth?.data,
+  }));
 
   const [modalVisible, setModalVisible] = useState(false); // Modal visibility state
+  const [fastingStats, setFastingStats] = useState({}); // Modal visibility state
 
   // Get the selected plan from navigation params
   const selectedPlan = route.params?.selectedPlan;
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
+    if (tab === "Stats and History") {
+      getFastingHistory();
+    }
   };
 
   const [fill, setFill] = useState(0);
@@ -41,7 +50,8 @@ const FastingScreen = () => {
   useEffect(() => {
     if (selectedPlan) {
       // Check if a selected plan is available
-      const durationInSeconds = parseInt(selectedPlan.duration) * 3600; // Convert hours to seconds
+      const durationInSeconds =
+        extractNumberBeforeColon(selectedPlan?.type) * 3600; // Convert hours to seconds
       setTotalDuration(durationInSeconds);
       setRemainingTime(durationInSeconds);
     }
@@ -59,6 +69,38 @@ const FastingScreen = () => {
     return () => clearInterval(interval);
   }, [remainingTime, totalDuration]);
 
+  const endFastingSession = async () => {
+    try {
+      let payload = { user: userData?._id, fastingPlan: selectedPlan?._id };
+      const res = await API.post(
+        END_POINTS.END_FASTING_SESSION,
+        payload,
+        token
+      );
+      if (res.data.success) {
+        setModalVisible(true); // Show the modal
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  function extractNumberBeforeColon(timeString) {
+    const parts = timeString.split(":");
+    return parseInt(parts[0], 10);
+  }
+
+  const getFastingHistory = async () => {
+    try {
+      const res = await API.post(END_POINTS.FASTING_HISTORY, {}, token);
+      if (res?.data?.success) {
+        setFastingStats(res.data.data || {});
+      }
+    } catch (error) {
+      console.error("Error fetching history", error);
+    }
+  };
+
   const formattedTime = (timeInSeconds) => {
     const hours = Math.floor(timeInSeconds / 3600)
       .toString()
@@ -72,7 +114,7 @@ const FastingScreen = () => {
 
   // Function to reset the timer and progress
   const handleEndFast = () => {
-    setModalVisible(true); // Show the modal
+    endFastingSession();
   };
 
   // Close modal and reset the progress
@@ -256,12 +298,12 @@ const FastingScreen = () => {
             >
               <StatsHistoryCard
                 label={"Weekly Progress"}
-                value={10}
+                value={fastingStats?.completedFasts}
                 icon={ProgressIcon}
               />
               <StatsHistoryCard
                 label={"Longest Fast"}
-                value={10}
+                value={fastingStats?.longestFastHours}
                 icon={ProgressIcon}
               />
             </View>
@@ -274,13 +316,13 @@ const FastingScreen = () => {
               }}
             >
               <StatsHistoryCard
-                label={"Water Intake"}
-                value={10}
-                icon={GlassIcon}
+                label={"Incomplete Fast"}
+                value={fastingStats?.incompletedFasts}
+                icon={ProgressIcon}
               />
               <StatsHistoryCard
                 label={"Fast Type"}
-                value={10}
+                value={fastingStats?.longestFastType}
                 icon={FastTypeIcon}
               />
             </View>

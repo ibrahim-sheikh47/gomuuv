@@ -10,7 +10,9 @@ import { colors } from "../constants/colors";
 const WorkoutCard = ({ title, calories, time, category, image, onPress }) => (
   <TouchableOpacity style={styles.sessionContainer} onPress={onPress}>
     <Image source={image} style={styles.sessionImage} />
-    <Text style={styles.sessionTitleText}>{title}</Text>
+    <Text style={styles.sessionTitleText} numberOfLines={2}>
+      {title}
+    </Text>
     <View style={styles.sessionDetailsContainer}>
       <View style={styles.sessionDetail}>
         <CaloriesIcon width={15} height={15} />
@@ -18,12 +20,12 @@ const WorkoutCard = ({ title, calories, time, category, image, onPress }) => (
       </View>
       <View style={styles.sessionDetail}>
         <TimeIcon />
-        <Text style={styles.detailText}>{time}</Text>
+        <Text style={styles.detailText}>{time} mins</Text>
       </View>
-      <View style={styles.sessionDetail}>
+      {/* <View style={styles.sessionDetail}>
         <StrengthIcon />
         <Text style={styles.detailText}>{category}</Text>
-      </View>
+      </View> */}
       <IconButton
         icon="chevron-right"
         size={20} // Adjust the size as needed
@@ -51,7 +53,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 60,
     left: 10,
-    width: 103,
   },
   sessionDetailsContainer: {
     position: "absolute",
@@ -75,6 +76,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Regular",
     fontSize: 12,
     marginTop: 2,
+    marginRight: 10,
   },
   nextIcon: {
     marginLeft: "auto",

@@ -1,53 +1,147 @@
+import { useNavigation, useRoute } from "@react-navigation/native";
+import React, { useCallback, useState } from "react";
 import {
   Image,
   ScrollView,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
+  View,
 } from "react-native";
-import React, { useState } from "react";
-import Container from "../../components/Container";
-import Header from "../../components/Header";
-import icons from "../../constants/icons";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { colors } from "../../constants/colors";
-import CustomButton from "../../components/CustomButton";
+import { useDispatch, useSelector } from "react-redux";
 import CartIcon from "../../assets/svgs/CartIcon";
 import ShopIcon from "../../assets/svgs/ShopIcon";
+import Container from "../../components/Container";
+import CustomButton from "../../components/CustomButton";
+import Header from "../../components/Header";
+import { colors } from "../../constants/colors";
+import images from "../../constants/images";
+import { debounce } from "lodash";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import { setCartData } from "../../redux/reducers/CartSlice";
 
 const Cart = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
   const route = useRoute();
-  const { product } = route.params || {};
-  const [quantity, setQuantity] = useState(route.params?.quantity || 1);
+  const { token, cartItems } = useSelector((state) => ({
+    token: state.Auth?.token,
+    cartItems: state.Cart?.data,
+  }));
 
-  // Calculate the subtotal based on the quantity
-  const subtotal = product.amount * quantity;
-  const shippingCharges = 10;
-  const total = subtotal + shippingCharges;
-
-  const incrementQuantity = () => {
-    setQuantity((prevQuantity) => prevQuantity + 1);
+  // Calculate subtotal dynamically
+  const getSubtotal = (price, quantity) => {
+    return price * quantity;
   };
 
-  const decrementQuantity = () => {
-    setQuantity((prevQuantity) => (prevQuantity > 1 ? prevQuantity - 1 : 1));
+  // Handle increment and decrement for quantity based on item id
+  const incrementQuantity = (itemId) => {
+    const updatedCartItems = cartItems.map((item) =>
+      item?.product?._id === itemId
+        ? {
+            ...item,
+            quantity:
+              item?.quantity < item?.product?.stock
+                ? item?.quantity + 1
+                : item?.quantity, // Prevent incrementing beyond stock
+          }
+        : item
+    );
+    // Only call API if quantity is less than stock
+    const updatedItem = updatedCartItems.find(
+      (item) => item?.product?._id === itemId
+    );
+    if (updatedItem?.quantity < updatedItem?.product?.stock) {
+      dispatch(setCartData(updatedCartItems));
+      debouncedUpdateProductQuantity(updatedCartItems, itemId); // Call the debounced API function
+    } else {
+      dispatch(setCartData(updatedCartItems)); // Still update Redux without calling API
+    }
   };
 
-  const handleCheckout = () => {
-    navigation.navigate("Checkout", {
-      productImage: product.productImage,
-      title: product.title,
-      quantity: quantity,
-      weight: product.weight,
-      price: prices,
-    });
+  // Define debounced API call using useCallback to ensure it's created only once
+  const debouncedUpdateProductQuantity = useCallback(
+    debounce((updatedCartItems, itemId) => {
+      // Find the updated item to make the API call
+      const updatedItem = updatedCartItems.find(
+        (item) => item?.product?._id === itemId
+      );
+      if (updatedItem) {
+        // Call the API to update the product on the server
+        callProductUpdateApi(updatedItem?.product?._id, updatedItem?.quantity);
+      }
+    }, 1000), // Wait for 2 seconds before making the API call
+    [] // Empty dependency array ensures that the debounced function is created only once
+  );
+  const decrementQuantity = (itemId) => {
+    // Find the item in the cart
+    const updatedCartItems = cartItems.map((item) =>
+      item?.product?._id === itemId && item?.quantity > 1
+        ? { ...item, quantity: item?.quantity - 1 }
+        : item
+    );
+    // Only call API if quantity is greater than 1
+    const updatedItem = updatedCartItems.find(
+      (item) => item?.product?._id === itemId
+    );
+    if (updatedItem?.quantity > 0) {
+      dispatch(setCartData(updatedCartItems));
+      debouncedUpdateProductQuantity(updatedCartItems, itemId); // Call the debounced API function
+    } else {
+      dispatch(setCartData(updatedCartItems)); // Still update Redux without calling API
+    }
   };
 
-  const prices = subtotal.toFixed(2);
+  const callProductUpdateApi = async (productId, newQuantity) => {
+    try {
+      const payload = {
+        products: [
+          {
+            id: productId,
+            quantity: newQuantity,
+          },
+        ],
+      };
+      // Make your API request here to update the product quantity
+      await API.post(END_POINTS.ADD_TO_CART, payload, token);
+      console.log("Product quantity updated successfully");
+    } catch (error) {
+      console.error("Error updating product quantity", error);
+    }
+  };
 
-  if (!product) {
+  const callProductRemoveApi = async (productId) => {
+    try {
+      const payload = {
+        products: [
+          {
+            id: productId,
+            quantity: 0,
+          },
+        ],
+      };
+      // Make your API request here to update the product quantity
+      const response = await API.post(
+        END_POINTS.REMOVE_FROM_CART,
+        payload,
+        token
+      );
+      if (response?.data?.success) {
+        dispatch(setCartData(response.data?.data?.items));
+        console.log("Product removed successfully");
+      }
+    } catch (error) {
+      console.error("Error removing product", error);
+    }
+  };
+
+  const handleCheckout = (product) => {
+    navigation.navigate("Checkout");
+  };
+
+  // If no items in cart
+  if (!cartItems || cartItems.length === 0) {
     return (
       <Container>
         <Header
@@ -57,7 +151,14 @@ const Cart = () => {
           rightIcon2={<ShopIcon fill="white" />}
         />
         <Text
-          style={{ color: colors.white, textAlign: "center", marginTop: 20 }}
+          style={{
+            color: "#FFF",
+            textAlign: "center",
+            top: "42%",
+            right: 0,
+            bottom: 0,
+            width: "100%",
+          }}
         >
           No items in the cart.
         </Text>
@@ -76,64 +177,110 @@ const Cart = () => {
       <ScrollView>
         <View>
           <Text style={styles.sectionTitle}>Items</Text>
-          <View style={styles.productContainer}>
-            <Image source={product.productImage} style={styles.image} />
-            <View style={styles.productDetails}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "start",
-                }}
-              >
-                <View>
-                  <Text style={styles.productTitle}>{product.title}</Text>
-                  <Text style={styles.productQuantity}>
-                    Weight: {product.weight}
-                  </Text>
-                </View>
-                <View style={styles.quantityContainer}>
-                  <TouchableOpacity
-                    onPress={decrementQuantity}
-                    style={styles.quantityButton}
+          {cartItems.map((product, index) => {
+            const subtotal = getSubtotal(
+              product?.product?.price,
+              product?.quantity
+            );
+            const shippingCharges = 0;
+
+            return (
+              <View key={index} style={styles.productContainer}>
+                <Image
+                  source={product?.product?.image || images.product1}
+                  style={styles.image}
+                />
+                <View style={styles.productDetails}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "start",
+                    }}
                   >
-                    <Text style={styles.quantityButtonText}>-</Text>
-                  </TouchableOpacity>
-                  <Text style={styles.quantity}>{quantity}</Text>
-                  <TouchableOpacity
-                    onPress={incrementQuantity}
-                    style={styles.quantityButton}
-                  >
-                    <Text style={styles.quantityButtonText}>+</Text>
-                  </TouchableOpacity>
+                    <View>
+                      <Text style={styles.productTitle}>
+                        {product?.product?.name}
+                      </Text>
+                      <Text style={styles.productQuantity}>
+                        Weight: {product?.product?.weight}
+                      </Text>
+                    </View>
+                    <View style={styles.quantityContainer}>
+                      <TouchableOpacity
+                        onPress={() => decrementQuantity(product?.product?._id)}
+                        style={styles.quantityButton}
+                      >
+                        <Text style={styles.quantityButtonText}>-</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.quantity}>{product?.quantity}</Text>
+                      <TouchableOpacity
+                        onPress={() => incrementQuantity(product?.product?._id)}
+                        style={styles.quantityButton}
+                      >
+                        <Text style={styles.quantityButtonText}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                  <View style={styles.priceContainer}>
+                    <Text style={styles.productPrice}>
+                      ${subtotal.toFixed(2)}
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        const updateCartItems = cartItems.filter(
+                          (item) => item?.product?._id !== product?.product?._id
+                        );
+                        dispatch(setCartData(updateCartItems));
+                        callProductRemoveApi(product?.product?._id);
+                      }}
+                    >
+                      <Text style={styles.removeText}>Remove</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
-              <View style={styles.priceContainer}>
-                <Text style={styles.productPrice}>${subtotal.toFixed(2)}</Text>
-                <Text style={styles.removeText}>Remove</Text>
-              </View>
-            </View>
-          </View>
+            );
+          })}
           {/* Order Summary Section */}
           <Text style={styles.sectionTitle}>Order Summary</Text>
           <View style={styles.orderSummary}>
             <View style={styles.summaryRow}>
               <Text style={styles.summaryText}>Sub Total</Text>
-              <Text style={styles.summaryText}>${subtotal.toFixed(2)}</Text>
+              <Text style={styles.summaryText}>
+                $
+                {getSubtotal(
+                  cartItems.reduce(
+                    (acc, item) => acc + item?.product?.price,
+                    0
+                  ),
+                  cartItems.length
+                ).toFixed(2)}
+              </Text>
             </View>
             <View style={styles.summaryRow}>
               <Text style={styles.summaryText}>Shipping Charges</Text>
-              <Text style={styles.summaryText}>$10.00</Text>
+              <Text style={styles.summaryText}>$0.00</Text>
             </View>
             <View style={styles.separator}></View>
             <View style={styles.summaryRow}>
               <Text style={styles.totalText}>Total</Text>
-              <Text style={styles.totalText}>${total.toFixed(2)}</Text>
+              <Text style={styles.totalText}>
+                $
+                {cartItems.reduce(
+                  (acc, item) =>
+                    acc + getSubtotal(item?.product?.price, item?.quantity),
+                  0
+                ) + 0}
+              </Text>
             </View>
           </View>
         </View>
       </ScrollView>
-      <CustomButton title={"Proceed to Checkout"} onPress={handleCheckout} />
+      <CustomButton
+        title={"Proceed to Checkout"}
+        onPress={() => handleCheckout()}
+      />
 
       <CustomButton
         title={"Continue Shopping"}

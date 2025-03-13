@@ -1,35 +1,61 @@
 // screens/WorkoutListScreen.js
 
-import React from "react";
+import { useNavigation } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
-import WorkoutCard from "../../components/WorkoutCard";
-import { workoutData } from "../../utils/data";
+import { useDispatch, useSelector } from "react-redux";
+import SearchIcon from "../../assets/svgs/SearchIcon";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
-import icons from "../../constants/icons";
-import { useNavigation } from "@react-navigation/native";
-import SearchIcon from "../../assets/svgs/SearchIcon";
+import WorkoutCard from "../../components/WorkoutCard";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import { setTrendingWorkouts } from "../../redux/reducers/WorkoutSlice";
+import images from "../../constants/images";
 
 const ViewAllWorkouts = () => {
-  const navigation = useNavigation(); // Access the navigation object
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const { token, trendingData } = useSelector((state) => ({
+    token: state.Auth?.token,
+    trendingData: state.Workout.trendingData,
+  }));
+
+  const getTrendingWorkouts = async () => {
+    try {
+      const res = await API.get(END_POINTS.WORKOUTS, null, token);
+      if (res.data.success) {
+        dispatch(setTrendingWorkouts(res?.data?.data));
+      }
+    } catch (error) {
+      console.error("Error fetching workouts:", error);
+    }
+  };
+
+  useEffect(() => {
+    getTrendingWorkouts();
+  }, []);
 
   const handleOnPress = (workout) => {
     // Navigate to the WorkoutDetail screen with the selected workout data
     navigation.navigate("WorkoutDetails", { workout });
   };
 
-  const renderWorkoutCard = ({ item }) => (
-    <View style={{ marginBottom: 20 }}>
-      <WorkoutCard
-        title={item.title}
-        calories={`${item.calories}`}
-        time={`${item.time}`}
-        category={item.category}
-        image={item.image}
-        onPress={() => handleOnPress(item)} // Pass the item to the handleOnPress function
-      />
-    </View>
-  );
+  const renderWorkoutCard = ({ item }) => {
+    console.log("item", JSON.stringify(item, null, 2));
+    return (
+      <View style={{ marginBottom: 20 }}>
+        <WorkoutCard
+          title={item.name}
+          calories={`${item?.calories}`}
+          time={`${item?.workoutTime}`}
+          category={item?.category}
+          image={images.chestWorkout}
+          onPress={() => handleOnPress(item)} // Pass the item to the handleOnPress function
+        />
+      </View>
+    );
+  };
 
   return (
     <Container>
@@ -40,7 +66,7 @@ const ViewAllWorkouts = () => {
       />
       <FlatList
         style={{ marginTop: 30 }}
-        data={workoutData}
+        data={trendingData}
         renderItem={renderWorkoutCard}
         keyExtractor={(item) => item.title}
         contentContainerStyle={{ paddingBottom: 20 }} // Optional: Add padding at the bottom
