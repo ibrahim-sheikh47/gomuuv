@@ -1,5 +1,6 @@
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "../constants/colors";
+import { FontSize } from "../utils/font";
 
 export const ActivityCard = ({
   icon: ActivityIconComponent,
@@ -19,6 +20,6 @@ export const ActivityCard = ({
     }}
   >
     <ActivityIconComponent />
-    <Text style={{ color: "white" }}>{label}</Text>
+    <Text style={{ color: "white", fontSize: FontSize.small }}>{label}</Text>
   </TouchableOpacity>
 );

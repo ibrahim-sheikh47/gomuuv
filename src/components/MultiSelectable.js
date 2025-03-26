@@ -1,4 +1,3 @@
-import React from "react";
 import {
   View,
   TouchableOpacity,
@@ -9,13 +8,25 @@ import {
 import { colors } from "../constants/colors";
 import { FontSize } from "../utils/font";
 
-const Selectable = ({
-  items, // Renamed prop to make it more general
-  selectedItem,
-  setSelectedItem,
-  style, // Optional prop for additional styles
-  wrapOnLineChange = false, // New prop to control wrapping behavior
+const MultiSelectable = ({
+  items,
+  selectedItems,
+  setSelectedItems,
+  style,
+  wrapOnLineChange = false,
 }) => {
+  const handleItemPress = (item) => {
+    if (selectedItems.includes(item)) {
+      // Remove item if already selected
+      setSelectedItems(
+        selectedItems.filter((selectedItem) => selectedItem !== item)
+      );
+    } else {
+      // Add item if not selected
+      setSelectedItems([...selectedItems, item]);
+    }
+  };
+
   const content = (
     <View style={styles.timeRow}>
       {items.map((item, index) => (
@@ -23,14 +34,18 @@ const Selectable = ({
           key={index}
           style={[
             styles.timePeriodButton,
-            selectedItem === item ? styles.activeButton : styles.inactiveButton, // Apply active or inactive styles
+            selectedItems.includes(item)
+              ? styles.activeButton
+              : styles.inactiveButton,
           ]}
-          onPress={() => setSelectedItem(item)} // Update selected item on press
+          onPress={() => handleItemPress(item)}
         >
           <Text
             style={[
               styles.timePeriodText,
-              selectedItem === item ? styles.activeText : styles.inactiveText, // Apply active or inactive text styles
+              selectedItems.includes(item)
+                ? styles.activeText
+                : styles.inactiveText,
             ]}
           >
             {item}
@@ -43,7 +58,7 @@ const Selectable = ({
   return (
     <View style={[styles.container, style]}>
       {wrapOnLineChange ? (
-        content // Render normally if wrapping is enabled
+        content
       ) : (
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
           {content}
@@ -88,4 +103,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Selectable;
+export default MultiSelectable;

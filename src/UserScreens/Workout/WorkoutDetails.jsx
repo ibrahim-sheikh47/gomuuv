@@ -19,6 +19,7 @@ import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
 import { useDispatch, useSelector } from "react-redux";
 import { setTodaySessions } from "../../redux/reducers/WorkoutSlice";
+import { FontSize } from "../../utils/font";
 
 const SwitchItem = ({ label, isSwitchOn, onToggleSwitch }) => (
   <View style={styles.switchContainer}>
@@ -252,17 +253,17 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: "Poppins-Regular",
-    fontSize: 12,
+    fontSize: FontSize.small,
     color: "#F8F8F8",
   },
   value: {
     marginTop: 5,
     fontFamily: "Poppins-Regular",
-    fontSize: 12,
+    fontSize: FontSize.small,
     color: colors.green,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-SemiBold",
     color: "white",
     marginTop: 20,
@@ -271,7 +272,7 @@ const styles = StyleSheet.create({
     color: "#AFAFAF",
     marginTop: 10,
     fontFamily: "Poppins-Regular",
-    fontSize: 12,
+    fontSize: FontSize.small,
   },
   switchContainer: {
     height: 38,
@@ -285,12 +286,12 @@ const styles = StyleSheet.create({
   },
   switchLabel: {
     color: "#F8F8F8",
-    fontSize: 14,
+    fontSize: FontSize.medium,
     fontFamily: "Poppins-Medium",
   },
   exerciseHeading: {
     color: "white",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Medium",
     marginTop: 10,
   },
@@ -312,17 +313,17 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     color: "#F8F8F8",
     fontFamily: "Poppins-Regular",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     maxWidth: "65%",
   },
   exerciseReps: {
     marginLeft: "auto",
     color: colors.green,
     fontFamily: "Poppins-Medium",
-    fontSize: 16,
+    fontSize: FontSize.regular,
   },
   dayTitle: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-SemiBold",
     color: colors.green,
     textAlign: "center",

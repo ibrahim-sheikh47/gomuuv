@@ -20,6 +20,7 @@ import CaloriesIcon from "../../assets/svgs/CaloriesIcon";
 import TimeIcon from "../../assets/svgs/TimeIcon";
 import StrengthIcon from "../../assets/svgs/StrengthIcon";
 import { IconButton } from "react-native-paper";
+import { FontSize } from "../../utils/font";
 
 const EquipmentDetails = () => {
   const navigation = useNavigation();
@@ -124,7 +125,7 @@ const EquipmentDetails = () => {
           >
             <CustomButton
               style={{ flex: 1, backgroundColor: colors.bgColor, height: 40 }}
-              textStyle={{ color: "white", fontSize: 14 }}
+              textStyle={{ color: "white", fontSize: FontSize.medium }}
               title={"Reset"}
               onPress={handleReset}
             />
@@ -132,7 +133,7 @@ const EquipmentDetails = () => {
               style={{ flex: 1, height: 40 }}
               title={isTimerRunning ? "Pause" : "Start"}
               onPress={isTimerRunning ? handlePause : handleStart}
-              textStyle={{ fontSize: 14 }}
+              textStyle={{ fontSize: FontSize.medium }}
             />
           </View>
         </View>
@@ -148,7 +149,7 @@ const EquipmentDetails = () => {
             style={{
               color: "white",
               fontFamily: "Poppins-Medium",
-              fontSize: 16,
+              fontSize: FontSize.regular,
             }}
           >
             Saved Workout
@@ -193,7 +194,7 @@ const EquipmentDetails = () => {
               style={{
                 color: "#AFAFAF",
                 fontFamily: "Poppins-Medium",
-                fontSize: 16,
+                fontSize: FontSize.regular,
               }}
             >
               No Saved Workouts
@@ -219,7 +220,7 @@ const styles = StyleSheet.create({
   },
   remainingTime: {
     color: "white",
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Regular",
   },
   remaining: {
@@ -244,12 +245,12 @@ const styles = StyleSheet.create({
     left: 10,
     backgroundColor: colors.bgColor,
     padding: 5,
-    fontSize: 10,
+    fontSize: FontSize.xxsmall,
     fontFamily: "Poppins-Bold",
   },
   sessionTitleText: {
     color: "white",
-    fontSize: 22,
+    fontSize: FontSize.xxlarge,
     fontFamily: "Poppins-Bold",
     position: "absolute",
     bottom: 60,
@@ -276,7 +277,7 @@ const styles = StyleSheet.create({
   detailText: {
     color: "#F8F8F8",
     fontFamily: "Poppins-Regular",
-    fontSize: 12,
+    fontSize: FontSize.small,
     marginTop: 2,
   },
   nextIcon: {

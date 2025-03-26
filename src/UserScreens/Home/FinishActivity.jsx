@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Container from "../../components/Container";
@@ -13,6 +13,7 @@ import CaloriesIcon from "../../assets/svgs/CaloriesIcon";
 import TimeIcon from "../../assets/svgs/TimeIcon";
 import DistanceIcon from "../../assets/svgs/DistanceIcon";
 import PaceIcon from "../../assets/svgs/PaceIcon";
+import { FontSize } from "../../utils/font";
 
 const FinishActivity = () => {
   const route = useRoute();
@@ -23,7 +24,7 @@ const FinishActivity = () => {
   return (
     <Container>
       <Header title={`${activityName}`} showBackButton={true} />
-      <View style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1, marginBottom: 20 }}>
         <View
           style={{
             flexDirection: "row",
@@ -45,7 +46,7 @@ const FinishActivity = () => {
             <HeartRateIcon width={16} height={16} />
             <Text
               style={{
-                fontSize: 12,
+                fontSize: FontSize.small,
                 fontFamily: "Poppins-Regular",
                 color: "white",
               }}
@@ -66,7 +67,7 @@ const FinishActivity = () => {
             <CaloriesIcon width={16} height={16} />
             <Text
               style={{
-                fontSize: 12,
+                fontSize: FontSize.small,
                 fontFamily: "Poppins-Regular",
                 color: "white",
               }}
@@ -82,8 +83,8 @@ const FinishActivity = () => {
         <View style={styles.gridContainer}>
           <CustomCard
             label="Time Per Mile"
-            icon={TimeIcon}
-            message="8m:40s/mi"
+            iconImage={icons.timePerMile}
+            message="0m:0s/mi"
           />
           <CustomCard
             label="Total Time"
@@ -93,7 +94,7 @@ const FinishActivity = () => {
           />
         </View>
         <View style={styles.gridContainer}>
-          <CustomCard label="Pace" icon={PaceIcon} message="1.1mi/hr" />
+          <CustomCard label="Pace" icon={PaceIcon} message="0mi/hr" />
           <CustomCard
             label="Distance"
             icon={DistanceIcon}
@@ -101,9 +102,10 @@ const FinishActivity = () => {
             message={`${distance} ${distanceUnit}`}
           />
         </View>
-      </View>
+      </ScrollView>
       <CustomButton
         title={"Finish"}
+        style={{ marginTop: 20 }}
         onPress={() => {
           navigation.navigate("Home");
         }}

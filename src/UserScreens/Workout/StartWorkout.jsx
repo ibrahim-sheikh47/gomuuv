@@ -18,6 +18,7 @@ import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
 import { colors } from "../../constants/colors";
 import images from "../../constants/images";
+import { FontSize } from "../../utils/font";
 
 const StartWorkout = () => {
   const { level, calories, title, time, exercises, image, workoutSessionId } =
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   title: {
-    fontSize: 14,
+    fontSize: FontSize.medium,
     fontFamily: "Poppins-Medium",
     color: "#fff",
   },
@@ -242,7 +243,7 @@ const styles = StyleSheet.create({
     marginTop: 100,
   },
   time: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     color: "#fff",
   },
   timerText: {
@@ -263,12 +264,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   exerciseTitle: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     color: "#fff",
     flex: 1,
   },
   exerciseReps: {
-    fontSize: 14,
+    fontSize: FontSize.medium,
     fontFamily: "Poppins-Medium",
     color: colors.green,
     marginRight: 10,

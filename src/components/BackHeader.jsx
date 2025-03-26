@@ -8,6 +8,7 @@ import {
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { FontSize } from "../utils/font";
 
 const BackHeader = ({ title, showBackButton }) => {
   const navigation = useNavigation();
@@ -47,7 +48,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: "white",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Bold",
   },
   iconPlaceholder: {

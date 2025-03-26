@@ -5,6 +5,7 @@ import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
 import { ProgressBar } from "./ProgressBar";
 import { colors } from "../constants/colors";
 import GlassIcon from "../assets/svgs/GlassIcon";
+import { FontSize } from "../utils/font";
 
 const WaterIntake = ({ consumedGlasses, totalGlasses, onAddWater }) => {
   const waterProgress = Math.min((consumedGlasses / totalGlasses) * 100, 100);
@@ -19,6 +20,11 @@ const WaterIntake = ({ consumedGlasses, totalGlasses, onAddWater }) => {
         {`${consumedGlasses} of ${totalGlasses} glasses consumed`}
       </Text>
       <ProgressBar style={styles.waterProgressBar} progress={waterProgress} />
+      <Text
+        style={{ textAlign: "right", color: "#A4A4A4", marginVertical: 10 }}
+      >
+        1250 ml{" "}
+      </Text>
     </TouchableOpacity>
   );
 };
@@ -36,13 +42,14 @@ const styles = StyleSheet.create({
   },
   waterIntakeHeader: {
     flexDirection: "row",
+    marginTop: 5,
     alignItems: "center",
     justifyContent: "space-between",
   },
   waterIntakeText: {
     fontFamily: "Poppins-SemiBold",
     color: colors.green,
-    fontSize: 12,
+    fontSize: FontSize.small,
   },
   glassIcon: {
     width: 50,
@@ -51,7 +58,7 @@ const styles = StyleSheet.create({
   waterConsumptionText: {
     fontFamily: "Poppins-SemiBold",
     color: "white",
-    fontSize: 12,
+    fontSize: FontSize.small,
   },
   waterProgressBar: {
     marginTop: 10,

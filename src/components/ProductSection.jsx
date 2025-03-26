@@ -10,6 +10,7 @@ import { END_POINTS } from "../config/routes";
 import { useDispatch, useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
 import { setCartData } from "../redux/reducers/CartSlice";
+import { FontSize } from "../utils/font";
 
 const ProductSection = ({ title, products }) => {
   const dispatch = useDispatch();
@@ -103,7 +104,7 @@ export default ProductSection;
 
 const styles = StyleSheet.create({
   sectionTitle: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Bold",
     color: "white",
     marginTop: 20,

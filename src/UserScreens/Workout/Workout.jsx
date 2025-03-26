@@ -31,6 +31,7 @@ import {
   setTodaySessions,
   setTrendingWorkouts,
 } from "../../redux/reducers/WorkoutSlice";
+import { FontSize } from "../../utils/font";
 
 const WorkoutScreen = () => {
   const dispatch = useDispatch();
@@ -314,17 +315,17 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   metricLabel: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-SemiBold",
     color: "white",
   },
   metricValue: {
-    fontSize: 18,
+    fontSize: FontSize.large,
     fontFamily: "Poppins-Medium",
     color: colors.green,
   },
   metricUnit: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Regular",
     color: "white",
   },
@@ -333,13 +334,13 @@ const styles = StyleSheet.create({
     height: 24,
   },
   titleText: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-SemiBold",
     color: "white",
     marginTop: 2,
   },
   sessionTitle: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-SemiBold",
     color: "white",
     marginVertical: 20,
@@ -360,12 +361,12 @@ const styles = StyleSheet.create({
     left: 10,
     backgroundColor: colors.bgColor,
     padding: 5,
-    fontSize: 10,
+    fontSize: FontSize.xxsmall,
     fontFamily: "Poppins-Bold",
   },
   sessionTitleText: {
     color: "white",
-    fontSize: 22,
+    fontSize: FontSize.xxlarge,
     fontFamily: "Poppins-Bold",
     position: "absolute",
     bottom: 60,
@@ -392,7 +393,7 @@ const styles = StyleSheet.create({
   detailText: {
     color: "#F8F8F8",
     fontFamily: "Poppins-Regular",
-    fontSize: 12,
+    fontSize: FontSize.small,
     marginTop: 2,
   },
   nextIcon: {
@@ -400,7 +401,7 @@ const styles = StyleSheet.create({
     height: 30,
   },
   greenText: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Bold",
     color: colors.green,
   },

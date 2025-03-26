@@ -23,6 +23,7 @@ import LevelIcon from "../../assets/svgs/LevelIcon";
 import ActiveClientsIcon from "../../assets/svgs/ActiveClientsIcon";
 import ProgramSoldIcon from "../../assets/svgs/ProgramSoldIcon";
 import { useSelector } from "react-redux";
+import { FontSize } from "../../utils/font";
 
 const TrainerHome = () => {
   const navigation = useNavigation();
@@ -260,12 +261,12 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   cardLabel: {
-    fontSize: 14,
+    fontSize: FontSize.medium,
     fontFamily: "Poppins-Medium",
     color: "#f8f8f8",
   },
   cardValue: {
-    fontSize: 24,
+    fontSize: FontSize.xxlarge,
     fontFamily: "Poppins-Bold",
     color: colors.green,
   },
@@ -275,12 +276,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   workoutsTitle: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Bold",
     color: "white",
   },
   viewAllText: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Bold",
     color: colors.green,
   },
@@ -302,12 +303,12 @@ const styles = StyleSheet.create({
     padding: 14,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Bold",
     color: colors.green,
   },
   cardDescription: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Regular",
     color: "#F8F8F8",
   },
@@ -329,10 +330,10 @@ const styles = StyleSheet.create({
   detailText: {
     color: "#F8F8F8",
     fontFamily: "Poppins-Regular",
-    fontSize: 12,
+    fontSize: FontSize.small,
   },
   cardPrice: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     color: colors.green,
     fontFamily: "Poppins-Bold",
   },

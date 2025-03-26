@@ -6,6 +6,7 @@ import Header from "../../components/Header";
 import icons from "../../constants/icons";
 import Selectable from "../../components/Selectable";
 import EditIcon from "../../assets/svgs/EditIcon";
+import { FontSize } from "../../utils/font";
 
 const WorkoutProgramDetail = ({ route }) => {
   const { program } = route.params;
@@ -41,7 +42,17 @@ const WorkoutProgramDetail = ({ route }) => {
       <Header
         title={"Workout Program"}
         showBackButton={true}
-        rightIcon1={<EditIcon color="white" />}
+        rightIcon1={
+          <View
+            style={{
+              backgroundColor: colors.green,
+              padding: 10,
+              borderRadius: 10,
+            }}
+          >
+            <Text>Edit</Text>
+          </View>
+        }
         cusStyle={{ width: 58, height: 32 }}
       />
       <ScrollView style={{ marginTop: 20 }}>
@@ -118,18 +129,18 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   title: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-SemiBold",
     color: colors.green,
     width: 200,
   },
   description: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Regular",
     color: "#F8F8F8",
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-SemiBold",
     color: "white",
     marginTop: 20,
@@ -145,17 +156,17 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   detailText: {
-    fontSize: 14,
+    fontSize: FontSize.medium,
     fontFamily: "Poppins-Regular",
     color: "#F8F8F8",
   },
   price: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-SemiBold",
     color: colors.green,
   },
   cardDescription: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Regular",
     color: "#F8F8F8",
   },
@@ -174,18 +185,18 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: "Poppins-Regular",
-    fontSize: 12,
+    fontSize: FontSize.small,
     color: "#F8F8F8",
   },
   value: {
     marginTop: 5,
     fontFamily: "Poppins-Regular",
-    fontSize: 12,
+    fontSize: FontSize.small,
     color: colors.green,
   },
   exerciseHeading: {
     color: "white",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Medium",
     marginTop: 10,
   },
@@ -207,13 +218,13 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     color: "#F8F8F8",
     fontFamily: "Poppins-Regular",
-    fontSize: 16,
+    fontSize: FontSize.regular,
   },
   exerciseReps: {
     marginLeft: "auto",
     color: colors.green,
     fontFamily: "Poppins-Medium",
-    fontSize: 16,
+    fontSize: FontSize.regular,
   },
 });
 

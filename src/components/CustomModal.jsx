@@ -10,6 +10,7 @@ import {
 import { colors } from "../constants/colors"; // Adjust the import path as needed
 import icons from "../constants/icons";
 import { IconButton } from "react-native-paper";
+import { FontSize } from "../utils/font";
 
 const CustomModal = ({
   visible,
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
   },
   modalText: {
-    fontSize: 14,
+    fontSize: FontSize.small,
     color: colors.green,
     fontFamily: "Poppins-SemiBold",
     marginTop: 20,
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Bold",
   },
   modalIcon: {

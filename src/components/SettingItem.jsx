@@ -1,5 +1,6 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
+import { FontSize } from "../utils/font";
 
 const SettingItem = ({ icon, text, onPress }) => (
   <TouchableOpacity style={styles.settingContainer} onPress={onPress}>
@@ -27,8 +28,8 @@ const styles = StyleSheet.create({
   settingText: {
     marginLeft: 16,
     marginTop: 2,
-    color: "white",
+    color: "#F8F8F8",
     fontFamily: "Poppins-Regular",
-    fontSize: 14,
+    fontSize: FontSize.small,
   },
 });

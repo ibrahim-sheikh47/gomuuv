@@ -16,6 +16,7 @@ import Selectable from "../../components/Selectable";
 import SearchIcon from "../../assets/svgs/SearchIcon";
 import StrengthIcon from "../../assets/svgs/StrengthIcon";
 import LevelIcon from "../../assets/svgs/LevelIcon";
+import { FontSize } from "../../utils/font";
 
 const WorkoutProgramsList = ({ navigation, route }) => {
   const trainerWorkoutData = route.params?.trainerWorkoutData || [];
@@ -97,12 +98,12 @@ const styles = StyleSheet.create({
     padding: 14,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Bold",
     color: colors.green,
   },
   cardDescription: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Regular",
     color: "#F8F8F8",
   },
@@ -123,10 +124,10 @@ const styles = StyleSheet.create({
   detailText: {
     color: "#F8F8F8",
     fontFamily: "Poppins-Regular",
-    fontSize: 12,
+    fontSize: FontSize.small,
   },
   cardPrice: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     color: colors.green,
     fontFamily: "Poppins-Bold",
   },

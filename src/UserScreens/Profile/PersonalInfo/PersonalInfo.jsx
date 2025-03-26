@@ -13,6 +13,7 @@ import { END_POINTS } from "../../../config/routes";
 import { setUserData } from "../../../redux/reducers/AuthSlice";
 import Loader from "../../../components/Loader";
 import { useNavigation } from "@react-navigation/native";
+import { FontSize } from "../../../utils/font";
 
 const PersonalInfoScreen = () => {
   const dispatch = useDispatch();
@@ -37,8 +38,8 @@ const PersonalInfoScreen = () => {
       setPersonalInfo({
         firstName: userData?.firstName || "",
         lastName: userData?.lastName || "",
-        height: userData?.height || "",
-        weight: userData?.weight || "",
+        height: userData?.height + " " + userData?.heightUnit || "",
+        weight: userData?.weight + " " + userData?.weightUnit || "",
         dateOfBirth: userData?.dob || "",
       });
     }
@@ -184,7 +185,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: "Poppins-Medium",
-    fontSize: 16,
+    fontSize: FontSize.medium,
     color: "#fff",
     marginBottom: 8, // Add spacing between label and input field
   },

@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import { colors } from "../constants/colors";
+import { FontSize } from "../utils/font";
 
 const TabContainer = ({ activeTab, onTabClick, tabs }) => {
   return (
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
     borderBottomStartRadius: 0,
   },
   tabText: {
-    fontSize: 14,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-SemiBold",
     color: "white",
   },

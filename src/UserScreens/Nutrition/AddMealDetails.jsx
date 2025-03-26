@@ -11,6 +11,7 @@ import icons from "../../constants/icons";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { MealItem } from "../../components/MealItem";
+import { FontSize } from "../../utils/font";
 
 const AddMealDetails = ({ route }) => {
   const navigation = useNavigation();
@@ -82,7 +83,7 @@ const AddMealDetails = ({ route }) => {
               style={{
                 color: "white",
                 fontFamily: "Poppins-Bold",
-                fontSize: 16,
+                fontSize: FontSize.regular,
               }}
             >
               Daily Intake
@@ -109,7 +110,7 @@ const AddMealDetails = ({ route }) => {
               style={{
                 color: "white",
                 fontFamily: "Poppins-Bold",
-                fontSize: 16,
+                fontSize: FontSize.small,
                 marginVertical: 20,
               }}
             >
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   text: {
-    fontSize: 24,
+    fontSize: FontSize.xxlarge,
   },
   nutrientContainer: {
     backgroundColor: "#242425",

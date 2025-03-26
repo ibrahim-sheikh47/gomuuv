@@ -6,6 +6,7 @@ import Header from "../../components/Header";
 import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
 import { useSelector } from "react-redux";
+import { FontSize } from "../../utils/font";
 
 const FastingPlans = (props) => {
   const [fastingPlans, setFastingPlans] = useState([]);
@@ -50,7 +51,7 @@ const FastingPlans = (props) => {
 const styles = StyleSheet.create({
   headerText: {
     color: "#f8f8f8",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-SemiBold",
     marginBottom: 10,
   },

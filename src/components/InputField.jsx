@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { colors } from "../constants/colors";
+import { FontSize } from "../utils/font";
 
 const InputField = ({
   label,
@@ -95,7 +96,8 @@ const styles = StyleSheet.create({
     borderColor: "#1A1919", // Default border color
     backgroundColor: "#1A1919",
     color: "#fff",
-    fontSize: 16,
+    fontSize: FontSize.medium,
+    fontFamily: "Poppins-Regular",
     borderRadius: 10,
     paddingLeft: 16,
     paddingRight: 50,
@@ -117,7 +119,7 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   label: {
-    fontSize: 16,
+    fontSize: FontSize.medium,
     fontFamily: "Poppins-Medium",
     color: "#fff",
     marginBottom: 5,

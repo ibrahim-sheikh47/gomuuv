@@ -10,6 +10,7 @@ import Selectable from "../../components/Selectable";
 import { Text } from "react-native";
 import CustomModal from "../../components/CustomModal";
 import Tab2Icon from "../../assets/svgs/Tab2Icon";
+import { FontSize } from "../../utils/font";
 
 const NewWorkout = () => {
   const navigation = useNavigation();
@@ -98,13 +99,13 @@ const NewWorkout = () => {
       <View style={styles.buttonContainer}>
         <CustomButton
           style={{ flex: 1, backgroundColor: colors.bgColor }}
-          textStyle={{ color: "#AFAFAF", fontSize: 16 }}
+          textStyle={{ color: "#AFAFAF", fontSize: FontSize.regular }}
           title="Cancel"
           onPress={handleSave}
         />
         <CustomButton
           style={{ flex: 1 }}
-          textStyle={{ fontSize: 16 }}
+          textStyle={{ fontSize: FontSize.regular }}
           title="Save Workout"
           onPress={handleSave}
         />
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20, // Ensure there's space for scrolling
   },
   sessionTitle: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-SemiBold",
     color: "white",
     marginVertical: 10,

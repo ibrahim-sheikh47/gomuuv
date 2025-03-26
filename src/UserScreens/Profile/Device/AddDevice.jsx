@@ -8,6 +8,7 @@ import { colors } from "../../../constants/colors";
 import InputField from "../../../components/InputField";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import images from "../../../constants/images";
+import { FontSize } from "../../../utils/font";
 
 const AddDevice = () => {
   const navigation = useNavigation();
@@ -44,7 +45,7 @@ const AddDevice = () => {
         title="Add"
         onPress={() => handleSelectDevice(item)} // Add this device
         style={{ marginTop: 10, height: 30 }}
-        textStyle={{ fontSize: 16 }}
+        textStyle={{ fontSize: FontSize.regular }}
       />
     </View>
   );
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: "#f8f8f8",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Bold",
   },
   row: {
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
   },
   deviceName: {
     color: "#f8f8f8",
-    fontSize: 14,
+    fontSize: FontSize.medium,
     fontFamily: "Poppins-Medium",
     textAlign: "center",
   },

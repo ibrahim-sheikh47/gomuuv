@@ -19,10 +19,11 @@ import DailyReport from "../../components/DailyReport";
 import IconButton from "../../components/IconButton";
 import ProfileSection from "../../components/ProfileSection";
 import images from "../../constants/images";
+import { FontSize } from "../../utils/font";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
-  const completionPercentage = 75;
+  const completionPercentage = 0;
   const [isFirstTime, setIsFirstTime] = useState(true); // Track if it's the user's first time
 
   // Combine all useSelector Hooks
@@ -89,18 +90,15 @@ const HomeScreen = () => {
           <CustomCard
             label="Activity"
             icon={RunningIcon}
-            message={
-              isFirstTime ? `Please start Activity to see data` : "1.5 mi"
-            }
+            message={isFirstTime ? `Please start Activity to see data` : "0 mi"}
             goal="Goal: Walk 2 miles daily"
-            value="1.5 mi"
           />
           <CustomCard
             label="Sleep"
             icon={SleepIcon}
-            message={isFirstTime ? `Please start Sleep to see data` : "7h 32m"}
+            message={isFirstTime ? `Please start Sleep to see data` : "0h 0m"}
             goal="Goal: 8 hours of sleep daily"
-            value="7h 32m"
+            value="0h 0m"
             onPress={() => {
               handleInteraction();
               navigation.navigate("SleepScreen");
@@ -113,7 +111,7 @@ const HomeScreen = () => {
             label="Challenges"
             icon={ChallengesIcon}
             message={
-              isFirstTime ? `Please start Challenges to see data` : "100"
+              isFirstTime ? `Please start Challenges to see data` : "0Kg"
             }
             goal="Goal: burn 1,457 kcal this week"
             value="123"
@@ -125,7 +123,7 @@ const HomeScreen = () => {
           <CustomCard
             label="Workouts"
             icon={WorkoutsIcon}
-            message={isFirstTime ? `Please start Workouts to see data` : 3}
+            message={isFirstTime ? `Please start Workouts to see data` : 0}
             goal="Goal: 4 workouts per week"
             value="3"
             onPress={() => {
@@ -139,9 +137,7 @@ const HomeScreen = () => {
           <CustomCard
             label="Nutrition"
             icon={NutritionIcon}
-            message={
-              isFirstTime ? `Please start Nutrition to see data` : "64kg"
-            }
+            message={isFirstTime ? `Please start Nutrition to see data` : "0"}
             goal="Goal: 84kg"
             value="63kg"
             onPress={() => {
@@ -152,7 +148,7 @@ const HomeScreen = () => {
           <CustomCard
             label="Shop"
             icon={ShopIcon}
-            message={isFirstTime ? `Please start Shop to see data` : 2}
+            message={isFirstTime ? `Please start Shop to see data` : 0}
             goal="items in cart"
             value="02"
             onPress={() => {
@@ -181,7 +177,7 @@ const styles = StyleSheet.create({
   sectionText: {
     color: "#fff",
     marginTop: 20,
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Bold",
   },
   activityCardContainer: {

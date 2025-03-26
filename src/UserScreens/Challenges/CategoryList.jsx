@@ -17,6 +17,7 @@ import CustomButton from "../../components/CustomButton";
 import CustomModal from "../../components/CustomModal";
 import { challengesData } from "../../utils/data";
 import StrengthIcon from "../../assets/svgs/StrengthIcon";
+import { FontSize } from "../../utils/font";
 
 const CategoryList = () => {
   const route = useRoute();
@@ -68,7 +69,7 @@ const CategoryList = () => {
         </View>
         <CustomButton
           style={{ width: 90, height: 28, marginLeft: "auto" }}
-          textStyle={{ fontSize: 10, marginRight: 10 }}
+          textStyle={{ fontSize: FontSize.xxsmall, marginRight: 10 }}
           title={"Join Now"}
           onPress={() => openModal(item.title)} // Open modal with selected title
         />
@@ -106,7 +107,7 @@ const CategoryList = () => {
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-SemiBold",
     color: "#fff",
   },
@@ -128,12 +129,12 @@ const styles = StyleSheet.create({
   },
   challengeTitle: {
     color: colors.green,
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-SemiBold",
   },
   cardSubtitle: {
     color: "#F8F8F8",
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Regular",
   },
   absoluteText: {
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
     color: "white",
   },
   modalText: {
-    fontSize: 14,
+    fontSize: FontSize.medium,
     color: "white", // Style for the text that isn't the title
     textAlign: "center",
     marginTop: 20,

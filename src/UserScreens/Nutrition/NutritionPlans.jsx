@@ -8,6 +8,7 @@ import CustomButton from "../../components/CustomButton";
 import CustomModal from "../../components/CustomModal"; // Import your CustomModal
 import { nutritionPlansData } from "../../utils/data";
 import icons from "../../constants/icons";
+import { FontSize } from "../../utils/font";
 
 const NutritionPlans = ({ route, navigation }) => {
   const { title, type } = route.params;
@@ -38,7 +39,13 @@ const NutritionPlans = ({ route, navigation }) => {
       <Header title={"Nutrition Your Way"} showBackButton={true} />
       <SearchBar searchQuery={searchQuery} onChangeSearch={onChangeSearch} />
 
-      <Text style={{ fontSize: 16, fontFamily: "Poppins-Bold", color: "#fff" }}>
+      <Text
+        style={{
+          fontSize: FontSize.regular,
+          fontFamily: "Poppins-Bold",
+          color: "#fff",
+        }}
+      >
         {title}
       </Text>
       <FlatList

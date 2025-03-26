@@ -3,6 +3,9 @@ import React from "react";
 import { TouchableOpacity, Text, StyleSheet, Image } from "react-native";
 import { colors } from "../constants/colors";
 
+import { RFValue, RFPercentage } from "react-native-responsive-fontsize";
+import { FontSize } from "../utils/font";
+
 const CustomButton = ({
   onPress,
   title,
@@ -10,15 +13,10 @@ const CustomButton = ({
   textStyle,
   btnIcon,
   iconStyle,
-  disabled,
 }) => {
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      style={[styles.button, style]}
-      disabled={disabled}
-    >
-      <Image style={iconStyle} source={btnIcon} />
+    <TouchableOpacity onPress={onPress} style={[styles.button, style]}>
+      {btnIcon && <Image style={iconStyle} source={btnIcon} />}
       <Text style={[styles.buttonText, textStyle]}>{title}</Text>
     </TouchableOpacity>
   );
@@ -39,7 +37,7 @@ const styles = StyleSheet.create({
   buttonText: {
     textAlign: "center",
     fontFamily: "Poppins-Bold",
-    fontSize: 20,
+    fontSize: FontSize.large,
     marginTop: 2,
   },
 });

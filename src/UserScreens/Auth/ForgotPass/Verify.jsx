@@ -17,6 +17,7 @@ import CustomButton from "../../../components/CustomButton";
 import Toast from "react-native-toast-message";
 import { API } from "../../../config/apiClient";
 import { END_POINTS } from "../../../config/routes";
+import { FontSize } from "../../../utils/font";
 
 const Verify = (props) => {
   const navigation = useNavigation();
@@ -99,7 +100,7 @@ const Verify = (props) => {
             header="Forgot Password"
             description="Enter Verification Code"
             customStyles={{
-              headerText: { fontSize: 16 },
+              headerText: { fontSize: FontSize.regular },
               descriptionText: { color: colors.green },
             }}
           />
@@ -107,7 +108,7 @@ const Verify = (props) => {
             style={{
               color: "white",
               fontFamily: "Poppins-Medium",
-              fontSize: 14,
+              fontSize: FontSize.medium,
               textAlign: "center",
             }}
           >
@@ -197,7 +198,7 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     fontFamily: "Poppins-Regular",
-    fontSize: 14,
+    fontSize: FontSize.medium,
   },
   signInLink: {
     color: colors.green,

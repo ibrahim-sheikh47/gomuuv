@@ -1,6 +1,5 @@
-import { Picker } from "@react-native-picker/picker";
 import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Image,
   ScrollView,
@@ -8,17 +7,75 @@ import {
   Text,
   TouchableOpacity,
   View,
+  TextInput,
+  Modal,
+  SafeAreaView,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import Container from "../../components/Container";
 import CustomButton from "../../components/CustomButton";
 import CustomModal from "../../components/CustomModal";
 import Header from "../../components/Header";
-import InputField from "../../components/InputField"; // Import InputField
+import InputField from "../../components/InputField";
 import Selectable from "../../components/Selectable";
+import MultiSelectable from "../../components/MultiSelectable";
 import { colors } from "../../constants/colors";
 import icons from "../../constants/icons";
 import { useSelector } from "react-redux";
+import { FontSize } from "../../utils/font";
+
+// Unit Selection Modal Component
+const UnitSelectionModal = ({
+  visible,
+  onClose,
+  options,
+  selectedValue,
+  onSelect,
+}) => {
+  return (
+    <Modal
+      visible={visible}
+      transparent={true}
+      animationType="slide"
+      onRequestClose={onClose}
+    >
+      <SafeAreaView style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Select Unit</Text>
+            <TouchableOpacity onPress={onClose}>
+              <Text style={styles.closeButton}>Close</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.optionsContainer}>
+            {options.map((option) => (
+              <TouchableOpacity
+                key={option.value}
+                style={[
+                  styles.optionItem,
+                  selectedValue === option.value && styles.selectedOption,
+                ]}
+                onPress={() => {
+                  onSelect(option.value);
+                  onClose();
+                }}
+              >
+                <Text
+                  style={[
+                    styles.optionText,
+                    selectedValue === option.value && styles.selectedOptionText,
+                  ]}
+                >
+                  {option.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </SafeAreaView>
+    </Modal>
+  );
+};
 
 const CreatePlan = () => {
   const navigation = useNavigation();
@@ -27,6 +84,24 @@ const CreatePlan = () => {
   const { userData } = useSelector((state) => ({
     userData: state.Auth?.data,
   }));
+
+  // Modal visibility states
+  const [heightUnitModalVisible, setHeightUnitModalVisible] = useState(false);
+  const [weightUnitModalVisible, setWeightUnitModalVisible] = useState(false);
+  const [targetWeightUnitModalVisible, setTargetWeightUnitModalVisible] =
+    useState(false);
+
+  // Unit options
+  const heightUnitOptions = [
+    { label: "cm", value: "cm" },
+    { label: "ft", value: "ft" },
+  ];
+
+  const weightUnitOptions = [
+    { label: "kg", value: "kg" },
+    { label: "lb", value: "lb" },
+  ];
+
   const duration = [
     "Lose Weight",
     "Gain Weight",
@@ -51,6 +126,8 @@ const CreatePlan = () => {
     age: "",
     height: "",
     heightUnit: "cm",
+    heightFeet: "",
+    heightInches: "",
     weight: "",
     weightUnit: "kg",
     targetWeight: "",
@@ -58,7 +135,38 @@ const CreatePlan = () => {
   });
 
   const [selectedPeriod, setSelectedPeriod] = useState(null);
-  const [selectedDiet, setSelectedDiet] = useState(null);
+  const [selectedDiets, setSelectedDiets] = useState([]);
+  const [selectedGender, setSelectedGender] = useState(null);
+
+  // Effect to handle height unit changes
+  useEffect(() => {
+    if (formData.heightUnit === "ft") {
+      // Convert cm to feet and inches if switching from cm to ft
+      if (formData.height && !formData.heightFeet) {
+        const totalInches = Math.round(formData.height / 2.54);
+        const feet = Math.floor(totalInches / 12);
+        const inches = totalInches % 12;
+        setFormData((prev) => ({
+          ...prev,
+          heightFeet: feet.toString(),
+          heightInches: inches.toString(),
+          height: `${feet} ft ${inches} inches`,
+        }));
+      }
+    } else {
+      // Convert feet and inches to cm if switching from ft to cm
+      if (formData.heightFeet && formData.heightInches) {
+        const totalInches =
+          parseInt(formData.heightFeet) * 12 +
+          parseInt(formData.heightInches || 0);
+        const cm = Math.round(totalInches * 2.54);
+        setFormData((prev) => ({
+          ...prev,
+          height: cm.toString(),
+        }));
+      }
+    }
+  }, [formData.heightUnit]);
 
   // Function to handle input changes
   const handleInputChange = (field, value) => {
@@ -67,7 +175,30 @@ const CreatePlan = () => {
       [field]: value,
     }));
   };
-  const [selectedGender, setSelectedGender] = useState(null);
+
+  // Function to handle feet and inches input
+  const handleHeightChange = (field, value) => {
+    // Only allow numbers
+    if (value !== "" && !/^\d+$/.test(value)) {
+      return;
+    }
+
+    setFormData((prevData) => {
+      const newData = {
+        ...prevData,
+        [field]: value,
+      };
+
+      // Update the combined height display
+      if (field === "heightFeet" || field === "heightInches") {
+        const feet = newData.heightFeet || "0";
+        const inches = newData.heightInches || "0";
+        newData.height = `${feet} ft ${inches} inches`;
+      }
+
+      return newData;
+    });
+  };
 
   const handleGenderSelection = (gender) => {
     setSelectedGender(gender);
@@ -107,13 +238,30 @@ const CreatePlan = () => {
       return;
     }
 
-    if (!formData.height || isNaN(formData.height) || formData.height <= 0) {
-      Toast.show({
-        type: "error",
-        text1: "Alert!",
-        text2: "Please enter a valid height.",
-      });
-      return;
+    // Height validation
+    if (formData.heightUnit === "cm") {
+      if (!formData.height || isNaN(formData.height) || formData.height <= 0) {
+        Toast.show({
+          type: "error",
+          text1: "Alert!",
+          text2: "Please enter a valid height.",
+        });
+        return;
+      }
+    } else {
+      // For feet and inches
+      if (
+        !formData.heightFeet ||
+        isNaN(formData.heightFeet) ||
+        formData.heightFeet < 0
+      ) {
+        Toast.show({
+          type: "error",
+          text1: "Alert!",
+          text2: "Please enter valid feet for height.",
+        });
+        return;
+      }
     }
 
     if (!formData.weight || isNaN(formData.weight) || formData.weight <= 0) {
@@ -139,8 +287,8 @@ const CreatePlan = () => {
     }
 
     if (
-      formData.targetWeight >= formData.weight &&
-      selectedPeriod === "lose weight"
+      parseFloat(formData.targetWeight) >= parseFloat(formData.weight) &&
+      selectedPeriod.toLowerCase() === "lose weight"
     ) {
       Toast.show({
         type: "error",
@@ -152,8 +300,8 @@ const CreatePlan = () => {
     }
 
     if (
-      formData.targetWeight <= formData.weight &&
-      selectedPeriod === "gain weight"
+      parseFloat(formData.targetWeight) <= parseFloat(formData.weight) &&
+      selectedPeriod.toLowerCase() === "gain weight"
     ) {
       Toast.show({
         type: "error",
@@ -164,13 +312,25 @@ const CreatePlan = () => {
       return;
     }
 
-    if (!selectedDiet) {
+    if (selectedDiets.length === 0) {
       Toast.show({
         type: "error",
         text1: "Alert!",
-        text2: "Please select a dietary preference.",
+        text2: "Please select at least one dietary preference.",
       });
       return;
+    }
+
+    // Calculate height in cm for the payload
+    let heightInCm;
+    if (formData.heightUnit === "cm") {
+      heightInCm = parseFloat(formData.height);
+    } else {
+      // Convert feet and inches to cm
+      const feet = parseInt(formData.heightFeet) || 0;
+      const inches = parseInt(formData.heightInches) || 0;
+      const totalInches = feet * 12 + inches;
+      heightInCm = Math.round(totalInches * 2.54);
     }
 
     // Prepare Payload
@@ -179,10 +339,10 @@ const CreatePlan = () => {
       goal: selectedPeriod?.toLowerCase(),
       gender: selectedGender?.toLowerCase(),
       age: parseInt(formData.age, 10),
-      height: parseFloat(formData.height),
+      height: heightInCm,
       weight: parseFloat(formData.weight),
       targetWeight: parseFloat(formData.targetWeight),
-      dietaryPreferences: [selectedDiet?.toLowerCase()],
+      dietaryPreferences: selectedDiets.map((diet) => diet.toLowerCase()),
     };
 
     try {
@@ -198,6 +358,78 @@ const CreatePlan = () => {
       }, 2000);
     } catch (error) {
       console.error("Error creating plan:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to create plan. Please try again.",
+      });
+    }
+  };
+
+  // Render height input based on unit
+  const renderHeightInput = () => {
+    if (formData.heightUnit === "cm") {
+      return (
+        <View style={styles.row}>
+          <View style={{ flex: 1 }}>
+            <InputField
+              label="What's Your Height"
+              value={formData.height}
+              onChangeText={(value) => handleInputChange("height", value)}
+              keyboardType="numeric"
+              placeholder="Enter your height in cm"
+            />
+          </View>
+          <TouchableOpacity
+            style={styles.unitSelector}
+            onPress={() => setHeightUnitModalVisible(true)}
+          >
+            <Text style={styles.unitText}>{formData.heightUnit}</Text>
+            <Image source={icons.dropdown} style={styles.dropdownIcon} />
+          </TouchableOpacity>
+        </View>
+      );
+    } else {
+      return (
+        <View>
+          <Text style={styles.label}>What's Your Height</Text>
+          <View style={styles.feetInchesContainer}>
+            <View style={styles.feetContainer}>
+              <TextInput
+                style={styles.feetInput}
+                value={formData.heightFeet}
+                onChangeText={(value) =>
+                  handleHeightChange("heightFeet", value)
+                }
+                keyboardType="numeric"
+                placeholder="Feet"
+                placeholderTextColor="#888"
+              />
+              <Text style={styles.feetInchesLabel}>ft</Text>
+            </View>
+            <View style={styles.inchesContainer}>
+              <TextInput
+                style={styles.inchesInput}
+                value={formData.heightInches}
+                onChangeText={(value) =>
+                  handleHeightChange("heightInches", value)
+                }
+                keyboardType="numeric"
+                placeholder="Inches"
+                placeholderTextColor="#888"
+              />
+              <Text style={styles.feetInchesLabel}>in</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.unitSelector}
+              onPress={() => setHeightUnitModalVisible(true)}
+            >
+              <Text style={styles.unitText}>{formData.heightUnit}</Text>
+              <Image source={icons.dropdown} style={styles.dropdownIcon} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      );
     }
   };
 
@@ -220,7 +452,7 @@ const CreatePlan = () => {
           <Text
             style={{
               color: "white",
-              fontSize: 16,
+              fontSize: FontSize.regular,
               marginVertical: 20,
               fontFamily: "Poppins-Bold",
             }}
@@ -285,30 +517,9 @@ const CreatePlan = () => {
             keyboardType="numeric"
             placeholder="Enter your age"
           />
-          <View style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <InputField
-                label="What's Your Height"
-                value={formData.height}
-                onChangeText={(value) => handleInputChange("height", value)}
-                keyboardType="numeric"
-                placeholder="Enter your height"
-              />
-            </View>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={formData.heightUnit}
-                style={styles.picker}
-                onValueChange={(itemValue) =>
-                  handleInputChange("heightUnit", itemValue)
-                }
-                dropdownIconColor={colors.green}
-              >
-                <Picker.Item label="cm" value="cm" />
-                <Picker.Item label="ft" value="ft" />
-              </Picker>
-            </View>
-          </View>
+
+          {renderHeightInput()}
+
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
               <InputField
@@ -319,19 +530,13 @@ const CreatePlan = () => {
                 placeholder="Enter your weight"
               />
             </View>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={formData.weightUnit}
-                style={styles.picker}
-                onValueChange={(itemValue) =>
-                  handleInputChange("weightUnit", itemValue)
-                }
-                dropdownIconColor={colors.green}
-              >
-                <Picker.Item label="kg" value="kg" />
-                <Picker.Item label="lb" value="lb" />
-              </Picker>
-            </View>
+            <TouchableOpacity
+              style={styles.unitSelector}
+              onPress={() => setWeightUnitModalVisible(true)}
+            >
+              <Text style={styles.unitText}>{formData.weightUnit}</Text>
+              <Image source={icons.dropdown} style={styles.dropdownIcon} />
+            </TouchableOpacity>
           </View>
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
@@ -345,41 +550,62 @@ const CreatePlan = () => {
                 placeholder="Enter your target weight"
               />
             </View>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={formData.targetWeightUnit}
-                style={styles.picker}
-                onValueChange={(itemValue) =>
-                  handleInputChange("targetWeightUnit", itemValue)
-                }
-                dropdownIconColor={colors.green}
-              >
-                <Picker.Item label="kg" value="kg" />
-                <Picker.Item label="lb" value="lb" />
-              </Picker>
-            </View>
+            <TouchableOpacity
+              style={styles.unitSelector}
+              onPress={() => setTargetWeightUnitModalVisible(true)}
+            >
+              <Text style={styles.unitText}>{formData.targetWeightUnit}</Text>
+              <Image source={icons.dropdown} style={styles.dropdownIcon} />
+            </TouchableOpacity>
           </View>
 
           <Text
             style={{
               color: "white",
-              fontSize: 16,
+              fontSize: FontSize.regular,
               marginVertical: 20,
               fontFamily: "Poppins-Bold",
             }}
           >
             Select your Dietary Preferences
           </Text>
-          <Selectable
+          <MultiSelectable
             items={diets}
-            selectedItem={selectedDiet}
-            setSelectedItem={setSelectedDiet}
+            selectedItems={selectedDiets}
+            setSelectedItems={setSelectedDiets}
             wrapOnLineChange={true}
           />
         </View>
       </ScrollView>
 
-      <CustomButton title={"Save"} onPress={handleSave} />
+      <CustomButton title={"Create Plan"} onPress={handleSave} />
+
+      {/* Unit Selection Modals */}
+      <UnitSelectionModal
+        visible={heightUnitModalVisible}
+        onClose={() => setHeightUnitModalVisible(false)}
+        options={heightUnitOptions}
+        selectedValue={formData.heightUnit}
+        onSelect={(value) => handleInputChange("heightUnit", value)}
+      />
+
+      <UnitSelectionModal
+        visible={weightUnitModalVisible}
+        onClose={() => setWeightUnitModalVisible(false)}
+        options={weightUnitOptions}
+        selectedValue={formData.weightUnit}
+        onSelect={(value) => handleInputChange("weightUnit", value)}
+      />
+
+      <UnitSelectionModal
+        visible={targetWeightUnitModalVisible}
+        onClose={() => setTargetWeightUnitModalVisible(false)}
+        options={weightUnitOptions}
+        selectedValue={formData.targetWeightUnit}
+        onSelect={(value) => handleInputChange("targetWeightUnit", value)}
+      />
+
+      {/* Process Modals */}
       <CustomModal
         visible={isModalVisible}
         onClose={handleClose}
@@ -409,7 +635,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   selectedCard: {
-    backgroundColor: colors.green,
+    backgroundColor: "#BBF65480",
   },
   row: {
     flexDirection: "row",
@@ -417,17 +643,27 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     gap: 10,
   },
-  pickerContainer: {
+  unitSelector: {
     height: 50,
     width: 100,
     marginTop: 30,
     borderRadius: 10,
-    backgroundColor: "#1A1919", // Match the input field background
+    backgroundColor: "#1A1919",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    paddingHorizontal: 10,
   },
-  picker: {
-    height: "100%",
-    width: "100%",
+  unitText: {
     color: "#fff",
+    fontSize: FontSize.small,
+    fontFamily: "Poppins-Medium",
+    marginRight: 5,
+  },
+  dropdownIcon: {
+    width: 12,
+    height: 12,
+    tintColor: colors.green,
   },
   icon: {
     width: 32,
@@ -441,8 +677,106 @@ const styles = StyleSheet.create({
   },
   cardText: {
     color: "#fff",
-    fontSize: 12,
+    fontSize: FontSize.small,
     marginTop: 10,
     fontFamily: "Poppins-Bold",
+  },
+  label: {
+    color: "#fff",
+    fontSize: FontSize.small,
+    marginBottom: 8,
+    fontFamily: "Poppins-Medium",
+  },
+  feetInchesContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  feetContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#1A1919",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    height: 50,
+  },
+  inchesContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#1A1919",
+    borderRadius: 10,
+    marginLeft: 10,
+    paddingHorizontal: 10,
+    height: 50,
+  },
+  feetInput: {
+    flex: 1,
+    color: "#fff",
+    fontSize: FontSize.small,
+    fontFamily: "Poppins-Regular",
+  },
+  inchesInput: {
+    flex: 1,
+    color: "#fff",
+    fontSize: FontSize.small,
+    fontFamily: "Poppins-Regular",
+  },
+  feetInchesLabel: {
+    color: "#fff",
+    fontSize: FontSize.small,
+    fontFamily: "Poppins-Regular",
+    marginLeft: 5,
+  },
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#242425",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingBottom: 30,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#333",
+  },
+  modalTitle: {
+    color: "#fff",
+    fontSize: FontSize.medium,
+    fontFamily: "Poppins-Bold",
+  },
+  closeButton: {
+    color: colors.green,
+    fontSize: FontSize.small,
+    fontFamily: "Poppins-Medium",
+  },
+  optionsContainer: {
+    padding: 20,
+  },
+  optionItem: {
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#333",
+  },
+  selectedOption: {
+    backgroundColor: "rgba(187, 246, 84, 0.1)",
+  },
+  optionText: {
+    color: "#fff",
+    fontSize: FontSize.medium,
+    fontFamily: "Poppins-Regular",
+  },
+  selectedOptionText: {
+    color: colors.green,
+    fontFamily: "Poppins-Medium",
   },
 });
