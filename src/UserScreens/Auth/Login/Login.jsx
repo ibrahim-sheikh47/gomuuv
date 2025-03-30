@@ -25,15 +25,14 @@ import { API } from "../../../config/apiClient";
 import { setAuthData } from "../../../redux/reducers/AuthSlice";
 import { useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { FontSize } from "../../../utils/font";
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: "ahmadmuzaffar6228@gmail.com",
-    password: "abcd1234",
+    email: "test@gmail.com",
+    password: "Aa@123456",
     rememberMe: false,
   });
 
@@ -219,7 +218,7 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     color: "#000",
-    fontSize: FontSize.regular,
+    fontSize: 16,
     fontWeight: "bold",
   },
   rememberMeContainer: {
@@ -243,10 +242,10 @@ const styles = StyleSheet.create({
   },
   checkmark: {
     color: "#fff",
-    fontSize: FontSize.small,
+    fontSize: 12,
   },
   rememberMeText: {
-    fontSize: FontSize.regular,
+    fontSize: 16,
     color: "#fff",
   },
   forgotPasswordText: {
@@ -280,7 +279,7 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     fontFamily: "Poppins-Regular",
-    fontSize: FontSize.medium,
+    fontSize: 14,
   },
   signInLink: {
     color: colors.green,

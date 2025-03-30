@@ -12,14 +12,23 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "This app requires access to the photo library to update your profile picture.",
+        "NSCameraUsageDescription": "This app requires access to the camera to take profile pictures."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.gomuuv.android"
+      "package": "com.gomuuv.android",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./src/assets/favicon.png"
@@ -30,16 +39,20 @@
       }
     },
     "owner": "gomuuv",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
     "updates": {
       "url": "https://u.expo.dev/043ba87c-8b62-411c-91de-265476701a7e"
     },
     "plugins": [
       "expo-font",
       "react-native-video",
-      "expo-video"
+      "expo-video",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends.",
+          "cameraPermission": "The app needs access to your camera to take photos."
+        }
+      ]
     ]
   }
 }

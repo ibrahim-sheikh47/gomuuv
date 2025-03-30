@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -18,16 +18,22 @@ import CustomModal from "../../components/CustomModal";
 import { challengesData } from "../../utils/data";
 import StrengthIcon from "../../assets/svgs/StrengthIcon";
 import { FontSize } from "../../utils/font";
+import { useSelector } from "react-redux";
 
 const CategoryList = () => {
   const route = useRoute();
   const { category } = route.params;
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTitle, setSelectedTitle] = useState("");
+  const [filteredChallenges, setFilteredChallenges] = useState([]);
 
-  const filteredChallenges = challengesData.filter(
-    (challenge) => challenge.type === category
-  );
+  const { token } = useSelector((state) => ({
+    token: state.Auth?.token,
+  }));
+
+  useEffect(() => {
+    getFilteredChallenges();
+  }, []);
 
   const openModal = (title) => {
     setSelectedTitle(title);
@@ -37,6 +43,21 @@ const CategoryList = () => {
   const closeModal = () => {
     setModalVisible(false);
     setSelectedTitle("");
+  };
+
+  const getFilteredChallenges = async () => {
+    try {
+      const res = await API.get(
+        `${END_POINTS.CHALLENGES}?filter=${category}`,
+        null,
+        token
+      );
+      if (res.data.success) {
+        setFilteredChallenges(res.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching upcoming challenges:", error);
+    }
   };
 
   const renderChallengeItem = ({ item }) => (

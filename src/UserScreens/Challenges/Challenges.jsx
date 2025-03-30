@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   StyleSheet,
@@ -13,7 +13,7 @@ import Header from "../../components/Header";
 import TabContainer from "../../components/TabContainer";
 import { useNavigation } from "@react-navigation/native";
 import images from "../../constants/images";
-import { challenges } from "../../utils/data";
+// import { challenges } from "../../utils/data";
 import CustomButton from "../../components/CustomButton";
 import GoalModal from "../../components/GoalModal";
 import CustomModal from "../../components/CustomModal";
@@ -28,17 +28,31 @@ import LevelIcon from "../../assets/svgs/LevelIcon";
 import SearchIcon from "../../assets/svgs/SearchIcon";
 import WeightLossIcon from "../../assets/svgs/WeightLossIcon";
 import { FontSize } from "../../utils/font";
+import { END_POINTS } from "../../config/routes";
+import { useSelector } from "react-redux";
 
 const ChallengesScreen = () => {
-  const [activeTab, setActiveTab] = useState("Goals"); // Set default to Goals to match your screenshot
+  const [activeTab, setActiveTab] = useState("Challenges"); // Set default to Goals to match your screenshot
   const [weightModalVisible, setWeightModalVisible] = useState(false);
   const [targetModalVisible, setTargetModalVisible] = useState(false);
   const [weightUpdatedVisible, setWeightUpdatedVisible] = useState(false);
   const [targetUpdatedVisible, setTargetUpdatedVisible] = useState(false);
 
+  const [enrolledChallenges, setEnrolledChallenges] = useState([]);
+  const [upcomingChallenges, setUpcomingChallenges] = useState([]);
+
   const [currentWeight, setCurrentWeight] = useState(63); // Set to 63 to match your screenshot
   const [targetWeight, setTargetWeight] = useState(54); // Set to 54 to match your screenshot
   const [bmiValue, setBmiValue] = useState(23.0); // Initial BMI value
+
+  const { token } = useSelector((state) => ({
+    token: state.Auth?.token,
+  }));
+
+  useEffect(() => {
+    getEnrolledChallenges();
+    getUpcomingChallenges();
+  }, []);
 
   const handleUpdateWeight = (newWeight) => {
     setCurrentWeight(newWeight); // Update the current weight
@@ -71,6 +85,36 @@ const ChallengesScreen = () => {
     "Health & Wellness": <HealthWellIcon />,
     "Lifestyle & Habit": <HabitIcon />,
     "Skills Based": <ChallengesIcon />,
+  };
+
+  const getEnrolledChallenges = async () => {
+    try {
+      const res = await API.get(
+        `${END_POINTS.CHALLENGES}/enrolled`,
+        null,
+        token
+      );
+      if (res.data.success) {
+        setEnrolledChallenges(res.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching enrolled challenges:", error);
+    }
+  };
+
+  const getUpcomingChallenges = async () => {
+    try {
+      const res = await API.get(
+        `${END_POINTS.CHALLENGES}/upcoming`,
+        null,
+        token
+      );
+      if (res.data.success) {
+        setUpcomingChallenges(res.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching upcoming challenges:", error);
+    }
   };
 
   const renderChallengeCard = ({ item: challenge }) => (
@@ -299,14 +343,12 @@ const ChallengesScreen = () => {
 
   const renderListHeader = () => (
     <>
-      <Text style={styles.sectionTitle}>Enrolled Challenge</Text>
-      {challenges
-        .filter((challenge) => challenge.type === "enroll")
-        .map((challenge) => (
-          <View key={challenge.id}>
-            {renderChallengeCard({ item: challenge })}
-          </View>
-        ))}
+      <Text style={styles.sectionTitle}>Enrolled Challenges</Text>
+      {enrolledChallenges.map((challenge) => (
+        <View key={challenge._id}>
+          {renderChallengeCard({ item: challenge })}
+        </View>
+      ))}
       <Text style={styles.sectionTitle}>Upcoming Challenges</Text>
     </>
   );
@@ -320,7 +362,7 @@ const ChallengesScreen = () => {
           "Strength",
           "Flexibility",
           "Health & Wellness",
-          "Lifestyle & Habit",
+          "Lifestyle And Habit",
           "Skills Based",
         ].map((text) => (
           <TouchableOpacity
@@ -346,9 +388,7 @@ const ChallengesScreen = () => {
       />
       <FlatList
         data={
-          activeTab === "Challenges"
-            ? challenges.filter((challenge) => challenge.type === "upcoming")
-            : [] // Here you can add data for Goals if needed
+          activeTab === "Challenges" ? upcomingChallenges : [] // Here you can add data for Goals if needed
         }
         renderItem={renderChallengeCard}
         keyExtractor={(item) => item.id.toString()}

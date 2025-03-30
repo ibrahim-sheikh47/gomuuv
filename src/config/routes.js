@@ -14,7 +14,7 @@ export const END_POINTS = {
   PLACE_ORDER: `/orders`,
   EXERCISE: "/exercises",
   EXERCISE_COMPLETED: "/workout-sessions/mark-exercise-complete",
-  FASTING_PLANS: '/fasting-plans',
+  FASTING_PLANS: "/fasting-plans",
   FASTING_HISTORY: "/fasting-history/fasting-stats",
   GET_ALL_FASTING_HISTORY: "/fasting-history",
   END_FASTING_SESSION: "/fasting-history/end-fasting",
@@ -28,4 +28,5 @@ export const END_POINTS = {
   NUTRITION_MEALS: "/nutrition-meals",
   PHYSICAL_ACTIVITIES: "/physical-activities",
   ORDERS: "/orders",
+  CHALLENGES: "/challenges",
 };

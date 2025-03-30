@@ -24,26 +24,27 @@ const PersonalInfoScreen = () => {
   }));
   // State for personal information fields
   const [personalInfo, setPersonalInfo] = useState({
-    firstName: "",
-    lastName: "",
-    height: "",
-    weight: "",
-    dateOfBirth: "",
+    firstName: userData?.firstName || "",
+    lastName: userData?.lastName || "",
+    height: userData?.height || "",
+    weight: userData?.weight || "",
+    date: userData?.dob || "",
   });
   const [isLoading, setIsLoading] = useState(false);
 
   // Update personalInfo state when userData changes
-  useEffect(() => {
-    if (userData) {
-      setPersonalInfo({
-        firstName: userData?.firstName || "",
-        lastName: userData?.lastName || "",
-        height: userData?.height + " " + userData?.heightUnit || "",
-        weight: userData?.weight + " " + userData?.weightUnit || "",
-        dateOfBirth: userData?.dob || "",
-      });
-    }
-  }, [userData]);
+  // useEffect(() => {
+  //   if (userData) {
+  //     console.log(userData.dob);
+  //     setPersonalInfo({
+  //       firstName: userData?.firstName || "",
+  //       lastName: userData?.lastName || "",
+  //       height: userData?.height || "",
+  //       weight: userData?.weight || "",
+  //       date: userData?.dob || "",
+  //     });
+  //   }
+  // }, [userData]);
 
   const handleInputChange = (field, value) => {
     setPersonalInfo((prevInfo) => ({
@@ -59,7 +60,7 @@ const PersonalInfoScreen = () => {
       !personalInfo.lastName ||
       !personalInfo.height ||
       !personalInfo.weight ||
-      !personalInfo.dateOfBirth
+      !personalInfo.date
     ) {
       Toast.show({
         type: "error",
@@ -103,7 +104,7 @@ const PersonalInfoScreen = () => {
         lastName: personalInfo.lastName,
         height: personalInfo.height,
         weight: personalInfo.weight,
-        dob: personalInfo.dateOfBirth,
+        dob: personalInfo.date,
       };
       const response = await API.patch(
         END_POINTS.UPDATE_USER + `${userData?._id}`,
@@ -141,7 +142,7 @@ const PersonalInfoScreen = () => {
     { label: "Last Name", key: "lastName" },
     { label: "Height", key: "height", keyboardType: "numeric" },
     { label: "Weight", key: "weight", keyboardType: "numeric" },
-    { label: "Date Of Birth", key: "dateOfBirth" },
+    { label: "Date Of Birth", key: "date" },
   ];
 
   return (
@@ -154,14 +155,15 @@ const PersonalInfoScreen = () => {
           <View style={styles.fieldContainer}>
             <View>
               <InputField
+                type={item.key}
                 label={item.label}
                 value={personalInfo[item.key]}
                 onChangeText={(value) => handleInputChange(item.key, value)}
                 keyboardType={item.keyboardType || "default"} // Use keyboardType if specified
               />
-              <TouchableOpacity style={styles.editIcon}>
+              {/* <TouchableOpacity style={styles.editIcon}>
                 <EditIcon />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           </View>
         )}

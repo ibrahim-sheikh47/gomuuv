@@ -5,13 +5,37 @@
   },
   "build": {
     "development": {
+      "env": {
+        "EXPO_PUBLIC_API_KEY": "AIzaSyC4DL5mfh5URjf6o8pNdKJlvUPYo9V3tDg",
+        "EXPO_PUBLIC_AUTH_DOMAIN": "qick-86a7c.firebaseapp.com",
+        "EXPO_PUBLIC_PROJECT_ID": "qick-86a7c",
+        "EXPO_PUBLIC_STORAGE_BUCKET": "qick-86a7c.firebasestorage.app",
+        "EXPO_PUBLIC_MESSAGING_SENDER_ID": "589872331000",
+        "EXPO_PUBLIC_APP_ID": "1:589872331000:web:4af27a8a7f67c4f434e30d"
+      },
       "developmentClient": true,
       "distribution": "internal"
     },
     "preview": {
+      "env": {
+        "EXPO_PUBLIC_API_KEY": "AIzaSyC4DL5mfh5URjf6o8pNdKJlvUPYo9V3tDg",
+        "EXPO_PUBLIC_AUTH_DOMAIN": "qick-86a7c.firebaseapp.com",
+        "EXPO_PUBLIC_PROJECT_ID": "qick-86a7c",
+        "EXPO_PUBLIC_STORAGE_BUCKET": "qick-86a7c.firebasestorage.app",
+        "EXPO_PUBLIC_MESSAGING_SENDER_ID": "589872331000",
+        "EXPO_PUBLIC_APP_ID": "1:589872331000:web:4af27a8a7f67c4f434e30d"
+      },
       "distribution": "internal"
     },
     "production": {
+      "env": {
+        "EXPO_PUBLIC_API_KEY": "AIzaSyC4DL5mfh5URjf6o8pNdKJlvUPYo9V3tDg",
+        "EXPO_PUBLIC_AUTH_DOMAIN": "qick-86a7c.firebaseapp.com",
+        "EXPO_PUBLIC_PROJECT_ID": "qick-86a7c",
+        "EXPO_PUBLIC_STORAGE_BUCKET": "qick-86a7c.firebasestorage.app",
+        "EXPO_PUBLIC_MESSAGING_SENDER_ID": "589872331000",
+        "EXPO_PUBLIC_APP_ID": "1:589872331000:web:4af27a8a7f67c4f434e30d"
+      },
       "autoIncrement": true,
       "android": {
         "buildType": "apk",

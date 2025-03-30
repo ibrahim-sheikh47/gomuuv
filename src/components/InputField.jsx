@@ -6,11 +6,12 @@ import {
   TouchableOpacity,
   Text,
 } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { colors } from "../constants/colors";
-import { FontSize } from "../utils/font";
 
 const InputField = ({
+  type,
   label,
   value,
   cusStyles,
@@ -20,8 +21,13 @@ const InputField = ({
   autoFocus = false,
   placeholder, // Accept placeholder prop
 }) => {
+  console.log(value);
   const [isFocused, setIsFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(
+    value ? new Date(value) : new Date()
+  );
   const inputRef = useRef(null);
 
   // Focus the input field when the component mounts
@@ -43,41 +49,72 @@ const InputField = ({
     setIsFocused(false);
   };
 
+  const handleDateChange = (event, date) => {
+    setShowDatePicker(false);
+    if (date) {
+      setSelectedDate(date);
+      onChangeText(date.toISOString().split("T")[0]); // Send formatted date to parent
+    }
+  };
+
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
       {/* Render label only if it exists */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          ref={inputRef}
-          style={[
-            styles.input,
-            isFocused ? styles.inputFocused : styles.inputBlurred,
 
-            cusStyles,
-          ]}
-          value={value}
-          onChangeText={onChangeText}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          secureTextEntry={secureTextEntry && !showPassword}
-          keyboardType={keyboardType}
-          placeholder={placeholder} // Set placeholder
-          placeholderTextColor="#AFAFAF" // Set placeholder text color
+      {type === "date" ? (
+        <TouchableOpacity
+          onPress={() => setShowDatePicker(true)}
+          style={[styles.input, styles.dateInput]}
+        >
+          <Text style={styles.dateText}>
+            {selectedDate
+              ? selectedDate.toDateString()
+              : placeholder || "Select Date"}
+          </Text>
+          <Icon name="calendar" size={20} color={"#888"} style={styles.icon} />
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.inputContainer}>
+          <TextInput
+            ref={inputRef}
+            style={[
+              styles.input,
+              { ...(isFocused && { borderColor: colors.green }) },
+              cusStyles,
+            ]}
+            value={value}
+            onChangeText={onChangeText}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            secureTextEntry={secureTextEntry && !showPassword}
+            keyboardType={keyboardType}
+            placeholder={placeholder} // Set placeholder
+            placeholderTextColor="#AFAFAF" // Set placeholder text color
+          />
+          {secureTextEntry && (
+            <TouchableOpacity
+              onPress={handleTogglePassword}
+              style={styles.iconContainer}
+            >
+              <Icon
+                name={showPassword ? "eye" : "eye-slash"}
+                size={22}
+                color={"#888888"}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
+
+      {showDatePicker && (
+        <DateTimePicker
+          value={selectedDate}
+          mode="date"
+          display="default"
+          onChange={handleDateChange}
         />
-        {secureTextEntry && (
-          <TouchableOpacity
-            onPress={handleTogglePassword}
-            style={styles.iconContainer}
-          >
-            <Icon
-              name={showPassword ? "eye" : "eye-slash"}
-              size={22}
-              color={"#888888"}
-            />
-          </TouchableOpacity>
-        )}
-      </View>
+      )}
     </View>
   );
 };
