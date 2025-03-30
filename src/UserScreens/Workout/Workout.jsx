@@ -252,7 +252,6 @@ const WorkoutScreen = () => {
                   workout && navigation.navigate("WorkoutDetails", { workout })
                 }
               />
-              ;
             </View>
           </>
         )}
