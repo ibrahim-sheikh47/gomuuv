@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import BreakfastIcon from "../../assets/svgs/BreakfastIcon";
 import EatenIcon from "../../assets/svgs/EatenIcon";
 import LunchIcon from "../../assets/svgs/LunchIcon";
 import SnacksIcon from "../../assets/svgs/SnacksIcon";
+import DinnerIcon from "../../assets/svgs/DinnerIcon";
 import Container from "../../components/Container";
 import CustomButton from "../../components/CustomButton";
 import Header from "../../components/Header";
@@ -17,6 +18,7 @@ import {
   setDailyPlans,
   setNutritionMeals,
 } from "../../redux/reducers/NutritionSlice";
+import { FontSize } from "../../utils/font";
 
 const ViewAllMeals = ({ route, navigation }) => {
   const dispatch = useDispatch();
@@ -107,6 +109,11 @@ const ViewAllMeals = ({ route, navigation }) => {
       icon: <SnacksIcon width={24} height={24} />,
       value: "Snacks",
     },
+    {
+      label: "Dinner",
+      icon: <DinnerIcon width={24} height={24} />,
+      value: "Dinner",
+    },
   ];
 
   return (
@@ -117,14 +124,19 @@ const ViewAllMeals = ({ route, navigation }) => {
 
       {title.toLowerCase() === "recipes" && (
         <>
-          <MealCategorySelector
-            categories={mealCategories}
-            selectedCategory={selectedCategory}
-            onSelect={(index) =>
-              setSelectedCategory(mealCategories[index].value)
-            }
-          />
-
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={{ paddingBottom: 50 }}
+          >
+            <MealCategorySelector
+              categories={mealCategories}
+              selectedCategory={selectedCategory}
+              onSelect={(index) =>
+                setSelectedCategory(mealCategories[index].value)
+              }
+            />
+          </ScrollView>
           <Text style={styles.title}>Popular Recipes</Text>
         </>
       )}
@@ -139,7 +151,7 @@ const ViewAllMeals = ({ route, navigation }) => {
             mealImage={item?.image}
             calories={item?.calories}
             time={item?.preparationTime}
-            iconType="next"
+            iconType={title.toLowerCase() === "recipes" ? "next" : "delete"}
             onPress={() =>
               navigation.navigate("MealDetailScreen", { meal: item })
             }
@@ -173,7 +185,7 @@ const styles = StyleSheet.create({
   title: {
     color: "white",
     fontFamily: "Poppins-Bold",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     marginBottom: 5,
     marginTop: 20,
   },

@@ -1,5 +1,4 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Picker } from "@react-native-picker/picker"; // Import Picker
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
@@ -9,6 +8,8 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Modal,
+  FlatList,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { useDispatch } from "react-redux";
@@ -25,6 +26,7 @@ import { API } from "../../../config/apiClient";
 import { END_POINTS } from "../../../config/routes";
 import { colors } from "../../../constants/colors";
 import { setAuthData } from "../../../redux/reducers/AuthSlice";
+import { FontSize } from "../../../utils/font";
 
 const Signup = (props) => {
   const dispatch = useDispatch();
@@ -35,7 +37,7 @@ const Signup = (props) => {
     firstName: "",
     lastName: "",
     height: "",
-    heightUnit: "cm", // Default unit
+    heightUnit: "ft", // Default unit
     weight: "",
     weightUnit: "kg", // Default unit
     age: "",
@@ -44,6 +46,14 @@ const Signup = (props) => {
     confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
+
+  // States for modal visibility
+  const [heightModalVisible, setHeightModalVisible] = useState(false);
+  const [weightModalVisible, setWeightModalVisible] = useState(false);
+
+  // Options for the dropdowns
+  const heightUnitOptions = ["cm", "ft"];
+  const weightUnitOptions = ["kg", "lb"];
 
   const handleInputChange = (field, value) => {
     setForm((prevState) => ({
@@ -163,6 +173,42 @@ const Signup = (props) => {
     }
   };
 
+  // Custom modal selection component
+  const SelectionModal = ({ visible, onClose, options, onSelect, title }) => {
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={visible}
+        onRequestClose={onClose}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{title}</Text>
+            <FlatList
+              data={options}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.modalItem}
+                  onPress={() => {
+                    onSelect(item);
+                    onClose();
+                  }}
+                >
+                  <Text style={styles.modalItemText}>{item}</Text>
+                </TouchableOpacity>
+              )}
+            />
+            <TouchableOpacity style={styles.modalCloseButton} onPress={onClose}>
+              <Text style={styles.modalCloseButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
   return (
     <Container>
       <StatusBar style="light" backgroundColor="#121212" />
@@ -195,19 +241,12 @@ const Signup = (props) => {
                 keyboardType="numeric" // Ensure only numbers are entered
               />
             </View>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={form.heightUnit}
-                style={styles.picker}
-                onValueChange={(itemValue) =>
-                  handleInputChange("heightUnit", itemValue)
-                }
-                dropdownIconColor={colors.green}
-              >
-                <Picker.Item label="cm" value="cm" />
-                <Picker.Item label="ft" value="ft" />
-              </Picker>
-            </View>
+            <TouchableOpacity
+              style={styles.unitSelector}
+              onPress={() => setHeightModalVisible(true)}
+            >
+              <Text style={styles.unitSelectorText}>{form.heightUnit}</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.row}>
@@ -220,19 +259,12 @@ const Signup = (props) => {
                 keyboardType="numeric" // Ensure only numbers are entered
               />
             </View>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={form.weightUnit}
-                style={styles.picker}
-                onValueChange={(itemValue) =>
-                  handleInputChange("weightUnit", itemValue)
-                }
-                dropdownIconColor={colors.green}
-              >
-                <Picker.Item label="kg" value="kg" />
-                <Picker.Item label="lb" value="lb" />
-              </Picker>
-            </View>
+            <TouchableOpacity
+              style={styles.unitSelector}
+              onPress={() => setWeightModalVisible(true)}
+            >
+              <Text style={styles.unitSelectorText}>{form.weightUnit}</Text>
+            </TouchableOpacity>
           </View>
 
           <InputField
@@ -292,6 +324,25 @@ const Signup = (props) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Height Unit Selection Modal */}
+      <SelectionModal
+        visible={heightModalVisible}
+        onClose={() => setHeightModalVisible(false)}
+        options={heightUnitOptions}
+        onSelect={(value) => handleInputChange("heightUnit", value)}
+        title="Select Height Unit"
+      />
+
+      {/* Weight Unit Selection Modal */}
+      <SelectionModal
+        visible={weightModalVisible}
+        onClose={() => setWeightModalVisible(false)}
+        options={weightUnitOptions}
+        onSelect={(value) => handleInputChange("weightUnit", value)}
+        title="Select Weight Unit"
+      />
+
       <Loader isLoading={loading} message="Processing your request..." />
     </Container>
   );
@@ -308,17 +359,19 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     gap: 10,
   },
-  pickerContainer: {
+  unitSelector: {
     height: 50,
     width: 100,
     marginTop: 30,
     borderRadius: 10,
-    backgroundColor: "#1A1919", // Match the input field background
+    backgroundColor: "#1A1919",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  picker: {
-    height: "100%",
-    width: "100%",
+  unitSelectorText: {
     color: "#fff",
+    fontSize: 16,
+    fontFamily: "Poppins-Regular",
   },
   loginButton: {
     backgroundColor: colors.green,
@@ -361,11 +414,56 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     fontFamily: "Poppins-Regular",
-    fontSize: 14,
+    fontSize: FontSize.medium,
   },
   signInLink: {
     color: colors.green,
     fontFamily: "Poppins-SemiBold",
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    backgroundColor: "#212121",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontFamily: "Poppins-SemiBold",
+    color: "#fff",
+    marginBottom: 15,
+  },
+  modalItem: {
+    width: "100%",
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#333",
+  },
+  modalItemText: {
+    fontSize: 16,
+    fontFamily: "Poppins-Regular",
+    color: "#fff",
+    textAlign: "center",
+  },
+  modalCloseButton: {
+    marginTop: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: colors.green,
+    borderRadius: 5,
+  },
+  modalCloseButtonText: {
+    fontSize: 16,
+    fontFamily: "Poppins-Medium",
+    color: "#fff",
   },
 });
 

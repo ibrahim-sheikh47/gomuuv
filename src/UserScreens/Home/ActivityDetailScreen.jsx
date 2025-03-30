@@ -26,12 +26,13 @@ import TimeIcon from "../../assets/svgs/TimeIcon";
 import CaloriesIcon from "../../assets/svgs/CaloriesIcon";
 import HeartRateIcon from "../../assets/svgs/HeartRateIcon";
 import GoalIcon from "../../assets/svgs/GoalIcon";
+import { FontSize } from "../../utils/font";
 
 const ActivityDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const {
-    activityName = null,
+    activityName,
     distance = null,
     time = null,
     distanceUnit = null,
@@ -40,9 +41,12 @@ const ActivityDetailScreen = () => {
   const duration = ["Today", "Weekly", "Monthly", "Quarterly", "Yearly"];
   const [selectedPeriod, setSelectedPeriod] = useState("Today");
 
-  const pan = useRef(new Animated.ValueXY()).current;
+  // Button dimensions
   const buttonWidth = 300; // Adjust this to match your button width
-  const dragThreshold = buttonWidth * 0.8; // Trigger navigation when dragged 70% of the button width
+  const maxDragDistance = buttonWidth - 48 - 24; // Icon width is 48, padding is 24
+
+  const pan = useRef(new Animated.ValueXY()).current;
+  const dragThreshold = maxDragDistance * 0.9; // Trigger navigation when dragged 80% of max distance
 
   // Reset position when the screen comes into focus
   useFocusEffect(
@@ -58,11 +62,27 @@ const ActivityDetailScreen = () => {
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
-      onPanResponderMove: Animated.event([null, { dx: pan.x }], {
-        useNativeDriver: false,
-      }),
-      onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dx > dragThreshold) {
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        // Save the current position of the pan
+        pan.setOffset({
+          x: pan.x._value,
+          y: 0,
+        });
+        // Reset the value to avoid jumping
+        pan.setValue({ x: 0, y: 0 });
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        // Limit the drag to stay within the button and only horizontal
+        // Using clamp to keep the value between 0 and maxDragDistance
+        const newX = Math.max(0, Math.min(gestureState.dx, maxDragDistance));
+        pan.x.setValue(newX);
+      },
+      onPanResponderRelease: (evt, gestureState) => {
+        // Clear the offset to avoid accumulation
+        pan.flattenOffset();
+
+        if (pan.x._value > dragThreshold) {
           navigation.navigate("FinishActivity", {
             activityName: activityName,
             distance: distance,
@@ -74,6 +94,7 @@ const ActivityDetailScreen = () => {
         } else {
           Animated.spring(pan, {
             toValue: { x: 0, y: 0 },
+            friction: 5,
             useNativeDriver: false,
           }).start();
         }
@@ -81,8 +102,8 @@ const ActivityDetailScreen = () => {
     })
   ).current;
 
-  const heartRate = "96bpm";
-  const calories = "65kcal";
+  const heartRate = "0bpm";
+  const calories = "0kcal";
 
   return (
     <Container>
@@ -134,16 +155,20 @@ const ActivityDetailScreen = () => {
       </View>
       <View style={styles.button}>
         <Animated.View
-          style={[pan.getLayout(), { height: 48, width: 48 }]}
+          style={{
+            transform: [{ translateX: pan.x }],
+            height: 48,
+            width: 48,
+            position: "absolute",
+            left: 12,
+            zIndex: 10,
+          }}
           {...panResponder.panHandlers}
         >
           <Image source={images.locationBg} style={{ height: 48, width: 48 }} />
         </Animated.View>
         <Text style={styles.buttonText}>Open Map</Text>
-        <Image
-          source={icons.slideArrows}
-          style={{ width: 35, height: 12, marginRight: 10 }}
-        />
+        <Image source={icons.slideArrows} style={styles.arrowIcon} />
       </View>
     </Container>
   );
@@ -158,7 +183,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   title: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Bold",
     color: "#fff",
   },
@@ -177,7 +202,7 @@ const styles = StyleSheet.create({
     height: 17,
   },
   goalText: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     marginTop: 2,
     fontFamily: "Poppins-SemiBold",
   },
@@ -191,19 +216,25 @@ const styles = StyleSheet.create({
     height: 60,
     width: "100%",
     flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 12,
+    justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
     borderRadius: 10,
-    overflow: "hidden", // Ensure image stays within the button
+    overflow: "hidden",
+    position: "relative",
+    paddingHorizontal: 12,
   },
   buttonText: {
     textAlign: "center",
     fontFamily: "Poppins-SemiBold",
-    fontSize: 18,
+    fontSize: FontSize.large,
     color: "white",
-    zIndex: -1,
+  },
+  arrowIcon: {
+    width: 35,
+    height: 12,
+    position: "absolute",
+    right: 12,
   },
 });
 

@@ -12,6 +12,7 @@ import { colors } from "../constants/colors";
 import CaloriesIcon from "../assets/svgs/CaloriesIcon";
 import TimeIcon from "../assets/svgs/TimeIcon";
 import images from "../constants/images";
+import { FontSize } from "../utils/font";
 
 export const MealItem = ({
   title,
@@ -136,13 +137,13 @@ const styles = StyleSheet.create({
   mealTitle: {
     fontFamily: "Poppins-SemiBold",
     color: colors.green,
-    fontSize: 12,
+    fontSize: FontSize.small,
     maxWidth: "80%",
   },
   mealName: {
     fontFamily: "Poppins-Regular",
     color: "#F8F8F8",
-    fontSize: 12,
+    fontSize: FontSize.small,
   },
   mealStats: {
     flexDirection: "row",
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
   statText: {
     fontFamily: "Poppins-Regular",
     color: "white",
-    fontSize: 12,
+    fontSize: FontSize.small,
     marginTop: 2,
   },
   nextIcon: {
@@ -182,6 +183,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontFamily: "Poppins-SemiBold",
-    fontSize: 12,
+    fontSize: FontSize.small,
   },
 });

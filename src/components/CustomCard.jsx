@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "../constants/colors";
+import { FontSize } from "../utils/font";
 
 export const CustomCard = ({
   label,
   icon: CardIcon,
   goal,
+  iconImage,
   children,
   message = "",
   onPress,
@@ -23,19 +25,26 @@ export const CustomCard = ({
         <Text
           style={{
             color: "#fff",
-            fontSize: 12,
+            fontSize: FontSize.small,
             fontFamily: "Poppins-SemiBold",
           }}
         >
           {label}
         </Text>
-        <CardIcon />
+        {iconImage ? (
+          <Image source={iconImage} style={{ width: 20, height: 20 }} />
+        ) : CardIcon ? (
+          <CardIcon />
+        ) : null}
       </View>
       <Text
         style={{
           color: "#F8F8F8",
           textAlign: "center",
-          fontSize: message === `Please start ${label} to see data` ? 12 : 24,
+          fontSize:
+            message === `Please start ${label} to see data`
+              ? FontSize.small
+              : FontSize.xxlarge,
           fontFamily: "Poppins-Bold",
           marginTop: 10,
           paddingHorizontal: 20,
@@ -51,7 +60,7 @@ export const CustomCard = ({
           <Text
             style={{
               color: "#F8F8F8",
-              fontSize: 10,
+              fontSize: FontSize.xxsmall,
               paddingHorizontal: 14,
               marginBottom: 10,
               fontFamily: "Poppins-Regular",
@@ -86,7 +95,7 @@ const styles = StyleSheet.create({
     color: "#F8F8F8",
     textAlign: "center",
     marginTop: 10,
-    fontSize: 12,
+    fontSize: FontSize.small,
     marginHorizontal: 20,
   },
 });

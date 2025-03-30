@@ -6,6 +6,7 @@ import TimeIcon from "../assets/svgs/TimeIcon";
 import StrengthIcon from "../assets/svgs/StrengthIcon";
 import { IconButton } from "react-native-paper";
 import { colors } from "../constants/colors";
+import { FontSize } from "../utils/font";
 
 const WorkoutCard = ({ title, calories, time, category, image, onPress }) => (
   <TouchableOpacity style={styles.sessionContainer} onPress={onPress}>
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
   },
   sessionTitleText: {
     color: "white",
-    fontSize: 22,
+    fontSize: FontSize.xxlarge,
     fontFamily: "Poppins-Bold",
     position: "absolute",
     bottom: 60,
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
   detailText: {
     color: "#F8F8F8",
     fontFamily: "Poppins-Regular",
-    fontSize: 12,
+    fontSize: FontSize.small,
     marginTop: 2,
     marginRight: 10,
   },

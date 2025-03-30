@@ -10,6 +10,7 @@ import Loader from "../../../components/Loader";
 import { API } from "../../../config/apiClient";
 import { END_POINTS } from "../../../config/routes";
 import { colors } from "../../../constants/colors";
+import { FontSize } from "../../../utils/font";
 
 const ForgotPass = () => {
   const navigation = useNavigation();
@@ -83,7 +84,7 @@ const ForgotPass = () => {
         header="Forgot Password"
         description="Enter your Email to Reset Password"
         customStyles={{
-          headerText: { fontSize: 16 },
+          headerText: { fontSize: FontSize.regular },
           descriptionText: { color: colors.green },
         }}
       />

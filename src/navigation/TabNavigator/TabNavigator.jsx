@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { View, Text } from "react-native";
+import { View, Text, Platform } from "react-native";
 import { colors } from "../../constants/colors"; // Import your color palette
 import HomeScreen from "../../UserScreens/Home/Home";
 import ShopScreen from "../../UserScreens/Shop/Shop";
@@ -12,6 +12,7 @@ import Tab2Icon from "../../assets/svgs/Tab2Icon";
 import Tab3Icon from "../../assets/svgs/Tab3Icon";
 import Tab4Icon from "../../assets/svgs/Tab4Icon";
 import Tab5Icon from "../../assets/svgs/Tab5Icon";
+import { FontSize } from "../../utils/font";
 
 const Tab = createBottomTabNavigator();
 
@@ -22,10 +23,10 @@ const TabIcon = ({ focused, IconFilled, IconOutlined, label }) => {
       style={{
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: focused ? "#434747" : "transparent", // Gray background when focused
-        padding: 10, // Add padding for better spacing
+        backgroundColor: focused ? "#434747" : "transparent",
+        padding: Platform.OS === "ios" ? 12 : 8, // Different padding for iOS and Android
         marginVertical: 10,
-        borderRadius: 12, // Optional: Add border radius for rounded corners
+        borderRadius: 12,
       }}
     >
       {icon}
@@ -36,6 +37,7 @@ const TabIcon = ({ focused, IconFilled, IconOutlined, label }) => {
             fontSize: 8,
             fontFamily: "Poppins-Medium",
             color: colors.green, // Always black when active
+            paddingBottom: Platform.OS === "ios" ? 20 : 0,
           }}
         >
           {label}
@@ -76,7 +78,7 @@ export default function TabNavigator() {
         screenOptions={({ route }) => ({
           headerShown: false,
           tabBarStyle: {
-            height: 60,
+            height: 75,
             backgroundColor: "#1f1f20",
             borderTopLeftRadius: 10,
             borderTopRightRadius: 10,

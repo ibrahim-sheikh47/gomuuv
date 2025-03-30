@@ -9,22 +9,26 @@ import { settings } from "../../utils/data";
 import icons from "../../constants/icons";
 import { useNavigation } from "@react-navigation/native";
 import KetoIcon from "../../assets/svgs/KetoIcon";
+import { FontSize } from "../../utils/font";
+import PersonalInfoIcon from "../../assets/svgs/PersonalInfoIcon";
+import ChangePassIcon from "../../assets/svgs/ChangePassIcon";
+import SyncSecureIcon from "../../assets/svgs/SyncSecureIcon";
 
 const TrainerProfile = () => {
   const navigation = useNavigation();
   const trainerSettings = [
     {
-      icon: <KetoIcon />,
+      icon: <PersonalInfoIcon />,
       text: "Personal Information",
       route: "PersonalInfoScreen",
     },
     {
-      icon: <KetoIcon />,
+      icon: <ChangePassIcon />,
       text: "Change Password",
       route: "ChangePassScreen",
     },
     {
-      icon: <KetoIcon />,
+      icon: <SyncSecureIcon />,
       text: "Sync and Secure Data",
       route: "SyncSecureDataScreen",
     },
@@ -36,7 +40,7 @@ const TrainerProfile = () => {
         <Image source={images.dp} style={styles.profileImage} />
         <Text
           style={{
-            fontSize: 16,
+            fontSize: FontSize.regular,
             fontFamily: "Poppins-SemiBold",
             color: "#F8F8F8",
             marginTop: 10,
@@ -46,7 +50,7 @@ const TrainerProfile = () => {
         </Text>
         <Text
           style={{
-            fontSize: 14,
+            fontSize: FontSize.medium,
             fontFamily: "Poppins-Regular",
             color: colors.green,
           }}
@@ -86,6 +90,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontFamily: "Poppins-SemiBold",
     marginTop: 50,
-    fontSize: 16,
+    fontSize: FontSize.regular,
   },
 });

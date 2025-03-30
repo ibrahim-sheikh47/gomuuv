@@ -3,6 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { IconButton } from "react-native-paper";
 import { colors } from "../constants/colors";
 import { useEffect } from "react";
+import { FontSize } from "../utils/font";
 
 export const FastingCard = ({ plan, selectedPlan }) => {
   const navigation = useNavigation();
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
   },
   cardDuration: {
     color: colors.green,
-    fontSize: 24,
+    fontSize: FontSize.xxlarge,
     fontFamily: "Poppins-Bold",
   },
   cardDetails: {
@@ -66,12 +67,12 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontFamily: "Poppins-SemiBold",
-    fontSize: 14,
+    fontSize: FontSize.medium,
     color: "#f8f8f8",
   },
   cardDescription: {
     fontFamily: "Poppins-Regular",
-    fontSize: 10,
+    fontSize: FontSize.xxsmall,
     color: "#A4A4A4",
     marginTop: 10,
   },

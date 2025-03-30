@@ -22,12 +22,13 @@ import { END_POINTS } from "../../config/routes";
 import { colors } from "../../constants/colors";
 import images from "../../constants/images";
 import { setDailyPlans } from "../../redux/reducers/NutritionSlice";
+import { FontSize } from "../../utils/font";
 
 const MealDetailScreen = ({ route }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [isModalVisible, setModalVisible] = useState(false);
-  const { meal } = route.params; // Extract meal data from route params
+  const { meal, source } = route.params;
   const [carbs, setCarbs] = useState({ current: meal?.carbs || 0, total: 30 });
   const [proteins, setProteins] = useState({
     current: meal?.protein || 0,
@@ -197,7 +198,7 @@ const MealDetailScreen = ({ route }) => {
     if (item.type === "steps") {
       return (
         <View style={{ padding: 20 }}>
-          <Text style={styles.title}>How to make Step by Steppppp</Text>
+          <Text style={styles.title}>How to make Step by Step</Text>
           <FlatList
             data={item.steps}
             keyExtractor={(step) => step.id}
@@ -209,12 +210,14 @@ const MealDetailScreen = ({ route }) => {
               </View>
             )}
           />
+          {source === "popularRecipes" && (
+            <CustomButton
+              style={{ marginTop: 20 }}
+              title={"Add to your Plan"}
+              onPress={handleAddToPlan}
+            />
+          )}
 
-          <CustomButton
-            style={{ marginTop: 20 }}
-            title={"Add to your Plan"}
-            onPress={handleAddToPlan}
-          />
           <CustomModal
             visible={isModalVisible}
             onClose={handleClose}
@@ -242,7 +245,7 @@ const MealDetailScreen = ({ route }) => {
 
 const styles = StyleSheet.create({
   mealName: {
-    fontSize: 24,
+    fontSize: FontSize.xxlarge,
     fontFamily: "Poppins-Bold",
     marginBottom: 10,
     color: colors.green,
@@ -253,13 +256,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   title: {
-    fontSize: 18,
+    fontSize: FontSize.large,
     marginBottom: 5,
     fontFamily: "Poppins-SemiBold",
     color: "white",
   },
   items: {
-    fontSize: 14,
+    fontSize: FontSize.medium,
     marginBottom: 5,
     fontFamily: "Poppins-Medium",
     color: "#AFAFAF",
@@ -285,7 +288,7 @@ const styles = StyleSheet.create({
   statText: {
     fontFamily: "Poppins-Regular",
     color: "#F8F8F8",
-    fontSize: 12,
+    fontSize: FontSize.small,
     marginTop: 2,
   },
   nutrientContainer: {
@@ -308,13 +311,13 @@ const styles = StyleSheet.create({
   },
   ingredientText: {
     color: "#F8F8F8",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Regular",
     marginVertical: 5,
   },
   ingredientQuantity: {
     color: "#AFAFAF",
-    fontSize: 14,
+    fontSize: FontSize.medium,
     fontFamily: "Poppins-Regular",
   },
   stepContainer: {
@@ -324,12 +327,12 @@ const styles = StyleSheet.create({
   },
   stepNum: {
     color: colors.green,
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-SemiBold",
   },
   stepText: {
     color: "#AFAFAF",
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Regular",
   },
 });

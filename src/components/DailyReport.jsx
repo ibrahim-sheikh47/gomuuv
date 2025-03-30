@@ -2,6 +2,7 @@ import React from "react";
 import { Text, View, StyleSheet } from "react-native";
 import { colors } from "../constants/colors";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
+import { FontSize } from "../utils/font";
 
 const DailyReport = ({ completionPercentage, reportText }) => {
   return (
@@ -45,12 +46,12 @@ const styles = StyleSheet.create({
   reportText: {
     color: colors.green,
     marginBottom: 10,
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Bold",
   },
   reportCompletion: {
     color: "#fff",
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-SemiBold",
     width: 105,
   },
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
   reportPercentage: {
     color: colors.green,
     fontFamily: "Poppins-SemiBold",
-    fontSize: 20,
+    fontSize: FontSize.xxlarge,
   },
 });
 

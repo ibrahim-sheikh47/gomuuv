@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { ProgressBar } from "./ProgressBar";
+import { FontSize } from "../utils/font";
 
 const calculateProgress = (current, total) => (current / total) * 100;
 export const NutrientItem = ({ title, current, total }) => (
@@ -20,14 +21,14 @@ const styles = StyleSheet.create({
   },
   nutrientText: {
     fontFamily: "Poppins-Regular",
-    fontSize: 12,
+    fontSize: FontSize.small,
     color: "#A4A4A4",
     marginTop: 4,
   },
 
   nutrientHeading: {
     fontFamily: "Poppins-Medium",
-    fontSize: 12,
+    fontSize: FontSize.small,
     color: "white",
   },
 });

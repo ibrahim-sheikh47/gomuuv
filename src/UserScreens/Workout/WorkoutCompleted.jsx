@@ -13,6 +13,7 @@ import CustomButton from "../../components/CustomButton";
 import { useSelector } from "react-redux";
 import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
+import { FontSize } from "../../utils/font";
 
 const WorkoutCompleted = ({ route }) => {
   const navigation = useNavigation();
@@ -106,26 +107,26 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.7)",
   },
   workoutTitle: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Bold",
     color: "#f8f8f8",
     textAlign: "center",
   },
   completed: {
-    fontSize: 24,
+    fontSize: FontSize.xxlarge,
     fontFamily: "Poppins-Bold",
     color: colors.green,
     marginBottom: 10,
     textAlign: "center",
   },
   durationLabel: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     color: "#fff",
     fontFamily: "Poppins-Medium",
     marginBottom: 5,
   },
   durationText: {
-    fontSize: 14,
+    fontSize: FontSize.medium,
     color: "#fff",
     fontFamily: "Poppins-Regular",
     marginBottom: 30,
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
   },
   endWorkoutText: {
     color: "#000",
-    fontSize: 18,
+    fontSize: FontSize.large,
     fontFamily: "Poppins-Bold",
   },
 });

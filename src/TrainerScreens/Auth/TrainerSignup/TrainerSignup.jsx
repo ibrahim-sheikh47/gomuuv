@@ -17,6 +17,7 @@ import CustomButton from "../../../components/CustomButton";
 import InputField from "../../../components/InputField";
 import { SocialButton } from "../../../components/SocialButton";
 import { colors } from "../../../constants/colors";
+import { FontSize } from "../../../utils/font";
 
 const TrainerSignup = () => {
   const navigation = useNavigation();
@@ -150,7 +151,7 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     fontFamily: "Poppins-Regular",
-    fontSize: 14,
+    fontSize: FontSize.medium,
   },
   signInLink: {
     color: colors.green,

@@ -1,6 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   FlatList,
   ScrollView,
   StyleSheet,
@@ -27,6 +28,7 @@ import {
   setNutritionMeals,
 } from "../../redux/reducers/NutritionSlice";
 import { nutritionPlans } from "../../utils/data";
+import { FontSize } from "../../utils/font";
 
 // Meal Item Component
 
@@ -89,14 +91,28 @@ const NutritionScreen = () => {
   };
 
   const handleAddWater = () => {
-    // Check if consumed glasses have reached the total glasses limit
-    if (consumedGlasses < totalGlasses) {
-      setConsumedGlasses((prevConsumed) => prevConsumed + 1);
+    // Check if consumed glasses have reached the total glasses limit (equal but not exceeded)
+    if (consumedGlasses === totalGlasses) {
+      // Show a notification that the daily limit is reached
+      Alert.alert(
+        "Daily Limit Reached",
+        "You've reached your daily water intake goal!",
+        [
+          {
+            text: "Continue Drinking",
+            onPress: () =>
+              setConsumedGlasses((prevConsumed) => prevConsumed + 1),
+          },
+          { text: "Close", style: "cancel" },
+        ]
+      );
     } else {
-      alert("You have reached your daily water intake goal!");
+      // If not reached the limit, simply increment
+      setConsumedGlasses((prevConsumed) => prevConsumed + 1);
     }
   };
 
+  // The rest of the component remains the same
   const handleSetGoal = () => {
     navigation.navigate("SetWaterGoal", {
       setTotalIntakeGoal,
@@ -203,7 +219,10 @@ const NutritionScreen = () => {
               time={item?.preparationTime}
               mealItemOrientation={"Horizontal"}
               onPress={() =>
-                navigation.navigate("MealDetailScreen", { meal: item })
+                navigation.navigate("MealDetailScreen", {
+                  meal: item,
+                  source: "dailyPlan",
+                })
               }
             />
           )}
@@ -240,7 +259,10 @@ const NutritionScreen = () => {
               time={item?.preparationTime}
               mealItemOrientation={"Horizontal"}
               onPress={() =>
-                navigation.navigate("MealDetailScreen", { meal: item })
+                navigation.navigate("MealDetailScreen", {
+                  meal: item,
+                  source: "popularRecipes",
+                })
               }
             />
           )}
@@ -317,22 +339,22 @@ const styles = StyleSheet.create({
   },
   valueText: {
     fontFamily: "Poppins-SemiBold",
-    fontSize: 18,
+    fontSize: FontSize.large,
     color: "white",
   },
   labelText: {
     fontFamily: "Poppins-Regular",
-    fontSize: 12,
+    fontSize: FontSize.small,
     color: "#A4A4A4",
   },
   remainingText: {
     fontFamily: "Poppins-Bold",
-    fontSize: 18,
+    fontSize: FontSize.large,
     color: "white",
   },
   remainingLabel: {
     fontFamily: "Poppins-Regular",
-    fontSize: 12,
+    fontSize: FontSize.small,
     color: "#A4A4A4",
   },
   nutrientContainer: {
@@ -353,7 +375,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   title: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Bold",
     color: "white",
   },
@@ -372,7 +394,7 @@ const styles = StyleSheet.create({
   waterIntakeText: {
     fontFamily: "Poppins-SemiBold",
     color: colors.green,
-    fontSize: 12,
+    fontSize: FontSize.small,
   },
   goalButton: {
     backgroundColor: colors.green,
@@ -389,7 +411,7 @@ const styles = StyleSheet.create({
     height: 17,
   },
   goalText: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     marginTop: 2,
     fontFamily: "Poppins-SemiBold",
   },
@@ -400,7 +422,7 @@ const styles = StyleSheet.create({
   waterConsumptionText: {
     fontFamily: "Poppins-SemiBold",
     color: "white",
-    fontSize: 12,
+    fontSize: FontSize.small,
     marginTop: 10,
   },
   waterProgressBar: {
@@ -414,7 +436,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   greenText: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Bold",
     color: colors.green,
   },
@@ -440,7 +462,7 @@ const styles = StyleSheet.create({
     height: 24,
   },
   nutritionPlanText: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-SemiBold",
     color: "white",
   },

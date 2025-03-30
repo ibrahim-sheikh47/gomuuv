@@ -1,5 +1,6 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "../constants/colors";
+import { FontSize } from "../utils/font";
 
 export const StatsHistoryCard = ({
   label,
@@ -10,7 +11,11 @@ export const StatsHistoryCard = ({
   <TouchableOpacity style={styles.activityCard} onPress={onPress}>
     <View style={styles.activityCardContent}>
       <Text
-        style={{ color: "#F8F8F8", fontSize: 12, fontFamily: "Poppins-Bold" }}
+        style={{
+          color: "#F8F8F8",
+          fontSize: FontSize.small,
+          fontFamily: "Poppins-Bold",
+        }}
       >
         {label}
       </Text>
@@ -21,7 +26,7 @@ export const StatsHistoryCard = ({
       <Text
         style={{
           color: colors.green,
-          fontSize: 24,
+          fontSize: FontSize.xxlarge,
           paddingHorizontal: 14,
           marginBottom: 10,
           fontFamily: "Poppins-SemiBold",

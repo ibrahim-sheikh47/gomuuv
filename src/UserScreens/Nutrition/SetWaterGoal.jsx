@@ -1,12 +1,21 @@
 // screens/SetGoalScreen.js
 import React, { useState } from "react";
-import { View, TouchableOpacity, Text, StyleSheet, Image } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  Alert,
+} from "react-native";
 import InputField from "../../components/InputField";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
 import CustomButton from "../../components/CustomButton";
 import EditIcon from "../../assets/svgs/EditIcon";
 import { colors } from "../../constants/colors";
+import { FontSize } from "../../utils/font";
 
 const SetWaterGoal = ({ navigation, route }) => {
   const [glassQuantity, setGlassQuantity] = useState("");
@@ -25,7 +34,7 @@ const SetWaterGoal = ({ navigation, route }) => {
     <Container>
       <Header title={"Water Tracker"} showBackButton={true} />
       <Text style={styles.headerText}>Set Your Goal</Text>
-      <View style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1 }}>
         {/* Input field for the number of glasses */}
         <View>
           <InputField
@@ -47,9 +56,13 @@ const SetWaterGoal = ({ navigation, route }) => {
           keyboardType="numeric"
           placeholder="250 ml"
         />
-      </View>
 
-      <CustomButton title={"Save"} onPress={handleSaveGoal} />
+        <CustomButton
+          title={"Save"}
+          onPress={handleSaveGoal}
+          style={{ marginTop: 50 }}
+        />
+      </ScrollView>
     </Container>
   );
 };
@@ -61,7 +74,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#252525",
   },
   headerText: {
-    fontSize: 18,
+    fontSize: FontSize.large,
     fontWeight: "bold",
     color: "#fff",
     marginVertical: 30,

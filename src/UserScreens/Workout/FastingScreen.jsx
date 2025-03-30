@@ -18,6 +18,7 @@ import { colors } from "../../constants/colors";
 import { useDispatch, useSelector } from "react-redux";
 import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
+import { FontSize } from "../../utils/font";
 
 const FastingScreen = () => {
   const dispatch = useDispatch();
@@ -160,7 +161,7 @@ const FastingScreen = () => {
                 >
                   <Text
                     style={{
-                      fontSize: 14,
+                      fontSize: FontSize.medium,
                       fontFamily: "Poppins-Bold",
                       color: "white",
                     }}
@@ -171,7 +172,7 @@ const FastingScreen = () => {
                 </View>
                 <Text
                   style={{
-                    fontSize: 11,
+                    fontSize: FontSize.small,
                     fontFamily: "Poppins-Regular",
                     color: "white",
                   }}
@@ -191,7 +192,12 @@ const FastingScreen = () => {
                     alignItems: "center",
                   }}
                 >
-                  <Text style={{ fontSize: 11, fontFamily: "Poppins-Bold" }}>
+                  <Text
+                    style={{
+                      fontSize: FontSize.small,
+                      fontFamily: "Poppins-Bold",
+                    }}
+                  >
                     Explore Plans
                   </Text>
                 </TouchableOpacity>
@@ -230,7 +236,7 @@ const FastingScreen = () => {
                   marginHorizontal: "auto",
                   marginTop: 20,
                 }}
-                textStyle={{ fontSize: 14 }}
+                textStyle={{ fontSize: FontSize.medium }}
               />
 
               <View style={{ marginTop: 20 }}>
@@ -244,7 +250,7 @@ const FastingScreen = () => {
                   <Text
                     style={{
                       color: "white",
-                      fontSize: 16,
+                      fontSize: FontSize.regular,
                       fontWeight: "bold",
                       marginBottom: 10,
                     }}
@@ -257,7 +263,7 @@ const FastingScreen = () => {
                     <Text
                       style={{
                         color: colors.green,
-                        fontSize: 12,
+                        fontSize: FontSize.small,
                         fontWeight: "bold",
                       }}
                     >
@@ -271,7 +277,7 @@ const FastingScreen = () => {
                 <Text
                   style={{
                     color: "white",
-                    fontSize: 16,
+                    fontSize: FontSize.regular,
                     fontWeight: "bold",
                     marginBottom: 10,
                   }}
@@ -328,7 +334,7 @@ const FastingScreen = () => {
             </View>
             <Text
               style={{
-                fontSize: 16,
+                fontSize: FontSize.regular,
                 fontFamily: "Poppins-Bold",
                 color: "white",
                 marginTop: 40,
@@ -361,12 +367,12 @@ const styles = StyleSheet.create({
   },
   remainingTime: {
     color: "white",
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Regular",
   },
   remaining: {
     color: colors.green,
-    fontSize: 26,
+    fontSize: FontSize.xxlarge,
     fontFamily: "Poppins-SemiBold",
   },
 });

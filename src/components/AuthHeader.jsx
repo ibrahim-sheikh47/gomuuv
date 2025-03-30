@@ -1,6 +1,7 @@
 import { Image, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import Logo from "../assets/svgs/Logo";
+import { FontSize } from "../utils/font";
 
 const AuthHeader = ({ header, description, customStyles = {} }) => {
   return (
@@ -30,12 +31,12 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontFamily: "Poppins-Bold",
-    fontSize: 24,
+    fontSize: FontSize.xxlarge,
     color: "#fff",
   },
   descriptionText: {
     fontFamily: "Poppins-Regular",
-    fontSize: 14,
+    fontSize: FontSize.medium,
     color: "#fff",
     textAlign: "center",
     marginTop: 30,

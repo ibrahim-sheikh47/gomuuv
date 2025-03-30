@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { colors } from "../constants/colors"; // Adjust the import path as needed
 import { IconButton } from "react-native-paper";
+import { FontSize } from "../utils/font";
 
 const GoalModal = ({ visible, onClose, modalText, textStyle, onSave }) => {
   const [value, setValue] = useState(0); // State to track the current value
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
     padding: 40,
   },
   modalText: {
-    fontSize: 14,
+    fontSize: FontSize.medium,
     color: "#f8f8f8",
     fontFamily: "Poppins-SemiBold",
     textAlign: "center", // Ensure text is centered
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
   },
   adjustButtonText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Bold",
   },
   saveButton: {
@@ -137,7 +138,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonText: {
-    fontSize: 14,
+    fontSize: FontSize.medium,
     fontFamily: "Poppins-Bold",
   },
   absolute: {

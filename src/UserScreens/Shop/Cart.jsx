@@ -1,5 +1,5 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import {
   Image,
   ScrollView,
@@ -7,6 +7,8 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Dimensions,
+  useWindowDimensions,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import CartIcon from "../../assets/svgs/CartIcon";
@@ -20,15 +22,29 @@ import { debounce } from "lodash";
 import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
 import { setCartData } from "../../redux/reducers/CartSlice";
+import { FontSize } from "../../utils/font";
 
 const Cart = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const route = useRoute();
+  const { width } = useWindowDimensions(); // Get screen width for responsive design
   const { token, cartItems } = useSelector((state) => ({
     token: state.Auth?.token,
     cartItems: state.Cart?.data,
   }));
+
+  // Responsive values based on screen width
+  const isSmallScreen = width < 360;
+  const isMediumScreen = width >= 360 && width < 480;
+  const isLargeScreen = width >= 480;
+
+  // Calculate image width based on screen size
+  const getImageWidth = () => {
+    if (isSmallScreen) return width * 0.35; // 35% of screen width on small screens
+    if (isMediumScreen) return width * 0.4; // 40% of screen width on medium screens
+    return width * 0.45; // 45% of screen width on large screens
+  };
 
   // Calculate subtotal dynamically
   const getSubtotal = (price, quantity) => {
@@ -71,9 +87,10 @@ const Cart = () => {
         // Call the API to update the product on the server
         callProductUpdateApi(updatedItem?.product?._id, updatedItem?.quantity);
       }
-    }, 1000), // Wait for 2 seconds before making the API call
+    }, 1000), // Wait for 1 second before making the API call
     [] // Empty dependency array ensures that the debounced function is created only once
   );
+
   const decrementQuantity = (itemId) => {
     // Find the item in the cart
     const updatedCartItems = cartItems.map((item) =>
@@ -136,8 +153,12 @@ const Cart = () => {
     }
   };
 
-  const handleCheckout = (product) => {
+  const handleCheckout = () => {
     navigation.navigate("Checkout");
+  };
+
+  const handleContinueShopping = () => {
+    navigation.navigate("Shop");
   };
 
   // If no items in cart
@@ -150,18 +171,14 @@ const Cart = () => {
           rightIcon1={<CartIcon />}
           rightIcon2={<ShopIcon fill="white" />}
         />
-        <Text
-          style={{
-            color: "#FFF",
-            textAlign: "center",
-            top: "42%",
-            right: 0,
-            bottom: 0,
-            width: "100%",
-          }}
-        >
-          No items in the cart.
-        </Text>
+        <View style={styles.emptyCartContainer}>
+          <Text style={styles.emptyCartText}>No items in the cart.</Text>
+          <CustomButton
+            title={"Start Shopping"}
+            onPress={handleContinueShopping}
+            style={{ marginTop: 20 }}
+          />
+        </View>
       </Container>
     );
   }
@@ -174,32 +191,37 @@ const Cart = () => {
         rightIcon1={<CartIcon />}
         rightIcon2={<ShopIcon fill="white" />}
       />
-      <ScrollView>
-        <View>
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.container}>
           <Text style={styles.sectionTitle}>Items</Text>
           {cartItems.map((product, index) => {
             const subtotal = getSubtotal(
               product?.product?.price,
               product?.quantity
             );
-            const shippingCharges = 0;
+            const imageWidth = getImageWidth();
+            const imageHeight = imageWidth * 0.8; // Maintain aspect ratio
 
             return (
               <View key={index} style={styles.productContainer}>
                 <Image
                   source={product?.product?.image || images.product1}
-                  style={styles.image}
+                  style={[
+                    styles.image,
+                    { width: imageWidth, height: imageHeight },
+                  ]}
+                  resizeMode="cover"
                 />
                 <View style={styles.productDetails}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "start",
-                    }}
-                  >
-                    <View>
-                      <Text style={styles.productTitle}>
+                  <View style={styles.productHeader}>
+                    <View style={styles.productTitleContainer}>
+                      <Text
+                        style={[
+                          styles.productTitle,
+                          isSmallScreen && { fontSize: FontSize.small },
+                        ]}
+                        numberOfLines={2}
+                      >
                         {product?.product?.name}
                       </Text>
                       <Text style={styles.productQuantity}>
@@ -249,13 +271,13 @@ const Cart = () => {
               <Text style={styles.summaryText}>Sub Total</Text>
               <Text style={styles.summaryText}>
                 $
-                {getSubtotal(
-                  cartItems.reduce(
-                    (acc, item) => acc + item?.product?.price,
+                {cartItems
+                  .reduce(
+                    (acc, item) =>
+                      acc + getSubtotal(item?.product?.price, item?.quantity),
                     0
-                  ),
-                  cartItems.length
-                ).toFixed(2)}
+                  )
+                  .toFixed(2)}
               </Text>
             </View>
             <View style={styles.summaryRow}>
@@ -267,70 +289,105 @@ const Cart = () => {
               <Text style={styles.totalText}>Total</Text>
               <Text style={styles.totalText}>
                 $
-                {cartItems.reduce(
-                  (acc, item) =>
-                    acc + getSubtotal(item?.product?.price, item?.quantity),
-                  0
-                ) + 0}
+                {cartItems
+                  .reduce(
+                    (acc, item) =>
+                      acc + getSubtotal(item?.product?.price, item?.quantity),
+                    0
+                  )
+                  .toFixed(2)}
               </Text>
             </View>
           </View>
         </View>
       </ScrollView>
-      <CustomButton
-        title={"Proceed to Checkout"}
-        onPress={() => handleCheckout()}
-      />
+      <View style={styles.buttonContainer}>
+        <CustomButton title={"Proceed to Checkout"} onPress={handleCheckout} />
 
-      <CustomButton
-        title={"Continue Shopping"}
-        style={{
-          backgroundColor: "transparent",
-          borderColor: colors.green,
-          borderWidth: 2,
-        }}
-        textStyle={{ color: colors.green }}
-      />
+        <CustomButton
+          title={"Continue Shopping"}
+          onPress={handleContinueShopping}
+          style={{
+            backgroundColor: "transparent",
+            borderColor: colors.green,
+            borderWidth: 2,
+            marginTop: 10,
+          }}
+          textStyle={{ color: colors.green }}
+        />
+      </View>
     </Container>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+  },
+  container: {
+    paddingHorizontal: 15,
+    paddingBottom: 20,
+  },
+  emptyCartContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  emptyCartText: {
+    color: "#FFF",
+    fontSize: FontSize.medium,
+    fontFamily: "Poppins-Medium",
+    textAlign: "center",
+  },
   sectionTitle: {
     color: "#f8f8f8",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-SemiBold",
     marginTop: 20,
+    marginBottom: 10,
   },
   productContainer: {
     flexDirection: "row",
-    marginVertical: 10,
+    marginBottom: 15,
     backgroundColor: colors.bgColor,
     borderRadius: 10,
     padding: 10,
+    width: "100%",
   },
   image: {
-    width: 170,
-    height: "100%",
     borderRadius: 10,
+    alignSelf: "center",
   },
   productDetails: {
     marginLeft: 10,
     flex: 1,
+    justifyContent: "space-between",
+  },
+  productHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  productTitleContainer: {
+    flex: 1,
+    marginRight: 5,
   },
   productTitle: {
     color: "#fff",
-    fontSize: 14,
+    fontSize: FontSize.medium,
     fontFamily: "Poppins-Bold",
   },
   productQuantity: {
     color: "#AFAFAF",
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Regular",
+    marginTop: 2,
   },
   quantityContainer: {
     flexDirection: "column",
     alignItems: "center",
+    marginLeft: 5,
   },
   quantityButton: {
     backgroundColor: "#2D2D2F",
@@ -342,27 +399,31 @@ const styles = StyleSheet.create({
   },
   quantityButtonText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Bold",
+    lineHeight: 24,
+    textAlign: "center",
   },
   quantity: {
     color: colors.green,
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Bold",
+    marginVertical: 4,
   },
   priceContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
+    alignItems: "center",
+    marginTop: 10,
   },
   productPrice: {
     color: colors.green,
-    fontSize: 14,
+    fontSize: FontSize.medium,
     fontFamily: "Poppins-Bold",
   },
   removeText: {
     color: "#AFAFAF",
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Regular",
   },
   orderSummary: {
@@ -370,14 +431,16 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 20,
     marginTop: 10,
+    marginBottom: 20,
   },
   summaryRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginVertical: 5,
   },
   summaryText: {
     color: "#f8f8f8",
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Regular",
   },
   separator: {
@@ -387,8 +450,12 @@ const styles = StyleSheet.create({
   },
   totalText: {
     color: "#f8f8f8",
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Bold",
+  },
+  buttonContainer: {
+    paddingHorizontal: 15,
+    paddingBottom: 15,
   },
 });
 

@@ -11,7 +11,7 @@ import { colors } from "../../constants/colors";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
 import icons from "../../constants/icons";
-import { MaterialIcons } from "@expo/vector-icons"; // Importing Chevron icon (expo icons)
+import { AntDesign, MaterialIcons } from "@expo/vector-icons"; // Importing Chevron icon (expo icons)
 import CustomButton from "../../components/CustomButton";
 import CustomModal from "../../components/CustomModal";
 import { useNavigation } from "@react-navigation/native";
@@ -23,6 +23,7 @@ import { END_POINTS } from "../../config/routes";
 import { useDispatch, useSelector } from "react-redux";
 import { setCartData } from "../../redux/reducers/CartSlice";
 import Toast from "react-native-toast-message";
+import { FontSize } from "../../utils/font";
 
 const ProductDetailScreen = ({ route }) => {
   const dispatch = useDispatch(); // Initialize dispatch
@@ -144,11 +145,11 @@ const ProductDetailScreen = ({ route }) => {
           <Text style={styles.title}>Quantity</Text>
           <View style={styles.quantityControl}>
             <TouchableOpacity onPress={decreaseQuantity} style={styles.button}>
-              <Text style={styles.buttonText}>-</Text>
+              <AntDesign name="minus" size={16} color={"white"} />
             </TouchableOpacity>
             <Text style={styles.quantityText}>{quantity}</Text>
             <TouchableOpacity onPress={increaseQuantity} style={styles.button}>
-              <Text style={styles.buttonText}>+</Text>
+              <AntDesign name="plus" size={16} color={"white"} />
             </TouchableOpacity>
           </View>
         </View>
@@ -256,13 +257,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   title: {
-    fontSize: 14,
+    fontSize: FontSize.medium,
     color: "#fff",
     fontFamily: "Poppins-SemiBold",
     marginVertical: 10,
   },
   description: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     color: "#AFAFAF",
     fontFamily: "Poppins-Regular",
   },
@@ -292,10 +293,10 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: FontSize.large,
   },
   quantityText: {
-    fontSize: 14,
+    fontSize: FontSize.regular,
     color: colors.green,
     fontFamily: "Poppins-Bold",
     marginHorizontal: 16,
@@ -313,12 +314,12 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   detailHeading: {
-    fontSize: 14,
+    fontSize: FontSize.small,
     color: "#fff",
-    fontFamily: "Poppins-SemiBold",
+    fontFamily: "Poppins-Regular",
   },
   detailText: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     width: 150,
     color: "#AFAFAF",
     fontFamily: "Poppins-Regular",
@@ -329,7 +330,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   featureText: {
-    fontSize: 14,
+    fontSize: FontSize.medium,
     color: "#fff",
     fontFamily: "Poppins-Regular",
   },

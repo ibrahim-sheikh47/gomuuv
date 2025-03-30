@@ -2,6 +2,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons"; // Ensure you have Ionicons installed
 import IconButton from "./IconButton";
+import { FontSize } from "../utils/font";
 
 const Header = ({
   title,
@@ -44,7 +45,7 @@ const Header = ({
         <Text
           style={{
             color: "#fff",
-            fontSize: 16,
+            fontSize: FontSize.regular,
             fontFamily: "Poppins-Bold",
           }}
         >

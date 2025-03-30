@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setCartData } from "../redux/reducers/CartSlice";
 import { API } from "../config/apiClient";
 import { END_POINTS } from "../config/routes";
+import { FontSize } from "../utils/font";
 
 const ShopItem = ({ productImage, title, amount, onPress, product }) => {
   const dispatch = useDispatch(); // Initialize dispatch
@@ -123,12 +124,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Regular",
     color: "#F8F8F8",
   },
   amount: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     color: colors.green,
     fontFamily: "Poppins-Bold",
   },
@@ -143,7 +144,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#121212",
-    fontSize: 10,
+    fontSize: FontSize.xxsmall,
     fontFamily: "Poppins-Bold",
   },
 });

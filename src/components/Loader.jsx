@@ -2,6 +2,7 @@
 import React from "react";
 import { ActivityIndicator, StyleSheet, View, Text } from "react-native";
 import { colors } from "../constants/colors";
+import { FontSize } from "../utils/font";
 
 const Loader = ({ isLoading, message }) => {
   if (!isLoading) {
@@ -31,7 +32,7 @@ const styles = StyleSheet.create({
   },
   loaderText: {
     marginTop: 20,
-    fontSize: 16,
+    fontSize: FontSize.regular,
     width: 350,
     fontFamily: "Poppins-Medium",
     textAlign: "center",

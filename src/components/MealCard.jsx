@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { FontSize } from "../utils/font";
 
 const MealCard = ({ icon: MealIcon, label, type, style, textStyle }) => {
   const navigation = useNavigation();
@@ -27,7 +28,7 @@ const styles = StyleSheet.create({
   },
   cardText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     marginTop: 10,
     fontFamily: "Poppins-Bold",
   },

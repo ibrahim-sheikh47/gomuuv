@@ -14,6 +14,7 @@ import CustomButton from "../../components/CustomButton";
 import { colors } from "../../constants/colors";
 import icons from "../../constants/icons";
 import EditIcon from "../../assets/svgs/EditIcon";
+import { FontSize } from "../../utils/font";
 
 const TrainerInfo = () => {
   // State to hold dynamic values for each input field
@@ -110,7 +111,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: "Poppins-Medium",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     color: "#fff",
     marginBottom: 8, // Add spacing between label and input field
   },

@@ -1,11 +1,11 @@
 import React from "react";
 import { Svg, G, Path, ClipPath, Rect, Defs } from "react-native-svg";
 
-const DinnerIcon = () => {
+const DinnerIcon = ({ width = 47, height = 47 }) => {
   return (
     <Svg
-      width="47"
-      height="47"
+      width={width}
+      height={height}
       viewBox="0 0 47 47"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

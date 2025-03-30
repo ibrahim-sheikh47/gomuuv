@@ -8,6 +8,7 @@ import { colors } from "../../constants/colors";
 import Selectable from "../../components/Selectable";
 import CustomButton from "../../components/CustomButton";
 import SearchIcon from "../../assets/svgs/SearchIcon";
+import { FontSize } from "../../utils/font";
 
 const ChallengeDetail = () => {
   const route = useRoute();
@@ -89,10 +90,11 @@ const ChallengeDetail = () => {
 
         <Text style={styles.sectionTitle}>Exercises</Text>
         <Selectable
-          items={["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"]}
+          items={Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`)}
           selectedItem={selectedPeriod}
           setSelectedItem={setSelectedPeriod}
         />
+
         {selectedExercises.length > 0 && renderDayExercise(selectedExercises)}
       </ScrollView>
       {challenge.type === "enroll" && (
@@ -110,23 +112,23 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   title: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-SemiBold",
     color: colors.green,
     marginTop: 10,
   },
   cardSubtitle: {
-    fontSize: 14,
+    fontSize: FontSize.medium,
     color: "#F8F8F8",
     marginVertical: 5,
   },
   level: {
-    fontSize: 18,
+    fontSize: FontSize.large,
     color: "#F8F8F8",
     fontFamily: "Poppins-Regular",
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-SemiBold",
     color: "white",
     marginTop: 20,
@@ -135,7 +137,7 @@ const styles = StyleSheet.create({
     color: "#AFAFAF",
     marginTop: 10,
     fontFamily: "Poppins-Regular",
-    fontSize: 12,
+    fontSize: FontSize.small,
   },
   infoBox: {
     backgroundColor: colors.bgColor,
@@ -152,18 +154,18 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: "Poppins-Regular",
-    fontSize: 12,
+    fontSize: FontSize.small,
     color: "#F8F8F8",
   },
   value: {
     marginTop: 5,
     fontFamily: "Poppins-Regular",
-    fontSize: 12,
+    fontSize: FontSize.small,
     color: colors.green,
   },
   exerciseHeading: {
     color: "white",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Medium",
     marginTop: 10,
   },
@@ -185,13 +187,13 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     color: "#F8F8F8",
     fontFamily: "Poppins-Regular",
-    fontSize: 16,
+    fontSize: FontSize.regular,
   },
   exerciseReps: {
     marginLeft: "auto",
     color: colors.green,
     fontFamily: "Poppins-Medium",
-    fontSize: 16,
+    fontSize: FontSize.regular,
   },
 });
 

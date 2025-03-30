@@ -5,6 +5,7 @@ import Header from "../../components/Header";
 import Tab5Icon from "../../assets/svgs/Tab5Icon";
 import Selectable from "../../components/Selectable";
 import { colors } from "../../constants/colors";
+import { FontSize } from "../../utils/font";
 
 const SleepScreen = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("Today");
@@ -33,7 +34,7 @@ const SleepScreen = () => {
         >
           <Text
             style={{
-              fontSize: 16,
+              fontSize: FontSize.regular,
               fontFamily: "Poppins-Bold",
               color: "#f8f8f8",
             }}
@@ -51,7 +52,7 @@ const SleepScreen = () => {
           </Text>
           <Text
             style={{
-              fontSize: 12,
+              fontSize: FontSize.small,
               fontFamily: "Poppins-Bold",
               color: "#afafaf",
             }}
@@ -73,7 +74,7 @@ const SleepScreen = () => {
         >
           <Text
             style={{
-              fontSize: 16,
+              fontSize: FontSize.regular,
               fontFamily: "Poppins-Regular",
               color: "#afafaf",
             }}
@@ -82,7 +83,7 @@ const SleepScreen = () => {
           </Text>
           <Text
             style={{
-              fontSize: 12,
+              fontSize: FontSize.small,
               fontFamily: "Poppins-Regular",
               color: "#afafaf",
             }}
@@ -91,7 +92,7 @@ const SleepScreen = () => {
           </Text>
           <Text
             style={{
-              fontSize: 18,
+              fontSize: FontSize.large,
               fontFamily: "Poppins-Bold",
               color: "#afafaf",
             }}
@@ -100,7 +101,7 @@ const SleepScreen = () => {
           </Text>
         </View>
 
-        <Text
+        {/* <Text
           style={{
             color: "white",
             margin: 30,
@@ -109,7 +110,7 @@ const SleepScreen = () => {
           }}
         >
           TO BE UPDATED ALONG WITH SMART WATCH
-        </Text>
+        </Text> */}
       </View>
     </Container>
   );
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
   sectionText: {
     color: "#fff",
     marginTop: 20,
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Bold",
   },
 });

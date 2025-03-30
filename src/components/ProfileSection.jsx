@@ -2,6 +2,7 @@
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "../constants/colors";
+import { FontSize } from "../utils/font";
 
 const ProfileSection = ({ userName, imageSource, onPress }) => {
   return (
@@ -23,7 +24,7 @@ const ProfileSection = ({ userName, imageSource, onPress }) => {
         <Text
           style={{
             color: "#fff",
-            fontSize: 14,
+            fontSize: FontSize.medium,
             fontFamily: "Poppins-Medium",
           }}
         >
@@ -32,7 +33,7 @@ const ProfileSection = ({ userName, imageSource, onPress }) => {
         <Text
           style={{
             color: "#fff",
-            fontSize: 14,
+            fontSize: FontSize.medium,
             fontFamily: "Poppins-Bold",
           }}
         >

@@ -1,13 +1,14 @@
 // MealCategorySelector.js
-
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FontSize } from "../utils/font";
+import { colors } from "../constants/colors"; // Import your colors
 
 const MealCategorySelector = ({ categories, selectedCategory, onSelect }) => {
   return (
     <View style={styles.cardContainer}>
       {categories.map((category, index) => {
-        const isSelected = selectedCategory === index;
+        const isSelected = selectedCategory === category.value; // Compare with value instead of index
         return (
           <TouchableOpacity
             key={index}
@@ -35,20 +36,21 @@ const styles = StyleSheet.create({
     margin: 5,
     borderRadius: 10,
     height: 80,
+    paddingHorizontal: 20,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#242425",
   },
   selectedCard: {
-    backgroundColor: "#F5F5F5", // Highlight selected card
+    backgroundColor: "#BBF65480", // Use your app's green color
   },
   cardText: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     marginBottom: 5,
     color: "#fff",
   },
   selectedText: {
-    color: "#242425",
+    color: "#242425", // Keep this the same for contrast
   },
   iconContainer: {
     width: 40,

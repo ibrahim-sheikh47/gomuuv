@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Image,
   ScrollView,
@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   View,
   TextInput,
+  Alert,
+  Platform,
 } from "react-native";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
@@ -20,15 +22,19 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import SearchIcon from "../../assets/svgs/SearchIcon";
 import { IconButton } from "react-native-paper";
 import StrengthIcon from "../../assets/svgs/StrengthIcon";
+import { FontSize } from "../../utils/font";
+import * as ImagePicker from "expo-image-picker";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const CreateProgram = () => {
   const modes = ["Strength", "Cardio", "Hill Climb", "Fat Burn", "Flexibility"];
   const equipment = [
     "Dumbbell",
-    "Kettlebell",
+    "Bench",
+    "Pull Up Bar",
     "Barbell",
     "Treadmill",
-    "Resistance Bands",
+    "Jump Rope",
   ];
 
   const [selectedMode, setSelectedMode] = useState("Strength");
@@ -36,10 +42,13 @@ const CreateProgram = () => {
   const [selectedEquipment, setSelectedEquipment] = useState(modes[0]);
   const [modalVisible, setModalVisible] = useState(false);
   const [createdModalVisible, setCreatedModalVisible] = useState(false);
+  const [titleImage, setTitleImage] = useState(null);
+  const [exerciseMedia, setExerciseMedia] = useState(null);
+  const [currentExerciseIndex, setCurrentExerciseIndex] = useState(null);
 
   const [selectedDay, setSelectedDay] = useState(null);
   const [exercises, setExercises] = useState([
-    { exercise: "", time: "", reps: "" },
+    { exercise: "", time: "", reps: "", media: null },
   ]);
 
   const [savedExercises, setSavedExercises] = useState([]);
@@ -47,10 +56,33 @@ const CreateProgram = () => {
   const closeModal = () => setModalVisible(false);
 
   const openCreatedModal = () => setCreatedModalVisible(true);
-  const closeCreatedModal = () => setCreatedModalVisible(false);
+  const closeCreatedModal = () => {
+    setCreatedModalVisible(false);
+    // Reset form after successful creation
+    resetForm();
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      selectedMode: "Strength",
+      selectedSkillLevel: "Beginner",
+      selectedEquipment: equipment[0],
+      price: "",
+      calories: "",
+      targetMuscle: "",
+    });
+    setStartDate(null);
+    setEndDate(null);
+    setSavedExercises([]);
+    setTitleImage(null);
+  };
 
   const addExercise = () => {
-    setExercises([...exercises, { exercise: "", time: "", reps: "" }]);
+    setExercises([
+      ...exercises,
+      { exercise: "", time: "", reps: "", media: null },
+    ]);
   };
 
   const updateExercise = (index, field, value) => {
@@ -58,6 +90,7 @@ const CreateProgram = () => {
     updatedExercises[index][field] = value;
     setExercises(updatedExercises);
   };
+
   const handleSave = () => {
     if (selectedDay) {
       setSavedExercises((prev) => [
@@ -65,12 +98,13 @@ const CreateProgram = () => {
         { day: selectedDay, exercises: [...exercises] },
       ]);
       setModalVisible(false);
-      setExercises([{ exercise: "", time: "", reps: "" }]); // Reset exercises
+      setExercises([{ exercise: "", time: "", reps: "", media: null }]); // Reset exercises
       setSelectedDay(null); // Reset selected day
     } else {
-      alert("Please select a day before saving!");
+      Alert.alert("Error", "Please select a day before saving!");
     }
   };
+
   const showStartDatePicker = () => setStartDatePickerVisibility(true);
   const hideStartDatePicker = () => setStartDatePickerVisibility(false);
 
@@ -86,7 +120,7 @@ const CreateProgram = () => {
   const handleStartDateConfirm = (date) => {
     const today = new Date();
     if (date < today) {
-      alert("Start date cannot be earlier than today's date.");
+      Alert.alert("Error", "Start date cannot be earlier than today's date.");
       return;
     }
 
@@ -96,31 +130,170 @@ const CreateProgram = () => {
 
   const handleEndDateConfirm = (date) => {
     if (!startDate) {
-      alert("Please select the start date first.");
+      Alert.alert("Error", "Please select the start date first.");
       return;
     }
     if (date <= startDate) {
-      alert("End date must be after the start date.");
+      Alert.alert("Error", "End date must be after the start date.");
       return;
     }
     setEndDate(date);
     hideEndDatePicker();
   };
+
   const [formData, setFormData] = useState({
     title: "",
-    selectedMode: "",
-    selectedSkillLevel: "",
-    selectedEquipment: "",
+    selectedMode: "Strength",
+    selectedSkillLevel: "Beginner",
+    selectedEquipment: equipment[0],
     price: "",
     calories: "",
     targetMuscle: "",
   });
+
   const handleInputChange = (field, value) => {
     setFormData((prevState) => ({
       ...prevState,
       [field]: value,
     }));
   };
+
+  const pickTitleImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission Denied",
+        "We need camera roll permission to upload images"
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [16, 9],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setTitleImage(result.assets[0].uri);
+    }
+  };
+
+  const pickExerciseMedia = async (index) => {
+    setCurrentExerciseIndex(index);
+
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission Denied",
+        "We need camera roll permission to upload images"
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All, // Allow both images and videos
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const updatedExercises = [...exercises];
+      updatedExercises[index].media = result.assets[0].uri;
+      setExercises(updatedExercises);
+    }
+  };
+
+  const validateForm = () => {
+    if (!formData.title.trim()) {
+      Alert.alert("Error", "Please enter a program title");
+      return false;
+    }
+
+    if (!startDate || !endDate) {
+      Alert.alert("Error", "Please select both start and end dates");
+      return false;
+    }
+
+    if (!formData.price.trim()) {
+      Alert.alert("Error", "Please enter a price");
+      return false;
+    }
+
+    if (savedExercises.length === 0) {
+      Alert.alert("Error", "Please add at least one exercise");
+      return false;
+    }
+
+    if (!formData.calories.trim()) {
+      Alert.alert("Error", "Please enter calories");
+      return false;
+    }
+
+    if (!formData.targetMuscle.trim()) {
+      Alert.alert("Error", "Please enter target muscle");
+      return false;
+    }
+
+    if (!titleImage) {
+      Alert.alert("Error", "Please upload a title image");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleCreateProgram = () => {
+    if (validateForm()) {
+      // Here you would typically send the data to your API
+      console.log("Creating program with data:", {
+        ...formData,
+        startDate,
+        endDate,
+        exercises: savedExercises,
+        titleImage,
+      });
+
+      openCreatedModal();
+    }
+  };
+
+  const formatDateRange = () => {
+    if (startDate && endDate) {
+      const formatDate = (date) => {
+        const day = date.getDate().toString().padStart(2, "0");
+        const month = (date.getMonth() + 1).toString().padStart(2, "0");
+        const year = date.getFullYear();
+        return `${day} ${getMonthName(date.getMonth())} ${year}`;
+      };
+
+      return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+    }
+    return "";
+  };
+
+  const getMonthName = (monthIndex) => {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    return months[monthIndex];
+  };
+
   return (
     <Container>
       <Header
@@ -128,7 +301,7 @@ const CreateProgram = () => {
         showBackButton={true}
         rightIcon1={<SearchIcon />}
       />
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <InputField
           label={"Title"}
           placeholder={"Add Your Program Title"}
@@ -152,10 +325,11 @@ const CreateProgram = () => {
           <InputField
             placeholder={"Select Start Date"}
             value={startDate ? startDate.toLocaleDateString() : ""}
+            editable={false}
           />
           <TouchableOpacity>
             <IconButton
-              icon="calendar" // Calendar icon from MaterialCommunityIcons
+              icon="calendar"
               size={24}
               iconColor={colors.green}
               onPress={showStartDatePicker}
@@ -173,10 +347,11 @@ const CreateProgram = () => {
           <InputField
             placeholder={"Select End Date"}
             value={endDate ? endDate.toLocaleDateString() : ""}
+            editable={false}
           />
           <TouchableOpacity onPress={showEndDatePicker}>
             <IconButton
-              icon="calendar" // Calendar icon from MaterialCommunityIcons
+              icon="calendar"
               size={24}
               iconColor={colors.green}
               onPress={showEndDatePicker}
@@ -203,6 +378,7 @@ const CreateProgram = () => {
           label={"Price $"}
           value={formData.price}
           onChangeText={(text) => handleInputChange("price", text)}
+          keyboardType="numeric"
         />
 
         <View style={styles.addExerciseContainer}>
@@ -211,19 +387,29 @@ const CreateProgram = () => {
             <Text style={styles.addButtonText}>Add + </Text>
           </TouchableOpacity>
         </View>
-        {savedExercises.map((entry, index) => (
-          <View key={index} style={styles.savedExerciseContainer}>
-            <Text style={styles.savedDayText}>{entry.day}</Text>
-            {entry.exercises.map((exercise, idx) => (
-              <View key={idx} style={styles.exerciseDisplay}>
-                <Text style={styles.exerciseText}>
-                  {exercise.exercise} x {exercise.reps} Reps ({exercise.time}{" "}
-                  mins)
-                </Text>
+
+        {savedExercises.length > 0 ? (
+          savedExercises.map((entry, index) => (
+            <View key={index} style={styles.savedExerciseContainer}>
+              <Text style={styles.savedDayText}>{entry.day}</Text>
+              <View style={styles.exercisesWrapper}>
+                {entry.exercises.map((exercise, idx) => (
+                  <View key={idx} style={styles.exerciseDisplay}>
+                    <Text style={styles.exerciseText}>
+                      {exercise.exercise} x {exercise.reps} Reps (
+                      {exercise.time} mins)
+                    </Text>
+                  </View>
+                ))}
               </View>
-            ))}
+            </View>
+          ))
+        ) : (
+          <View style={styles.noExercisesContainer}>
+            <Text style={styles.noExercisesText}>No exercises added yet</Text>
           </View>
-        ))}
+        )}
+
         <CustomModal
           visible={modalVisible}
           onClose={closeModal}
@@ -263,17 +449,40 @@ const CreateProgram = () => {
                     label={"Time"}
                     value={exercise.time}
                     onChangeText={(text) => updateExercise(index, "time", text)}
+                    keyboardType="numeric"
                   />
                   <InputField
                     label={"Reps"}
                     value={exercise.reps}
                     onChangeText={(text) => updateExercise(index, "reps", text)}
+                    keyboardType="numeric"
                   />
                 </View>
 
-                <TouchableOpacity style={styles.uploadButton}>
-                  <Text style={styles.uploadButtonText}>Upload Media</Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                  onPress={() => pickExerciseMedia(index)}
+                >
+                  <MaterialIcons
+                    name="file-upload"
+                    size={20}
+                    color="#fff"
+                    style={styles.uploadIcon}
+                  />
+                  <Text style={styles.uploadButtonText}>
+                    {exercise.media ? "Change Media" : "Upload Media"}
+                  </Text>
                 </TouchableOpacity>
+
+                {exercise.media && (
+                  <View style={styles.mediaPreviewContainer}>
+                    <Image
+                      source={{ uri: exercise.media }}
+                      style={styles.mediaPreview}
+                      resizeMode="cover"
+                    />
+                  </View>
+                )}
               </View>
             ))}
 
@@ -288,35 +497,68 @@ const CreateProgram = () => {
           <CustomButton
             title={"Save"}
             onPress={handleSave}
-            style={{ marginTop: 30, width: 200, marginHorizontal: "auto" }}
+            style={{ marginTop: 30, width: 200, alignSelf: "center" }}
           />
         </CustomModal>
 
         <InputField
           label={"Calories"}
+          placeholder={"Enter calories (e.g. 129kcal)"}
           value={formData.calories}
           onChangeText={(text) => handleInputChange("calories", text)}
+          keyboardType="numeric"
         />
+
         <InputField
-          label={"Calories"}
-          value={formData.calories}
+          label={"Target Muscle"}
+          placeholder={"Enter target muscle group"}
+          value={formData.targetMuscle}
           onChangeText={(text) => handleInputChange("targetMuscle", text)}
         />
-        <InputField label={"Target Muscle"} value={formData.targetMuscle} />
 
-        <Text style={styles.text}>Select Main Equipment</Text>
+        <Text style={[styles.text, { width: "100%" }]}>
+          Select Main Equipment
+        </Text>
         <Selectable
           items={equipment}
-          selectedItem={selectedEquipment}
-          setSelectedItem={setSelectedEquipment}
+          selectedItem={formData.selectedEquipment}
+          setSelectedItem={(item) =>
+            handleInputChange("selectedEquipment", item)
+          }
           wrapOnLineChange={true}
         />
+
+        {/* Title Image Section */}
+        <Text style={styles.text}>Title Image</Text>
+        <TouchableOpacity
+          style={styles.titleImageContainer}
+          onPress={pickTitleImage}
+        >
+          {titleImage ? (
+            <Image
+              source={{ uri: titleImage }}
+              style={styles.titleImagePreview}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={styles.uploadTitleImageButton}>
+              <MaterialIcons
+                name="file-upload"
+                size={24}
+                color={colors.green}
+              />
+              <Text style={styles.uploadTitleImageText}>Upload Media</Text>
+            </View>
+          )}
+        </TouchableOpacity>
       </ScrollView>
+
       <CustomButton
         title={"Create"}
-        style={{ marginTop: 20 }}
-        onPress={openCreatedModal}
+        style={{ marginTop: 20, marginBottom: 10 }}
+        onPress={handleCreateProgram}
       />
+
       <CustomModal
         visible={createdModalVisible}
         onClose={closeCreatedModal}
@@ -330,7 +572,7 @@ const CreateProgram = () => {
 const styles = StyleSheet.create({
   text: {
     color: "white",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     marginTop: 10,
     fontFamily: "Poppins-Medium",
     width: 200,
@@ -358,11 +600,11 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     color: colors.green,
-    fontSize: 14,
+    fontSize: FontSize.medium,
   },
   modalText: {
     color: "#f8f8f8",
-    fontSize: 18,
+    fontSize: FontSize.large,
     marginBottom: 10,
   },
   dayContainer: {
@@ -391,6 +633,12 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 10,
     marginTop: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  uploadIcon: {
+    marginRight: 8,
   },
   uploadButtonText: {
     color: "white",
@@ -405,11 +653,11 @@ const styles = StyleSheet.create({
   addMoreButtonText: {
     color: colors.green,
     fontFamily: "Poppins-Bold",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     textAlign: "center",
   },
   savedExerciseContainer: {
-    backgroundColor: colors.green,
+    backgroundColor: colors.bgColor,
     padding: 10,
     borderRadius: 10,
     marginTop: 10,
@@ -417,16 +665,68 @@ const styles = StyleSheet.create({
   },
   savedDayText: {
     fontFamily: "Poppins-SemiBold",
-    fontSize: 14,
+    fontSize: FontSize.medium,
     marginBottom: 5,
     width: 50,
+    color: "#fff",
+  },
+  exercisesWrapper: {
+    flex: 1,
   },
   exerciseDisplay: {
     borderRadius: 5,
+    marginBottom: 3,
   },
   exerciseText: {
-    fontSize: 14,
-    fontFamily: "Poppins-medium",
+    fontSize: FontSize.small,
+    fontFamily: "Poppins-Medium",
+    color: "#fff",
+  },
+  noExercisesContainer: {
+    backgroundColor: colors.bgColor,
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  noExercisesText: {
+    color: "#AFAFAF",
+    fontSize: FontSize.small,
+    fontFamily: "Poppins-Regular",
+  },
+  mediaPreviewContainer: {
+    marginTop: 10,
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  mediaPreview: {
+    width: "100%",
+    height: 150,
+    borderRadius: 10,
+  },
+  titleImageContainer: {
+    backgroundColor: colors.bgColor,
+    borderRadius: 10,
+    height: 150,
+    marginTop: 10,
+    marginBottom: 20,
+    overflow: "hidden",
+  },
+  titleImagePreview: {
+    width: "100%",
+    height: "100%",
+  },
+  uploadTitleImageButton: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  uploadTitleImageText: {
+    color: colors.green,
+    fontSize: FontSize.small,
+    fontFamily: "Poppins-Medium",
+    marginTop: 8,
   },
 });
 

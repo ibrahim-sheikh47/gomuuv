@@ -14,6 +14,7 @@ import icons from "../../../constants/icons";
 import { colors } from "../../../constants/colors";
 import { useNavigation } from "@react-navigation/native";
 import images from "../../../constants/images";
+import { FontSize } from "../../../utils/font";
 
 const Device = () => {
   const navigation = useNavigation();
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: "#f8f8f8",
-    fontSize: 16,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Bold",
     marginTop: 20,
     textAlign: "center",
@@ -135,7 +136,7 @@ const styles = StyleSheet.create({
   },
   deviceName: {
     color: "#f8f8f8",
-    fontSize: 14,
+    fontSize: FontSize.medium,
     fontFamily: "Poppins-Medium",
   },
   removeButton: {
@@ -149,12 +150,12 @@ const styles = StyleSheet.create({
   },
   removeText: {
     color: "#fff",
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Regular",
   },
   noDeviceText: {
     color: "#f8f8f8",
-    fontSize: 14,
+    fontSize: FontSize.medium,
     fontFamily: "Poppins-Medium",
     textAlign: "center",
     marginTop: 20,

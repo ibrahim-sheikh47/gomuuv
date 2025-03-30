@@ -11,6 +11,7 @@ import { MealItem } from "../../components/MealItem";
 import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
 import { useSelector } from "react-redux";
+import { FontSize } from "../../utils/font";
 
 const FastingPlanDetail = () => {
   const navigation = useNavigation();
@@ -165,7 +166,7 @@ const FastingPlanDetail = () => {
         style={{
           marginTop: 40,
           color: "#fff",
-          fontSize: 16,
+          fontSize: FontSize.regular,
           fontFamily: "Poppins-Bold",
         }}
       >
@@ -194,7 +195,7 @@ const FastingPlanDetail = () => {
               style={{
                 color: "white",
                 fontFamily: "Poppins-Medium",
-                fontSize: 20,
+                fontSize: FontSize.xlarge,
                 textAlign: "center",
                 marginTop: 30,
               }}
@@ -222,20 +223,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f8f8",
   },
   timeText: {
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Medium",
     color: "#F8F8F8",
     marginTop: 30,
   },
   timeDetail: {
-    fontSize: 14,
+    fontSize: FontSize.medium,
     fontFamily: "Poppins-Regular",
     color: "#AFAFAF",
   },
   elapsedTimeText: {
     marginVertical: 30,
     color: "#fff",
-    fontSize: 16,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-Bold",
   },
   buttonContainer: {

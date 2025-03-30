@@ -10,6 +10,7 @@ import { MealItem } from "../../components/MealItem";
 import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
 import { colors } from "../../constants/colors";
+import { FontSize } from "../../utils/font";
 
 const FinalizePlan = ({ route }) => {
   const { planData } = route.params;
@@ -96,7 +97,7 @@ const FinalizePlan = ({ route }) => {
         <Text
           style={{
             color: "white",
-            fontSize: 16,
+            fontSize: FontSize.regular,
             marginTop: 20,
             fontFamily: "Poppins-Bold",
           }}
@@ -154,13 +155,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   label: {
-    fontSize: 15,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-SemiBold",
     color: "#f8f8f8",
     width: 100,
   },
   value: {
-    fontSize: 15,
+    fontSize: FontSize.regular,
     fontFamily: "Poppins-SemiBold",
     color: colors.green, // Text in green
   },

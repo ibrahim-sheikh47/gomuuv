@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import { colors } from "../constants/colors";
+import { FontSize } from "../utils/font";
 
 export const ProgressBar = ({ progress, style }) => {
   return (
@@ -35,7 +36,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   progressText: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontFamily: "Poppins-Medium",
     color: "white",
   },

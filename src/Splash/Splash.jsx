@@ -15,6 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import CustomButton from "../components/CustomButton";
 import LogoText from "../assets/svgs/LogoText";
 import { useSelector } from "react-redux";
+import { FontSize } from "../utils/font";
 
 const Splash = () => {
   const navigation = useNavigation();
@@ -54,8 +55,6 @@ const Splash = () => {
           <Text style={styles.tagline}>
             Your Path to Peak Health & Wellness starts here.
           </Text>
-
-          <Text style={styles.tagline}>{isLoggedIn ? "Fuck" : "You"}</Text>
         </View>
         <View></View>
 
@@ -139,7 +138,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "Poppins-Medium",
     width: 300,
-    fontSize: 17,
+    fontSize: FontSize.regular,
     marginBottom: 30,
     marginTop: 20,
   },
@@ -163,13 +162,13 @@ const styles = StyleSheet.create({
   buttonText: {
     textAlign: "center",
     fontFamily: "Poppins-SemiBold",
-    fontSize: 18,
+    fontSize: FontSize.large,
   },
   signInText: {
     color: "white",
     textAlign: "center",
     fontFamily: "Poppins-Regular",
-    fontSize: 14,
+    fontSize: FontSize.medium,
   },
   signInLink: {
     color: colors.green,

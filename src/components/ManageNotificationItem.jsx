@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Switch } from "react-native-paper";
 import { colors } from "../constants/colors";
+import { FontSize } from "../utils/font";
 
 const ManageNotificationItem = ({ label, value, onToggle }) => {
   return (
@@ -33,6 +34,6 @@ const styles = StyleSheet.create({
   notificationText: {
     color: "#AFAFAF",
     fontFamily: "Poppins-Medium",
-    fontSize: 14,
+    fontSize: FontSize.medium,
   },
 });
