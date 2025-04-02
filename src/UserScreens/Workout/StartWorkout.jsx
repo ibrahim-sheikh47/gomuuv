@@ -21,8 +21,16 @@ import images from "../../constants/images";
 import { FontSize } from "../../utils/font";
 
 const StartWorkout = () => {
-  const { level, calories, title, time, exercises, image, workoutSessionId } =
-    useRoute().params;
+  const {
+    level,
+    calories,
+    title,
+    time,
+    exercises,
+    image,
+    workoutSessionId,
+    isChallenge,
+  } = useRoute().params;
   const navigation = useNavigation();
   const [secondsRemaining, setSecondsRemaining] = useState(time * 60);
   const [isRunning, setIsRunning] = useState(true);

@@ -19,6 +19,9 @@ import { challengesData } from "../../utils/data";
 import StrengthIcon from "../../assets/svgs/StrengthIcon";
 import { FontSize } from "../../utils/font";
 import { useSelector } from "react-redux";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import moment from "moment";
 
 const CategoryList = () => {
   const route = useRoute();
@@ -61,33 +64,32 @@ const CategoryList = () => {
   };
 
   const renderChallengeItem = ({ item }) => (
-    <TouchableOpacity key={item.id} style={styles.challengeCard}>
-      <Image style={styles.cardImage} source={item.image} />
+    <TouchableOpacity key={item._id} style={styles.challengeCard}>
+      {/* <Image style={styles.cardImage} source={item.image} /> */}
+      <Image style={styles.cardImage} source={images.sessionBg} />
       <View style={styles.cardContent}>
-        <Text style={styles.challengeTitle}>{item.title}</Text>
-        <Text style={styles.cardSubtitle}>{item.description}</Text>
-        <View
-          style={{
-            width: 45,
-            height: 60,
-            backgroundColor: "#3C3C3C",
-            position: "absolute",
-            borderRadius: 15,
-            top: -50,
-            right: 10,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+        <Text style={styles.challengeTitle}>{item.workout.name}</Text>
+        <Text style={styles.cardSubtitle}>{item.workout.description}</Text>
+        <Text
+          style={[
+            styles.absoluteText,
+            { color: colors.green, fontSize: FontSize.small },
+            {
+              backgroundColor: "#3C3C3C",
+              position: "absolute",
+              borderRadius: 15,
+              top: -50,
+              right: 10,
+              justifyContent: "center",
+              alignItems: "center",
+              padding: 6,
+            },
+          ]}
         >
-          <Text
-            style={[styles.absoluteText, { color: colors.green, fontSize: 16 }]}
-          >
-            {item.startDate}
-          </Text>
-          <Text style={[styles.absoluteText, { fontSize: 14 }]}>
-            {item.startMonth}
-          </Text>
-        </View>
+          {`${moment(item.startDate).format("DD MMM")} - ${moment(
+            item.endDate
+          ).format("DD MMM")}`}
+        </Text>
         <CustomButton
           style={{ width: 90, height: 28, marginLeft: "auto" }}
           textStyle={{ fontSize: FontSize.xxsmall, marginRight: 10 }}
@@ -107,7 +109,7 @@ const CategoryList = () => {
       <FlatList
         data={filteredChallenges}
         renderItem={renderChallengeItem}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item._id.toString()}
         contentContainerStyle={{ paddingBottom: 20 }}
       />
 
@@ -133,7 +135,6 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   challengeCard: {
-    height: 284,
     backgroundColor: colors.bgColor,
     borderRadius: 15,
     marginBottom: 20,

@@ -1,6 +1,6 @@
 import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
 import React, { useState } from "react";
-import { useRoute } from "@react-navigation/native"; // Get route params
+import { useNavigation, useRoute } from "@react-navigation/native"; // Get route params
 import Container from "../../components/Container";
 import Header from "../../components/Header";
 import icons from "../../constants/icons";
@@ -9,36 +9,77 @@ import Selectable from "../../components/Selectable";
 import CustomButton from "../../components/CustomButton";
 import SearchIcon from "../../assets/svgs/SearchIcon";
 import { FontSize } from "../../utils/font";
+import images from "../../constants/images";
+import { useSelector } from "react-redux";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import CustomModal from "../../components/CustomModal";
+import StrengthIcon from "../../assets/svgs/StrengthIcon";
 
 const ChallengeDetail = () => {
   const route = useRoute();
+  const navigation = useNavigation();
   const { challenge } = route.params; // Access challenge data from params
+  const { token, userData } = useSelector((state) => ({
+    token: state.Auth?.token,
+    userData: state.Auth?.data,
+  }));
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedTitle, setSelectedTitle] = useState("");
   const [selectedPeriod, setSelectedPeriod] = useState("Day 1");
 
-  console.log(challenge);
+  const openModal = (title) => {
+    setSelectedTitle(title);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedTitle("");
+    // navigation.goBack();
+
+    navigation.navigate("StartWorkout", {
+      title: challenge.workout.name,
+      image: images.chestWorkout,
+      time: challenge.workout.workoutTime,
+      exercises: selectedExercises,
+      level: challenge.workout.level,
+      calories: challenge.workout.calories,
+      workoutSessionId: challenge._id,
+      isChallenge: true,
+    });
+  };
+
+  const handleJoinChallenge = async () => {
+    try {
+      // deleteWorkoutSession();
+      let payload = { challengeId: challenge._id };
+      const res = await API.post(
+        `${END_POINTS.CHALLENGES}/enroll-challenge`,
+        payload,
+        token
+      );
+      if (res.data.success) {
+        openModal(challenge.workout.name);
+      }
+    } catch (error) {
+      console.error("Error enrolling into challenge:", error);
+    }
+  };
+
   const renderDayExercise = (dayExercises) => {
-    return dayExercises.map((exercise, index) => (
-      <View key={index} style={styles.exerciseContainer}>
-        <Image source={exercise.image} style={styles.exerciseImage} />
-        <Text style={styles.exerciseTitle}>{exercise.title}</Text>
+    return dayExercises.map((exercise) => (
+      <View key={exercise._id} style={styles.exerciseContainer}>
+        <Image source={images.chestWorkout} style={styles.exerciseImage} />
+        <Text style={styles.exerciseTitle}>{exercise.name}</Text>
         <Text style={styles.exerciseReps}>{exercise.reps}</Text>
       </View>
     ));
   };
   const getExercisesForDay = (day) => {
-    switch (day) {
-      case "Day 1":
-        return challenge.days.day1 || [];
-      case "Day 2":
-        return challenge.days.day2 || [];
-      case "Day 3":
-        return challenge.days.day3 || [];
-      case "Day 4":
-        return challenge.days.day4 || [];
-      default:
-        return []; // Return an empty array if the day is not found
-    }
+    const dayData = challenge.workout.days.find((d) => d.shortName === day);
+    return dayData ? dayData.exercises : [];
   };
 
   const selectedExercises = getExercisesForDay(selectedPeriod);
@@ -50,12 +91,13 @@ const ChallengeDetail = () => {
         rightIcon1={<SearchIcon />}
       />
       <ScrollView>
-        <Image source={challenge.image} style={styles.challengeImage} />
-        <Text style={styles.title}>{challenge.title}</Text>
-        <Text style={styles.cardSubtitle}>{challenge.cardSubtitle}</Text>
+        {/* <Image source={challenge.image} style={styles.challengeImage} /> */}
+        <Image source={images.sessionBg} style={styles.challengeImage} />
+        <Text style={styles.title}>{challenge.workout.name}</Text>
+        {/* <Text style={styles.cardSubtitle}>{challenge.workout.description}</Text> */}
 
         <Text style={styles.sectionTitle}>Description</Text>
-        <Text style={styles.description}>{challenge.description}</Text>
+        <Text style={styles.description}>{challenge.workout.description}</Text>
 
         <View style={styles.infoBox}>
           <View style={styles.row}>
@@ -64,10 +106,12 @@ const ChallengeDetail = () => {
                 <Text style={styles.label}>{label}</Text>
                 <Text style={styles.value}>
                   {label === "Exercises"
-                    ? challenge.exercises + " Exercises"
+                    ? challenge.workout.days.reduce((sum, day) => {
+                        return sum + day.exercises.length;
+                      }, 0) + " Exercises"
                     : label === "Calories"
-                    ? challenge.calories + " kcal"
-                    : challenge.time + ""}
+                    ? challenge.workout.calories + " kcal"
+                    : challenge.workout.timePerWorkout + ""}
                 </Text>
               </View>
             ))}
@@ -79,8 +123,10 @@ const ChallengeDetail = () => {
                 <Text style={styles.label}>{label}</Text>
                 <Text style={styles.value}>
                   {label === "Equipment"
-                    ? challenge.equipment
-                    : challenge.level}
+                    ? challenge.workout.equipments.length > 0
+                      ? challenge.workout.equipments
+                      : "None"
+                    : challenge.workout.level}
                 </Text>
               </View>
             ))}
@@ -90,16 +136,44 @@ const ChallengeDetail = () => {
 
         <Text style={styles.sectionTitle}>Exercises</Text>
         <Selectable
-          items={Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`)}
+          items={Array.from(
+            { length: challenge.workout.days.length },
+            (_, i) => `Day ${i + 1}`
+          )}
           selectedItem={selectedPeriod}
           setSelectedItem={setSelectedPeriod}
         />
 
         {selectedExercises.length > 0 && renderDayExercise(selectedExercises)}
       </ScrollView>
-      {challenge.type === "enroll" && (
-        <CustomButton title={"Continue Challenge"} style={{ marginTop: 20 }} />
+
+      {challenge.participants.includes(userData._id) && (
+        <CustomButton
+          title={"Continue Challenge"}
+          style={{ marginTop: 20 }}
+          onPress={closeModal}
+        />
       )}
+
+      {!challenge.participants.includes(userData._id) && (
+        <CustomButton
+          title={"Join Now"}
+          style={{ marginTop: 20 }}
+          onPress={handleJoinChallenge}
+        />
+      )}
+
+      <CustomModal
+        visible={modalVisible}
+        onClose={closeModal}
+        modalIcon={<StrengthIcon />}
+        width={240}
+      >
+        <Text style={styles.modalText}>
+          You have successfully Enrolled in {""}
+          <Text style={styles.selectedTitle}>{selectedTitle} Challenge</Text>
+        </Text>
+      </CustomModal>
     </Container>
   );
 };
@@ -194,6 +268,16 @@ const styles = StyleSheet.create({
     color: colors.green,
     fontFamily: "Poppins-Medium",
     fontSize: FontSize.regular,
+  },
+  modalText: {
+    fontSize: FontSize.medium,
+    color: "white", // Style for the text that isn't the title
+    textAlign: "center",
+    marginTop: 20,
+  },
+  selectedTitle: {
+    color: colors.green, // Style for the selected title
+    fontFamily: "Poppins-SemiBold",
   },
 });
 

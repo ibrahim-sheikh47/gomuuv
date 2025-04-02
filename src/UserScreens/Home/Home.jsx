@@ -55,10 +55,9 @@ const HomeScreen = () => {
               navigation.navigate("Profile");
             }}
           />
-          <View style={styles.iconButtonContainer}>
+          {/* <View style={styles.iconButtonContainer}>
             <IconButton icon={<SearchIcon />} />
-            <IconButton icon={<Tab5Icon color="white" />} />
-          </View>
+          </View> */}
         </View>
 
         <DailyReport
@@ -108,16 +107,16 @@ const HomeScreen = () => {
 
         <View style={styles.cardRow}>
           <CustomCard
-            label="Challenges"
-            icon={ChallengesIcon}
+            label="Nutrition"
+            icon={NutritionIcon}
             message={
-              isFirstTime ? `Please start Challenges to see data` : "0Kg"
+              isFirstTime ? `Please start Nutrition to see data` : "0kcal"
             }
             goal="Goal: burn 1,457 kcal this week"
             value="123"
             onPress={() => {
               handleInteraction();
-              navigation.navigate("Challenges");
+              navigation.navigate("Nutrition");
             }}
           />
           <CustomCard
@@ -135,14 +134,14 @@ const HomeScreen = () => {
 
         <View style={styles.cardRow}>
           <CustomCard
-            label="Nutrition"
-            icon={NutritionIcon}
-            message={isFirstTime ? `Please start Nutrition to see data` : "0"}
+            label="Challenges"
+            icon={ChallengesIcon}
+            message={isFirstTime ? `Please start Challenges to see data` : "0"}
             goal="Goal: 84kg"
             value="63kg"
             onPress={() => {
               handleInteraction();
-              navigation.navigate("Nutrition");
+              navigation.navigate("Challenges");
             }}
           />
           <CustomCard

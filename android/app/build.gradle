@@ -125,7 +125,7 @@ android {
         ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
     }
     buildFeatures {
-        buildConfig = true  // Ensure this is set to true
+        buildConfig true
     }
 }
 

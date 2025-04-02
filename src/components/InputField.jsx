@@ -9,6 +9,7 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { colors } from "../constants/colors";
+import { FontSize } from "../utils/font";
 
 const InputField = ({
   type,

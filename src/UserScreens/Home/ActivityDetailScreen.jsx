@@ -43,7 +43,7 @@ const ActivityDetailScreen = () => {
 
   // Button dimensions
   const buttonWidth = 300; // Adjust this to match your button width
-  const maxDragDistance = buttonWidth - 48 - 24; // Icon width is 48, padding is 24
+  const maxDragDistance = buttonWidth; // Icon width is 48, padding is 24
 
   const pan = useRef(new Animated.ValueXY()).current;
   const dragThreshold = maxDragDistance * 0.9; // Trigger navigation when dragged 80% of max distance
@@ -83,14 +83,16 @@ const ActivityDetailScreen = () => {
         pan.flattenOffset();
 
         if (pan.x._value > dragThreshold) {
-          navigation.navigate("FinishActivity", {
-            activityName: activityName,
-            distance: distance,
-            time: time,
-            distanceUnit: distanceUnit,
-            heartRate: heartRate,
-            calories: calories,
-          });
+          navigation.navigate("Map");
+
+          // navigation.navigate("FinishActivity", {
+          //   activityName: activityName,
+          //   distance: distance,
+          //   time: time,
+          //   distanceUnit: distanceUnit,
+          //   heartRate: heartRate,
+          //   calories: calories,
+          // });
         } else {
           Animated.spring(pan, {
             toValue: { x: 0, y: 0 },

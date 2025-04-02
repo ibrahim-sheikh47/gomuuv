@@ -1,6 +1,7 @@
 package com.gomuuv.android
 import expo.modules.splashscreen.SplashScreenManager
 
+import com.gomuuv.BuildConfig
 import android.os.Build
 import android.os.Bundle
 
@@ -10,7 +11,6 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnable
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 
 import expo.modules.ReactActivityDelegateWrapper
-import com.gomuuv.android.BuildConfig
 
 class MainActivity : ReactActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {

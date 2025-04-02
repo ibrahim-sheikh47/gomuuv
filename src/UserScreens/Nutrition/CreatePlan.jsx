@@ -609,13 +609,17 @@ const CreatePlan = () => {
       <CustomModal
         visible={isModalVisible}
         onClose={handleClose}
-        modalIcon={icons.wait}
+        modalIcon={
+          <Image style={{ width: 60, height: 60 }} source={icons.wait} />
+        }
         modalText={"Please Wait While We Select Plan For You"}
       />
       <CustomModal
         visible={is2ndModalVisible}
         onClose={handleClose}
-        modalIcon={icons.planAdded}
+        modalIcon={
+          <Image style={{ width: 60, height: 60 }} source={icons.planAdded} />
+        }
         modalText={"Plan Created!"}
       />
     </Container>

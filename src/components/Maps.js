@@ -1,7 +1,13 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  useWindowDimensions,
+} from "react-native";
 import React, { useRef, useState } from "react";
 import Geocoder from "react-native-geocoding";
-import { MAPS_API_KEY } from "@env";
+// import { MAPS_API_KEY } from "@env";
 import MapView, {
   PROVIDER_GOOGLE,
   Marker,
@@ -12,58 +18,61 @@ import MapStyle from "../utils/MapStyle";
 import { useEffect } from "react";
 import Commons from "../utils/Commons";
 
-export default function Map(props) {
+const Map = (props) => {
+  const { width } = useWindowDimensions();
   var map = useRef(null);
   const shouldCallDelta = useRef(true);
 
   const [region, setRegion] = useState({
-    latitude: 18.46633,
-    longitude: -66.10572,
-    latitudeDelta: 0.2,
-    longitudeDelta: 0.2,
+    latitude: 39.8283,
+    longitude: -98.5795,
+    latitudeDelta: 0.02,
+    longitudeDelta: 0.02,
   });
-  Geocoder.init(MAPS_API_KEY);
+
+  Geocoder.init("AIzaSyBwh9rxGr03bkOMgDgkrRajui1pl7k-8qU");
 
   useEffect(() => {
     fetchLocation();
   }, []);
 
   const callDelta = (lat, long) => {
-    Geocoder.from(lat, long)
-      .then((json) => {
-        var addressComponent = json.results[0].formatted_address;
+    // Geocoder.from(lat, long)
+    //   .then((json) => {
+    //     var addressComponent = json.results[0].formatted_address;
 
-        props.setAddress({
-          address: addressComponent,
-          lat: lat,
-          lng: long,
-        });
-        shouldCallDelta.current = false;
-        map.current.animateCamera({
-          center: {
-            latitude: lat,
-            longitude: long,
-          },
-        });
-      })
-      .catch((error) => console.warn(error));
+    props.setAddress({
+      // address: addressComponent,
+      lat: lat,
+      lng: long,
+    });
+    shouldCallDelta.current = false;
+    map.current.animateCamera({
+      center: {
+        latitude: lat,
+        longitude: long,
+      },
+    });
+    // })
+    // .catch((error) => console.warn(error));
   };
 
-  const fetchLocation = () => {
-    Commons.fetchLocation()
+  const fetchLocation = async () => {
+    await Commons.fetchLocation()
       .then((res) => {
+        console.log(res);
         if (props.setCurrentLocation) {
           props.setCurrentLocation({
-            latitude: res.coords.latitude,
-            longitude: res.coords.longitude,
+            latitude: res.latitude,
+            longitude: res.longitude,
           });
         }
         setRegion({
           ...region,
-          latitude: res.coords.latitude,
-          longitude: res.coords.longitude,
+          latitude: res.latitude,
+          longitude: res.longitude,
         });
-        callDelta(res.coords.latitude, res.coords.longitude);
+        callDelta(res.latitude, res.longitude);
       })
       .catch((err) => {
         console.log(err);
@@ -76,7 +85,7 @@ export default function Map(props) {
         customMapStyle={MapStyle}
         provider={PROVIDER_GOOGLE}
         style={{
-          width: Commons.width(),
+          width,
           flex: 1,
         }}
         ref={map}
@@ -84,7 +93,7 @@ export default function Map(props) {
         zoomEnabled={true}
         pitchEnabled={true}
         showsBuildings={true}
-        showsUserLocation={false}
+        showsUserLocation={true}
         showScale={true}
         // showsTraffic={true}
         showsIndoors={true}
@@ -114,4 +123,6 @@ export default function Map(props) {
       ></MapView>
     </View>
   );
-}
+};
+
+export default Map;

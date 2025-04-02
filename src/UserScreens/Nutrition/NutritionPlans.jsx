@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import { View, Text, FlatList, StyleSheet, Image } from "react-native";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
 import SearchBar from "../../components/SearchBar";
@@ -30,7 +30,7 @@ const NutritionPlans = ({ route, navigation }) => {
   const handleStartPlan = () => {
     // Set the modal text and icon here
     setModalText("You have started this nutrition plan!"); // Customize this message
-    setModalIcon(/* Your icon source here, e.g., require('path/to/icon.png') */);
+    setModalIcon();
     setModalVisible(true); // Show the modal
   };
 
@@ -80,7 +80,9 @@ const NutritionPlans = ({ route, navigation }) => {
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         modalText={"Plan Added!"}
-        modalIcon={icons.planAdded}
+        modalIcon={
+          <Image style={{ width: 60, height: 60 }} source={icons.planAdded} />
+        }
       />
     </Container>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Image,
   StyleSheet,
@@ -11,7 +11,7 @@ import Container from "../../components/Container";
 import { colors } from "../../constants/colors";
 import Header from "../../components/Header";
 import TabContainer from "../../components/TabContainer";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import images from "../../constants/images";
 // import { challenges } from "../../utils/data";
 import CustomButton from "../../components/CustomButton";
@@ -30,6 +30,8 @@ import WeightLossIcon from "../../assets/svgs/WeightLossIcon";
 import { FontSize } from "../../utils/font";
 import { END_POINTS } from "../../config/routes";
 import { useSelector } from "react-redux";
+import { API } from "../../config/apiClient";
+import moment from "moment";
 
 const ChallengesScreen = () => {
   const [activeTab, setActiveTab] = useState("Challenges"); // Set default to Goals to match your screenshot
@@ -43,16 +45,20 @@ const ChallengesScreen = () => {
 
   const [currentWeight, setCurrentWeight] = useState(63); // Set to 63 to match your screenshot
   const [targetWeight, setTargetWeight] = useState(54); // Set to 54 to match your screenshot
+  const [progressPercentage, setProgressPercentage] = useState(0); // Set to 54 to match your screenshot
   const [bmiValue, setBmiValue] = useState(23.0); // Initial BMI value
 
-  const { token } = useSelector((state) => ({
+  const { token, userData } = useSelector((state) => ({
     token: state.Auth?.token,
+    userData: state.Auth?.data,
   }));
 
-  useEffect(() => {
-    getEnrolledChallenges();
-    getUpcomingChallenges();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getEnrolledChallenges();
+      getUpcomingChallenges();
+    }, [])
+  );
 
   const handleUpdateWeight = (newWeight) => {
     setCurrentWeight(newWeight); // Update the current weight
@@ -90,7 +96,7 @@ const ChallengesScreen = () => {
   const getEnrolledChallenges = async () => {
     try {
       const res = await API.get(
-        `${END_POINTS.CHALLENGES}/enrolled`,
+        `${END_POINTS.CHALLENGES}/enrolled/challenges`,
         null,
         token
       );
@@ -105,12 +111,14 @@ const ChallengesScreen = () => {
   const getUpcomingChallenges = async () => {
     try {
       const res = await API.get(
-        `${END_POINTS.CHALLENGES}/upcoming`,
+        `${END_POINTS.CHALLENGES}/upcoming/challenges`,
         null,
         token
       );
       if (res.data.success) {
-        setUpcomingChallenges(res.data.data);
+        setUpcomingChallenges(
+          res.data.data.filter((d) => !d.participants.includes(userData._id))
+        );
       }
     } catch (error) {
       console.error("Error fetching upcoming challenges:", error);
@@ -119,69 +127,66 @@ const ChallengesScreen = () => {
 
   const renderChallengeCard = ({ item: challenge }) => (
     <TouchableOpacity
-      key={challenge.id}
+      key={challenge._id}
       style={styles.challengeCard}
       onPress={() => handleCardPress(challenge)}
     >
-      <Image style={styles.cardImage} source={challenge.image} />
+      {/* <Image style={styles.cardImage} source={challenge.image} /> */}
+      <Image style={styles.cardImage} source={images.sessionBg} />
       <View style={styles.cardContent}>
         <View style={styles.cardHeader}>
-          <Text style={styles.challengeTitle}>{challenge.title}</Text>
-          <View style={styles.cardHeaderTag}>
+          <Text style={styles.challengeTitle}>{challenge.workout?.name}</Text>
+          {/* <View style={styles.cardHeaderTag}>
             <StrengthIcon />
             <Text style={styles.cardSubtitle}>{challenge.muscleGroup}</Text>
-          </View>
+          </View> */}
         </View>
-        {challenge.type === "upcoming" && (
+        {upcomingChallenges.some((c) => c._id.toString() === challenge._id) && (
           <>
-            <View
-              style={{
-                width: 45,
-                height: 60,
-                backgroundColor: "#3C3C3C",
-                position: "absolute",
-                borderRadius: 15,
-                top: -50,
-                right: 10,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
+            <Text
+              style={[
+                styles.absoluteText,
+                { color: colors.green, fontSize: FontSize.small },
+                {
+                  backgroundColor: "#3C3C3C",
+                  position: "absolute",
+                  borderRadius: 15,
+                  top: -50,
+                  right: 10,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: 6,
+                },
+              ]}
             >
-              <Text
-                style={[
-                  styles.absoluteText,
-                  { color: colors.green, fontSize: FontSize.regular },
-                ]}
-              >
-                {challenge.date}
-              </Text>
-              <Text
-                style={[styles.absoluteText, { fontSize: FontSize.medium }]}
-              >
-                {challenge.month}
-              </Text>
-            </View>
-            <Text style={styles.cardSubtitle}>{challenge.cardSubtitle}</Text>
+              {`${moment(challenge.startDate).format("DD MMM")} - ${moment(
+                challenge.endDate
+              ).format("DD MMM")}`}
+            </Text>
+            <Text style={styles.cardSubtitle}>
+              {challenge.workout?.description}
+            </Text>
             <View style={styles.cardHeaderTag}>
-              <StrengthIcon />
+              {/* <StrengthIcon />
               <Text style={styles.cardSubtitle}>{challenge.muscleGroup}</Text>
-              <LevelIcon />
+              <LevelIcon /> */}
               <Text style={styles.cardSubtitle}>{challenge.level}</Text>
             </View>
           </>
         )}
-        {challenge.type === "enroll" && (
+        {enrolledChallenges.some((c) => c._id.toString() === challenge._id) && (
           <>
             <View style={styles.cardHeader}>
-              <Text style={styles.cardSubtitle}>{challenge.cardSubtitle}</Text>
-              <Text style={[styles.cardSubtitle, { color: colors.green }]}>
+              {/* <Text style={[styles.cardSubtitle, { color: colors.green }]}>
                 {challenge.percent} %
-              </Text>
+              </Text> */}
             </View>
 
-            <ProgressBar progress={challenge.percent} />
+            {/* <ProgressBar progress={challenge.percent} /> */}
             <Text style={styles.cardSubtitle}>
-              {challenge.startDate} - {challenge.endDate}
+              {`${moment(challenge.startDate).format("DD MMM")} - ${moment(
+                challenge.endDate
+              ).format("DD MMM")}`}
             </Text>
           </>
         )}
@@ -198,6 +203,10 @@ const ChallengesScreen = () => {
     return Math.min(100, (currentLoss / totalLoss) * 100);
   };
 
+  useEffect(() => {
+    setProgressPercentage(calculateProgressPercentage());
+  }, [currentWeight, targetWeight]);
+
   const renderGoalsSection = () => (
     <View>
       <Text style={[styles.sectionTitle, { fontSize: 14, marginBottom: 5 }]}>
@@ -210,7 +219,7 @@ const ChallengesScreen = () => {
           fontFamily: "Poppins-Bold",
         }}
       >
-        {currentWeight} kg
+        {currentWeight ? `${currentWeight} kg` : "N/A"}
       </Text>
 
       {/* Weight graph with dropdown */}
@@ -222,7 +231,6 @@ const ChallengesScreen = () => {
           marginTop: 10,
         }}
       >
-        <View></View> {/* Empty view for spacing */}
         <TouchableOpacity>
           <View
             style={{
@@ -259,14 +267,16 @@ const ChallengesScreen = () => {
         <View style={styles.progressLabels}>
           <View>
             <Text style={styles.progressLabelText}>Current</Text>
-            <Text style={styles.currentWeightText}>{currentWeight} kg</Text>
+            <Text style={styles.currentWeightText}>
+              {currentWeight ? `${currentWeight} kg` : "N/A"}
+            </Text>
           </View>
           <View>
             <Text style={[styles.progressLabelText, { textAlign: "right" }]}>
               Target
             </Text>
             <Text style={[styles.targetWeightText, { textAlign: "right" }]}>
-              {targetWeight} kg
+              {targetWeight ? `${targetWeight} kg` : "N/A"}
             </Text>
           </View>
         </View>
@@ -276,13 +286,16 @@ const ChallengesScreen = () => {
           <View
             style={[
               styles.customProgressBar,
-              { width: `${calculateProgressPercentage()}%` },
+              { width: progressPercentage ? `${progressPercentage}%` : "0%" },
             ]}
           />
           <View
             style={[
               styles.progressMarker,
-              { left: `${calculateProgressPercentage()}%`, marginLeft: -8 },
+              {
+                left: progressPercentage ? `${progressPercentage}%` : "0%",
+                marginLeft: -8,
+              },
             ]}
           />
         </View>
@@ -308,7 +321,9 @@ const ChallengesScreen = () => {
       <Text style={styles.sectionTitle}>Your BMI</Text>
       <View style={styles.bmiContainer}>
         <View style={styles.bmiValueContainer}>
-          <Text style={styles.bmiValue}>{bmiValue}</Text>
+          <Text style={styles.bmiValue}>
+            {bmiValue ? bmiValue.toString() : "N/A"}
+          </Text>
           <Text style={styles.bmiLabel}>Normal</Text>
         </View>
 
@@ -341,17 +356,23 @@ const ChallengesScreen = () => {
     </View>
   );
 
-  const renderListHeader = () => (
-    <>
-      <Text style={styles.sectionTitle}>Enrolled Challenges</Text>
-      {enrolledChallenges.map((challenge) => (
-        <View key={challenge._id}>
-          {renderChallengeCard({ item: challenge })}
+  const renderListHeader = () => {
+    if (enrolledChallenges.length > 0) {
+      return (
+        <View>
+          <Text style={styles.sectionTitle}>Enrolled Challenges</Text>
+          {enrolledChallenges.map((challenge) => (
+            <View key={challenge._id}>
+              {renderChallengeCard({ item: challenge })}
+            </View>
+          ))}
+          <Text style={styles.sectionTitle}>Upcoming Challenges</Text>
         </View>
-      ))}
-      <Text style={styles.sectionTitle}>Upcoming Challenges</Text>
-    </>
-  );
+      );
+    } else if (upcomingChallenges.length > 0)
+      return <Text style={styles.sectionTitle}>Upcoming Challenges</Text>;
+    return null;
+  };
 
   const renderFooter = () => (
     <>
@@ -388,15 +409,22 @@ const ChallengesScreen = () => {
       />
       <FlatList
         data={
-          activeTab === "Challenges" ? upcomingChallenges : [] // Here you can add data for Goals if needed
+          activeTab === "Challenges"
+            ? upcomingChallenges.filter((c, i) => i < 3)
+            : [] // Here you can add data for Goals if needed
         }
         renderItem={renderChallengeCard}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) =>
+          item?._id?.toString() || Math.random().toString()
+        }
         ListHeaderComponent={
           activeTab === "Challenges" ? renderListHeader : renderGoalsSection
         }
         showsVerticalScrollIndicator={false}
         ListFooterComponent={activeTab === "Challenges" && renderFooter}
+        ListEmptyComponent={
+          activeTab === "Challenges" ? <Text>No Challenge</Text> : null
+        }
       />
 
       {/* Modals for Update Weight and Set Target */}

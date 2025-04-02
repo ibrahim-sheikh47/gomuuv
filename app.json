@@ -15,7 +15,8 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "This app requires access to the photo library to update your profile picture.",
-        "NSCameraUsageDescription": "This app requires access to the camera to take profile pictures."
+        "NSCameraUsageDescription": "This app requires access to the camera to take profile pictures.",
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show your position on the map."
       }
     },
     "android": {
@@ -23,11 +24,19 @@
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBwh9rxGr03bkOMgDgkrRajui1pl7k-8qU"
+        }
+      },
       "package": "com.gomuuv.android",
       "permissions": [
-        "android.permission.CAMERA",
-        "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE"
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_MEDIA_IMAGES",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
       ]
     },
     "web": {

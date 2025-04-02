@@ -1,45 +1,35 @@
-import { PermissionsAndroid } from "react-native";
-import Geolocation from "react-native-geolocation-service";
+import * as Location from "expo-location";
 
-const checkPermissions = async () => {
-  const granted = await PermissionsAndroid.requestMultiple([
-    PermissionsAndroid.PERMISSIONS.CAMERA,
-    PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
-  ]);
-  if (
-    !JSON.stringify(granted).includes("denied") &&
-    !JSON.stringify(granted).includes("never_ask_again")
-  ) {
-    return true;
-  } else {
-    toast("Kindly allow all permissions to continue");
+const checkLocationPermissions = async () => {
+  try {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    return status === "granted";
+  } catch (error) {
+    console.error("Error checking location permissions:", error);
     return false;
   }
 };
 
-const fetchLocation = () => {
+const fetchLocation = async () => {
   return new Promise(async (resolve, reject) => {
-    if (checkPermissions()) {
-      Geolocation.getCurrentPosition(
-        (position) => {
-          resolve(position);
-        },
-        (error) => {
-          const { code, message } = error;
-          toast(message);
-          reject(error);
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-      );
+    try {
+      const hasPermission = await checkLocationPermissions();
+      if (!hasPermission) {
+        return reject(new Error("Location permission denied"));
+      }
+
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      resolve(location.coords);
+    } catch (error) {
+      reject(error);
     }
   });
 };
 
 export default {
-  checkPermissions,
+  checkLocationPermissions,
   fetchLocation,
 };

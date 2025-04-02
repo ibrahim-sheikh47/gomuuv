@@ -1,8 +1,8 @@
 import { View } from "react-native";
 import React from "react";
-import { Map } from "../../components/Maps";
+import Map from "../../components/Maps";
 
-export default function MapScreen(props) {
+const MapScreen = () => {
   let loc = null;
   return (
     <View style={{ flex: 1 }}>
@@ -13,4 +13,6 @@ export default function MapScreen(props) {
       />
     </View>
   );
-}
+};
+
+export default MapScreen;
