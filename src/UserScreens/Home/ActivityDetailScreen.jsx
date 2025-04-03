@@ -40,6 +40,11 @@ const ActivityDetailScreen = () => {
 
   const duration = ["Today", "Weekly", "Monthly", "Quarterly", "Yearly"];
   const [selectedPeriod, setSelectedPeriod] = useState("Today");
+  const [activityResult, setActivityResult] = useState({
+    time: 0,
+    distance: "0 meters",
+    coordinates: [],
+  });
 
   // Button dimensions
   const buttonWidth = 300; // Adjust this to match your button width
@@ -83,7 +88,11 @@ const ActivityDetailScreen = () => {
         pan.flattenOffset();
 
         if (pan.x._value > dragThreshold) {
-          navigation.navigate("Map");
+          navigation.navigate("Map", {
+            activityName,
+            heartRate,
+            calories,
+          });
 
           // navigation.navigate("FinishActivity", {
           //   activityName: activityName,
@@ -136,13 +145,13 @@ const ActivityDetailScreen = () => {
             label="Distance"
             icon={DistanceIcon}
             goal={"Goal: 2mi daily"}
-            message={`${distance} ${distanceUnit}`}
+            message={activityResult.distance}
           />
           <CustomCard
             label="Time"
             icon={TimeIcon}
             goal={"Goal: 45min"}
-            message={time}
+            message={activityResult.time}
           />
         </View>
 

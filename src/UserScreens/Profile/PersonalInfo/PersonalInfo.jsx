@@ -32,20 +32,6 @@ const PersonalInfoScreen = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  // Update personalInfo state when userData changes
-  // useEffect(() => {
-  //   if (userData) {
-  //     console.log(userData.dob);
-  //     setPersonalInfo({
-  //       firstName: userData?.firstName || "",
-  //       lastName: userData?.lastName || "",
-  //       height: userData?.height || "",
-  //       weight: userData?.weight || "",
-  //       date: userData?.dob || "",
-  //     });
-  //   }
-  // }, [userData]);
-
   const handleInputChange = (field, value) => {
     setPersonalInfo((prevInfo) => ({
       ...prevInfo,

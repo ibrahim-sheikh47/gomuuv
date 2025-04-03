@@ -21,6 +21,19 @@ const FinishActivity = () => {
     route.params;
   const navigation = useNavigation();
 
+  // Convert time from seconds (assuming time is given in seconds)
+  const timeInSeconds = time; // time is in seconds from params
+  const distanceInMiles = distance; // Assuming distance is in miles
+
+  // Calculate Time Per Mile (in minutes and seconds)
+  const timePerMileInSeconds = timeInSeconds / distanceInMiles;
+  const minutesPerMile = Math.floor(timePerMileInSeconds / 60);
+  const secondsPerMile = Math.round(timePerMileInSeconds % 60);
+
+  // Calculate Pace (in miles per hour)
+  const paceInHours = distanceInMiles / (timeInSeconds / 3600); // timeInSeconds is divided by 3600 to convert time to hours
+  const pace = paceInHours.toFixed(2); // Format the pace to 2 decimal places
+
   return (
     <Container>
       <Header title={`${activityName}`} showBackButton={true} />
@@ -84,17 +97,19 @@ const FinishActivity = () => {
           <CustomCard
             label="Time Per Mile"
             iconImage={icons.timePerMile}
-            message="0m:0s/mi"
+            message={`${minutesPerMile}m:${secondsPerMile}s/mi`}
           />
           <CustomCard
             label="Total Time"
             icon={TimeIcon}
-            message={time}
+            message={`${Math.floor(timeInSeconds / 60)}m ${
+              timeInSeconds % 60
+            }s`}
             goal={"Goal: 30 min daily"}
           />
         </View>
         <View style={styles.gridContainer}>
-          <CustomCard label="Pace" icon={PaceIcon} message="0mi/hr" />
+          <CustomCard label="Pace" icon={PaceIcon} message={`${pace} mi/hr`} />
           <CustomCard
             label="Distance"
             icon={DistanceIcon}

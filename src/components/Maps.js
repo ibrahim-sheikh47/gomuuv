@@ -1,82 +1,150 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  useWindowDimensions,
-} from "react-native";
-import React, { useRef, useState } from "react";
+import { View } from "react-native";
+import React, { useRef, useState, useEffect } from "react";
 import Geocoder from "react-native-geocoding";
-// import { MAPS_API_KEY } from "@env";
-import MapView, {
-  PROVIDER_GOOGLE,
-  Marker,
-  MAP_TYPES,
-  Callout,
-} from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from "react-native-maps";
 import MapStyle from "../utils/MapStyle";
-import { useEffect } from "react";
 import Commons from "../utils/Commons";
+import haversine from "haversine"; // Install via `npm install haversine`
 
 const Map = (props) => {
-  const { width } = useWindowDimensions();
-  var map = useRef(null);
-  const shouldCallDelta = useRef(true);
+  const { tracking, onLocationUpdate } = props;
+  const map = useRef(null); // Reference to MapView
+  const [locationHistory, setLocationHistory] = useState([]); // Track location history
+  const [location, setLocation] = useState(null); // Store the location
+  const [elapsedTime, setElapsedTime] = useState(0); // Store elapsed time
+  const [totalDistance, setTotalDistance] = useState(0); // Store total distance
+  const [address, setAddress] = useState(""); // Store total distance
 
-  const [region, setRegion] = useState({
-    latitude: 39.8283,
-    longitude: -98.5795,
-    latitudeDelta: 0.02,
-    longitudeDelta: 0.02,
-  });
+  const startLocation = useRef(null);
+  const intervalRef = useRef(null); // For tracking location updates
+  const timerRef = useRef(null); // For tracking elapsed time
 
-  Geocoder.init("AIzaSyBwh9rxGr03bkOMgDgkrRajui1pl7k-8qU");
+  Geocoder.init("AIzaSyCSz-v30_BxTuT6a23e78UUy0ANbRd0gC4");
 
   useEffect(() => {
+    // Initial fetch location on component mount
     fetchLocation();
   }, []);
 
-  const callDelta = (lat, long) => {
-    // Geocoder.from(lat, long)
-    //   .then((json) => {
-    //     var addressComponent = json.results[0].formatted_address;
+  useEffect(() => {
+    // Handle tracking state change
+    if (tracking) {
+      startLocationTracking();
+    } else {
+      stopLocationTracking();
+    }
 
-    props.setAddress({
-      // address: addressComponent,
-      lat: lat,
-      lng: long,
-    });
-    shouldCallDelta.current = false;
-    map.current.animateCamera({
-      center: {
-        latitude: lat,
-        longitude: long,
-      },
-    });
-    // })
-    // .catch((error) => console.warn(error));
-  };
+    return () => {
+      clearInterval(intervalRef.current);
+      clearInterval(timerRef.current);
+    };
+  }, [tracking]);
 
+  useEffect(() => {
+    if (locationHistory.length > 0 && startLocation.current) {
+      const lastLocation = locationHistory[locationHistory.length - 1];
+      const distance = haversine(
+        lastLocation,
+        {
+          latitude: startLocation.current.latitude,
+          longitude: startLocation.current.longitude,
+        },
+        { unit: "meter" }
+      );
+
+      // Update total distance
+      setTotalDistance((prevTotal) => prevTotal + distance);
+    }
+  }, [locationHistory.length]);
+
+  useEffect(() => {
+    if (onLocationUpdate) {
+      onLocationUpdate({
+        address,
+        distance: totalDistance,
+        time: elapsedTime,
+        pathCoordinates: locationHistory,
+      });
+    }
+  }, [address, totalDistance, elapsedTime]);
+
+  // Fetch location function
   const fetchLocation = async () => {
-    await Commons.fetchLocation()
-      .then((res) => {
-        console.log(res);
-        if (props.setCurrentLocation) {
-          props.setCurrentLocation({
-            latitude: res.latitude,
-            longitude: res.longitude,
-          });
-        }
-        setRegion({
-          ...region,
+    try {
+      const res = await Commons.fetchLocation();
+      if (!startLocation.current) {
+        startLocation.current = res;
+      }
+      setLocation({
+        latitude: res.latitude,
+        longitude: res.longitude,
+      });
+
+      // Immediately add the fetched location to location history for start marker
+      setLocationHistory((prevHistory) => {
+        const newLocation = {
           latitude: res.latitude,
           longitude: res.longitude,
-        });
-        callDelta(res.latitude, res.longitude);
-      })
-      .catch((err) => {
-        console.log(err);
+        };
+        return [...prevHistory, newLocation];
       });
+
+      // Animate camera to the current location
+      if (map.current) {
+        map.current.animateCamera({
+          center: {
+            latitude: res.latitude,
+            longitude: res.longitude,
+          },
+          zoom: 14, // Adjust zoom level if necessary
+          pitch: 1,
+          heading: 0,
+          altitude: 500,
+        });
+      }
+
+      // Get address from location and send it back to MapScreen
+      setAddress(await getAddress(res.latitude, res.longitude));
+    } catch (err) {
+      console.log("Error fetching location:", err);
+    }
+  };
+
+  // Convert latitude and longitude to address
+  const getAddress = async (lat, long) => {
+    try {
+      const json = await Geocoder.from(lat, long);
+      return json.results[0].formatted_address;
+    } catch (error) {
+      console.warn(error);
+      return null;
+    }
+  };
+
+  // Start location tracking
+  const startLocationTracking = () => {
+    // Start a timer to track elapsed time
+    if (!timerRef.current) {
+      timerRef.current = setInterval(() => {
+        setElapsedTime((prevTime) => prevTime + 1); // Increment time every second
+      }, 1000);
+    }
+
+    // Fetch location every 10 seconds
+    if (!intervalRef.current) {
+      intervalRef.current = setInterval(fetchLocation, 1000); // Fetch every 10 seconds
+    }
+  };
+
+  // Stop location tracking
+  const stopLocationTracking = () => {
+    clearInterval(intervalRef.current);
+    clearInterval(timerRef.current);
+    intervalRef.current = null;
+    timerRef.current = null;
+    setElapsedTime(0);
+    setTotalDistance(0);
+    setLocationHistory([]);
   };
 
   return (
@@ -84,43 +152,30 @@ const Map = (props) => {
       <MapView
         customMapStyle={MapStyle}
         provider={PROVIDER_GOOGLE}
-        style={{
-          width,
-          flex: 1,
-        }}
+        style={{ flex: 1 }} // Ensure the map takes up the full container
         ref={map}
-        initialRegion={region}
-        zoomEnabled={true}
-        pitchEnabled={true}
-        showsBuildings={true}
         showsUserLocation={true}
-        showScale={true}
-        // showsTraffic={true}
-        showsIndoors={true}
+        showsBuildings={true}
         tracksViewChanges={false}
-        onRegionChange={(region, details) => {
-          if (shouldCallDelta.current) {
-            setRegion({
-              ...region,
-              latitude: region.latitude,
-              longitude: region.longitude,
-            });
-          } else {
-            shouldCallDelta.current = true;
-          }
-        }}
-        onPress={(event) => {
-          setRegion({
-            ...region,
-            latitude: event.nativeEvent.coordinate.latitude,
-            longitude: event.nativeEvent.coordinate.longitude,
-          });
-          callDelta(
-            event.nativeEvent.coordinate.latitude,
-            event.nativeEvent.coordinate.longitude
-          );
-        }}
-      ></MapView>
+      >
+        {/* Polyline to show the path */}
+        {locationHistory.length > 1 && (
+          <Polyline
+            coordinates={locationHistory}
+            strokeWidth={5}
+            strokeColor="white"
+          />
+        )}
+
+        {/* Marker for start location */}
+        {locationHistory.length > 0 && (
+          <Marker
+            coordinate={locationHistory[0]} // Start marker at the first fetched location
+            pinColor="green"
+            title="Start"
+          />
+        )}
+      </MapView>
     </View>
   );
 };

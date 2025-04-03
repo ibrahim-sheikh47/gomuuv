@@ -41,10 +41,7 @@ export const CustomCard = ({
         style={{
           color: "#F8F8F8",
           textAlign: "center",
-          fontSize:
-            message === `Please start ${label} to see data`
-              ? FontSize.small
-              : FontSize.xxlarge,
+          fontSize: FontSize.large,
           fontFamily: "Poppins-Bold",
           marginTop: 10,
           paddingHorizontal: 20,

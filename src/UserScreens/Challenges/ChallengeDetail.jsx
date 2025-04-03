@@ -53,7 +53,6 @@ const ChallengeDetail = () => {
 
   const handleJoinChallenge = async () => {
     try {
-      // deleteWorkoutSession();
       let payload = { challengeId: challenge._id };
       const res = await API.post(
         `${END_POINTS.CHALLENGES}/enroll-challenge`,

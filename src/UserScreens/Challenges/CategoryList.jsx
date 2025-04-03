@@ -7,7 +7,7 @@ import {
   Image,
   FlatList,
 } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
 import images from "../../constants/images";
@@ -25,13 +25,15 @@ import moment from "moment";
 
 const CategoryList = () => {
   const route = useRoute();
+  const navigation = useNavigation();
   const { category } = route.params;
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTitle, setSelectedTitle] = useState("");
   const [filteredChallenges, setFilteredChallenges] = useState([]);
 
-  const { token } = useSelector((state) => ({
+  const { token, userData } = useSelector((state) => ({
     token: state.Auth?.token,
+    userData: state.Auth?.data,
   }));
 
   useEffect(() => {
@@ -63,8 +65,30 @@ const CategoryList = () => {
     }
   };
 
+  const handleJoinChallenge = async (challenge) => {
+    try {
+      let payload = { challengeId: challenge._id };
+      const res = await API.post(
+        `${END_POINTS.CHALLENGES}/enroll-challenge`,
+        payload,
+        token
+      );
+      if (res.data.success) {
+        openModal(challenge.workout.name);
+      }
+    } catch (error) {
+      console.error("Error enrolling into challenge:", error);
+    }
+  };
+
   const renderChallengeItem = ({ item }) => (
-    <TouchableOpacity key={item._id} style={styles.challengeCard}>
+    <TouchableOpacity
+      key={item._id}
+      style={styles.challengeCard}
+      onPress={() => {
+        navigation.navigate("ChallengeDetail", { challenge: item });
+      }}
+    >
       {/* <Image style={styles.cardImage} source={item.image} /> */}
       <Image style={styles.cardImage} source={images.sessionBg} />
       <View style={styles.cardContent}>
@@ -93,8 +117,13 @@ const CategoryList = () => {
         <CustomButton
           style={{ width: 90, height: 28, marginLeft: "auto" }}
           textStyle={{ fontSize: FontSize.xxsmall, marginRight: 10 }}
-          title={"Join Now"}
-          onPress={() => openModal(item.title)} // Open modal with selected title
+          title={
+            item.participants.includes(userData._id) ? "Joined" : "Join Now"
+          }
+          onPress={() => {
+            if (!item.participants.includes(userData._id))
+              handleJoinChallenge(item);
+          }} // Open modal with selected title
         />
       </View>
     </TouchableOpacity>
@@ -110,7 +139,24 @@ const CategoryList = () => {
         data={filteredChallenges}
         renderItem={renderChallengeItem}
         keyExtractor={(item) => item._id.toString()}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingBottom: 20,
+          alignItems: "center",
+          justifyContent:
+            filteredChallenges.length === 0 ? "center" : "flex-start",
+        }}
+        ListEmptyComponent={
+          <Text
+            style={{
+              fontSize: FontSize.small,
+              color: "white",
+              fontWeight: "bold",
+            }}
+          >
+            No Challenge
+          </Text>
+        }
       />
 
       <CustomModal
