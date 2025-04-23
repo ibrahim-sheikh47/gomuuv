@@ -90,7 +90,7 @@ const CategoryList = () => {
       }}
     >
       {/* <Image style={styles.cardImage} source={item.image} /> */}
-      <Image style={styles.cardImage} source={images.sessionBg} />
+      <Image style={styles.cardImage} source={{ uri: item.workout.image }} />
       <View style={styles.cardContent}>
         <Text style={styles.challengeTitle}>{item.workout.name}</Text>
         <Text style={styles.cardSubtitle}>{item.workout.description}</Text>

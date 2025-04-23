@@ -132,7 +132,10 @@ const ChallengesScreen = () => {
       onPress={() => handleCardPress(challenge)}
     >
       {/* <Image style={styles.cardImage} source={challenge.image} /> */}
-      <Image style={styles.cardImage} source={images.sessionBg} />
+      <Image
+        style={styles.cardImage}
+        source={{ uri: challenge.workout?.image }}
+      />
       <View style={styles.cardContent}>
         <View style={styles.cardHeader}>
           <Text style={styles.challengeTitle}>{challenge.workout?.name}</Text>

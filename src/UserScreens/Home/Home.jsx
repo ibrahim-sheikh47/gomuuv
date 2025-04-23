@@ -37,6 +37,8 @@ const HomeScreen = () => {
   const { userData } = useSelector((state) => ({
     userData: state.Auth?.data,
   }));
+  const profileImage =
+    userData.image !== "" ? { uri: userData.image } : images.dp;
 
   useFocusEffect(
     useCallback(() => {
@@ -57,11 +59,7 @@ const HomeScreen = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await API.post(
-        `${END_POINTS.SIGNUP}/stats`,
-        {},
-        token
-      );
+      const response = await API.post(`${END_POINTS.SIGNUP}/stats`, {}, token);
 
       if (response?.data?.success) {
         console.log(response?.data?.data);
@@ -80,7 +78,7 @@ const HomeScreen = () => {
             userName={
               (userData?.firstName || "") + " " + (userData?.lastName || "")
             }
-            imageSource={images.dp}
+            imageSource={profileImage}
             onPress={() => {
               navigation.navigate("Profile");
             }}

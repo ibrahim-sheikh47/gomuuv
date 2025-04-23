@@ -137,7 +137,7 @@ const StartWorkout = () => {
     <Container cusStyles={{ paddingHorizontal: 0 }}>
       <Header title={title} showBackButton={true} />
       <View style={styles.imageContainer}>
-        <ImageBackground source={image} style={styles.backgroundImage}>
+        <ImageBackground source={{ uri: image }} style={styles.backgroundImage}>
           <ScrollView contentContainerStyle={styles.overlayContent}>
             {/* Display the current exercise title at the top */}
             {exercises.length > 0 && (

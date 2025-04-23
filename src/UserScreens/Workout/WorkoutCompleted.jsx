@@ -38,7 +38,7 @@ const WorkoutCompleted = ({ route }) => {
   return (
     <Container cusStyles={{ paddingHorizontal: 0 }}>
       <View style={styles.imageContainer}>
-        <ImageBackground source={image} style={styles.backgroundImage}>
+        <ImageBackground source={{ uri: image }} style={styles.backgroundImage}>
           <View style={styles.overlayContent}>
             <Text style={styles.completed}>Workout Completed</Text>
             <Text style={styles.workoutTitle}>{title}</Text>

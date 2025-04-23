@@ -17,22 +17,28 @@ import CustomButton from "../../components/CustomButton";
 import SettingItem from "../../components/SettingItem";
 import StatCard from "../../components/StatCard";
 import images from "../../constants/images";
-import { clearUserData } from "../../redux/reducers/AuthSlice";
+import { clearUserData, setUserData } from "../../redux/reducers/AuthSlice";
 import { settings } from "../../utils/data";
 import { FontSize } from "../../utils/font";
 import * as ImagePicker from "expo-image-picker"; // Assuming expo is used
 import AntDesign from "@expo/vector-icons/AntDesign";
 import EditIcon from "../../assets/svgs/EditIcon";
+import Toast from "react-native-toast-message";
+import { END_POINTS } from "../../config/routes";
+import { API } from "../../config/apiClient";
 
 const Profile = ({ navigation }) => {
   const dispatch = useDispatch();
   // Local state for profile image, initialized with default image
-  const [profileImage, setProfileImage] = useState(images.dp);
 
   // Combine all useSelector Hooks
-  const { userData } = useSelector((state) => ({
+  const { userData, token } = useSelector((state) => ({
     userData: state.Auth?.data,
+    token: state.Auth?.token,
   }));
+  const [profileImage, setProfileImage] = useState(
+    userData.image !== "" ? { uri: userData.image } : images.dp
+  );
 
   // Destructure height, weight, and age from userData
   const height = userData?.height || "0";
@@ -65,10 +71,41 @@ const Profile = ({ navigation }) => {
       if (!result.canceled && result.assets && result.assets[0]) {
         // Just update local state - no backend changes
         setProfileImage({ uri: result.assets[0].uri });
+        updateProfileImage(result.assets[0]);
       }
     } catch (error) {
       console.log("Error selecting image:", error);
       Alert.alert("Error", "Failed to change profile photo");
+    }
+  };
+
+  const updateProfileImage = async (image) => {
+    const formData = new FormData();
+
+    formData.append("file", {
+      uri: image.uri,
+      name: image.fileName || "photo.jpg",
+      type: image.mimeType || "image/jpeg",
+    });
+
+    try {
+      const response = await API.patch(
+        END_POINTS.UPDATE_PROFILE_PICTURE,
+        formData,
+        token
+      );
+
+      if (response?.data?.success) {
+        dispatch(setUserData(response?.data?.data));
+        Toast.show({
+          type: "success",
+          text1: "Profile picture updated",
+        });
+      } else {
+        throw new Error("Failed to update information.");
+      }
+    } catch (error) {
+      console.error("Upload failed", error);
     }
   };
 

@@ -190,7 +190,7 @@ const WorkoutScreen = () => {
                 <Text style={styles.sessionTitle}>Today's Session</Text>
                 <WorkoutCard
                   title={todaySessions[0]?.workout?.name}
-                  image={images.chestWorkout}
+                  image={todaySessions[0]?.workout?.image}
                   calories={todaySessions[0]?.workout?.calories}
                   time={todaySessions[0]?.workout?.workoutTime}
                   isTodayWorkout={true}
@@ -203,7 +203,7 @@ const WorkoutScreen = () => {
                       );
                     navigation.navigate("StartWorkout", {
                       title: todaySessions[0]?.workout?.name,
-                      image: images.chestWorkout,
+                      image: todaySessions[0]?.workout?.image,
                       time: todaySessions[0]?.workout?.workoutTime,
                       exercises: incompleteExercises,
                       level: todaySessions[0]?.workout?.level,
@@ -242,7 +242,7 @@ const WorkoutScreen = () => {
               </View>
               <WorkoutCard
                 title={workout?.name ?? "Chest Workout"}
-                image={images.chestWorkout}
+                image={workout?.image}
                 calories={workout?.calories ?? "190 kcal"}
                 time={
                   workout?.workoutTime ? `${workout.workoutTime}` : "25 mins"

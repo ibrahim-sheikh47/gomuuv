@@ -69,9 +69,7 @@ const InputField = ({
           style={[styles.input, styles.dateInput]}
         >
           <Text style={styles.dateText}>
-            {selectedDate
-              ? selectedDate.toDateString()
-              : placeholder || "Select Date"}
+            {selectedDate?.toDateString() ?? (placeholder || "Select Date")}
           </Text>
           <Icon name="calendar" size={20} color={"#888"} style={styles.icon} />
         </TouchableOpacity>

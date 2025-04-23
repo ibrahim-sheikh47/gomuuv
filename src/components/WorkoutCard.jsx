@@ -10,7 +10,7 @@ import { FontSize } from "../utils/font";
 
 const WorkoutCard = ({ title, calories, time, category, image, onPress }) => (
   <TouchableOpacity style={styles.sessionContainer} onPress={onPress}>
-    <Image source={image} style={styles.sessionImage} />
+    <Image source={{ uri: image }} style={styles.sessionImage} />
     <Text style={styles.sessionTitleText} numberOfLines={2}>
       {title}
     </Text>

@@ -91,7 +91,10 @@ const ChallengeDetail = () => {
       />
       <ScrollView>
         {/* <Image source={challenge.image} style={styles.challengeImage} /> */}
-        <Image source={images.sessionBg} style={styles.challengeImage} />
+        <Image
+          source={{ uri: challenge.workout.image }}
+          style={styles.challengeImage}
+        />
         <Text style={styles.title}>{challenge.workout.name}</Text>
         {/* <Text style={styles.cardSubtitle}>{challenge.workout.description}</Text> */}
 

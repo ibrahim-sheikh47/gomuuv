@@ -5,6 +5,7 @@ export const END_POINTS = {
   LOGIN: `/users/login`,
   FORGOT_PASSWORD: `/users/forgot-password`,
   UPDATE_USER: `/users/`,
+  UPDATE_PROFILE_PICTURE: `/users/update-profile-picture`,
   GET_CATEGORIES: `/categories`,
   GET_ALL_PRODUCTS: `/products`,
   ADD_TO_CART: `/cart/add-to-cart`,
