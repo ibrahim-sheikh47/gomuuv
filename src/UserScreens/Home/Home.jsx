@@ -37,6 +37,7 @@ const HomeScreen = () => {
   const { userData } = useSelector((state) => ({
     userData: state.Auth?.data,
   }));
+
   const profileImage =
     userData.image !== "" ? { uri: userData.image } : images.dp;
 

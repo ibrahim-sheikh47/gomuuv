@@ -133,6 +133,7 @@ const ChangePassScreen = () => {
           text1: "Password changed!",
           text2: "",
         });
+        navigation.goBack();
       }
     } catch (error) {
       // Handle error response

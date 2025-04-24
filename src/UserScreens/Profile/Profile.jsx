@@ -82,17 +82,20 @@ const Profile = ({ navigation }) => {
   const updateProfileImage = async (image) => {
     const formData = new FormData();
 
-    formData.append("file", {
+    formData.append("image", {
       uri: image.uri,
       name: image.fileName || "photo.jpg",
       type: image.mimeType || "image/jpeg",
     });
 
+    console.log(formData);
+
     try {
       const response = await API.patch(
         END_POINTS.UPDATE_PROFILE_PICTURE,
         formData,
-        token
+        token,
+        true
       );
 
       if (response?.data?.success) {

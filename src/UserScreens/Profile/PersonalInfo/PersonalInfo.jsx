@@ -33,6 +33,8 @@ const PersonalInfoScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (field, value) => {
+    console.log(field, value);
+
     setPersonalInfo((prevInfo) => ({
       ...prevInfo,
       [field]: value,

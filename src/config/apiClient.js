@@ -73,8 +73,16 @@ const API = {
     apiClient.post(url, data, { authorized: true, token }),
   put: (url, data, token) =>
     apiClient.put(url, data, { authorized: true, token }),
-  patch: (url, data, token) =>
-    apiClient.patch(url, data, { authorized: true, token }),
+  patch: (url, data, token, isMultipart = false) =>
+    apiClient.patch(url, data, {
+      authorized: true,
+      token,
+      headers: isMultipart
+        ? {
+            "Content-Type": "multipart/form-data",
+          }
+        : {},
+    }),
   delete: (url, token) => apiClient.delete(url, { authorized: true, token }),
 };
 

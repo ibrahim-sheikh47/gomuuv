@@ -50,7 +50,7 @@ const ViewAllWorkouts = () => {
           calories={`${item?.calories}`}
           time={`${item?.workoutTime}`}
           category={item?.category}
-          image={images.chestWorkout}
+          image={item?.image}
           onPress={() => handleOnPress(item)} // Pass the item to the handleOnPress function
         />
       </View>

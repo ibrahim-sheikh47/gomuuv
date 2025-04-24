@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   FlatList,
+  useWindowDimensions,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Container from "../../components/Container";
@@ -26,6 +27,7 @@ import moment from "moment";
 const CategoryList = () => {
   const route = useRoute();
   const navigation = useNavigation();
+  const { height, width } = useWindowDimensions();
   const { category } = route.params;
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTitle, setSelectedTitle] = useState("");
@@ -53,7 +55,9 @@ const CategoryList = () => {
   const getFilteredChallenges = async () => {
     try {
       const res = await API.get(
-        `${END_POINTS.CHALLENGES}?filter=${category}`,
+        `${END_POINTS.CHALLENGES}${
+          category !== "" ? "?filter=" + category : category
+        }`,
         null,
         token
       );
@@ -84,16 +88,22 @@ const CategoryList = () => {
   const renderChallengeItem = ({ item }) => (
     <TouchableOpacity
       key={item._id}
-      style={styles.challengeCard}
+      style={[styles.challengeCard, { width: width * 0.95 }]}
       onPress={() => {
         navigation.navigate("ChallengeDetail", { challenge: item });
       }}
     >
-      {/* <Image style={styles.cardImage} source={item.image} /> */}
-      <Image style={styles.cardImage} source={{ uri: item.workout.image }} />
-      <View style={styles.cardContent}>
-        <Text style={styles.challengeTitle}>{item.workout.name}</Text>
-        <Text style={styles.cardSubtitle}>{item.workout.description}</Text>
+      <View
+        style={[
+          styles.cardImage,
+          { height: height * 0.25, overflow: "hidden" },
+        ]}
+      >
+        <Image
+          style={[styles.cardImage, { height: "100%" }]}
+          source={{ uri: item.workout.image }}
+        />
+
         <Text
           style={[
             styles.absoluteText,
@@ -102,11 +112,12 @@ const CategoryList = () => {
               backgroundColor: "#3C3C3C",
               position: "absolute",
               borderRadius: 15,
-              top: -50,
-              right: 10,
+              bottom: height * 0.02,
+              right: height * 0.02,
               justifyContent: "center",
               alignItems: "center",
-              padding: 6,
+              paddingHorizontal: width * 0.04,
+              paddingVertical: width * 0.02,
             },
           ]}
         >
@@ -114,9 +125,17 @@ const CategoryList = () => {
             item.endDate
           ).format("DD MMM")}`}
         </Text>
+      </View>
+
+      <View style={styles.cardContent}>
+        <Text style={styles.challengeTitle}>{item.workout.name}</Text>
+        <Text style={styles.cardSubtitle}>{item.workout.description}</Text>
         <CustomButton
-          style={{ width: 90, height: 28, marginLeft: "auto" }}
-          textStyle={{ fontSize: FontSize.xxsmall, marginRight: 10 }}
+          style={{ alignSelf: "flex-end", height: height * 0.04 }}
+          textStyle={{
+            fontSize: FontSize.xxsmall,
+            paddingHorizontal: width * 0.04,
+          }}
           title={
             item.participants.includes(userData._id) ? "Joined" : "Join Now"
           }
@@ -130,12 +149,13 @@ const CategoryList = () => {
   );
 
   return (
-    <Container>
-      <Header title={"Challenges & Goals"} showBackButton={true} />
-      <View style={{ marginVertical: 30 }}>
-        <Text style={styles.title}>{category}</Text>
-      </View>
+    <Container cusStyles={{ paddingHorizontal: width * 0.025 }}>
+      <Header
+        title={category !== "" ? category : "All Challenges"}
+        showBackButton={true}
+      />
       <FlatList
+        style={{ marginTop: height * 0.05 }}
         data={filteredChallenges}
         renderItem={renderChallengeItem}
         keyExtractor={(item) => item._id.toString()}

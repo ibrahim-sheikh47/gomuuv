@@ -68,6 +68,7 @@ const WorkoutScreen = () => {
     try {
       const res = await API.get(END_POINTS.WORKOUT_SESSIONS, null, token);
       if (res.data.success) {
+        console.log(res?.data?.data);
         dispatch(setTodaySessions(res?.data?.data ? [res.data.data] : []));
       }
     } catch (error) {

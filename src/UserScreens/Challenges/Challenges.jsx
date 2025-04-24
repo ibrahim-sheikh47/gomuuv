@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
   FlatList,
+  useWindowDimensions,
 } from "react-native";
 import Container from "../../components/Container";
 import { colors } from "../../constants/colors";
@@ -34,6 +35,7 @@ import { API } from "../../config/apiClient";
 import moment from "moment";
 
 const ChallengesScreen = () => {
+  const { height, width } = useWindowDimensions();
   const [activeTab, setActiveTab] = useState("Challenges"); // Set default to Goals to match your screenshot
   const [weightModalVisible, setWeightModalVisible] = useState(false);
   const [targetModalVisible, setTargetModalVisible] = useState(false);
@@ -125,77 +127,80 @@ const ChallengesScreen = () => {
     }
   };
 
-  const renderChallengeCard = ({ item: challenge }) => (
-    <TouchableOpacity
-      key={challenge._id}
-      style={styles.challengeCard}
-      onPress={() => handleCardPress(challenge)}
-    >
-      {/* <Image style={styles.cardImage} source={challenge.image} /> */}
-      <Image
-        style={styles.cardImage}
-        source={{ uri: challenge.workout?.image }}
-      />
-      <View style={styles.cardContent}>
-        <View style={styles.cardHeader}>
-          <Text style={styles.challengeTitle}>{challenge.workout?.name}</Text>
-          {/* <View style={styles.cardHeaderTag}>
-            <StrengthIcon />
-            <Text style={styles.cardSubtitle}>{challenge.muscleGroup}</Text>
-          </View> */}
-        </View>
-        {upcomingChallenges.some((c) => c._id.toString() === challenge._id) && (
-          <>
-            <Text
-              style={[
-                styles.absoluteText,
-                { color: colors.green, fontSize: FontSize.small },
-                {
-                  backgroundColor: "#3C3C3C",
-                  position: "absolute",
-                  borderRadius: 15,
-                  top: -50,
-                  right: 10,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  padding: 6,
-                },
-              ]}
-            >
-              {`${moment(challenge.startDate).format("DD MMM")} - ${moment(
-                challenge.endDate
-              ).format("DD MMM")}`}
-            </Text>
-            <Text style={styles.cardSubtitle}>
-              {challenge.workout?.description}
-            </Text>
-            <View style={styles.cardHeaderTag}>
-              {/* <StrengthIcon />
-              <Text style={styles.cardSubtitle}>{challenge.muscleGroup}</Text>
-              <LevelIcon /> */}
-              <Text style={styles.cardSubtitle}>{challenge.level}</Text>
-            </View>
-          </>
-        )}
-        {enrolledChallenges.some((c) => c._id.toString() === challenge._id) && (
-          <>
-            <View style={styles.cardHeader}>
-              {/* <Text style={[styles.cardSubtitle, { color: colors.green }]}>
-                {challenge.percent} %
-              </Text> */}
-            </View>
+  const renderChallengeCard = ({ item }) => {
+    return (
+      <TouchableOpacity
+        key={item._id}
+        style={styles.challengeCard}
+        onPress={() => handleCardPress(item)}
+      >
+        <View
+          style={[
+            styles.cardImage,
+            { height: height * 0.25, overflow: "hidden" },
+          ]}
+        >
+          <Image
+            style={[styles.cardImage, { height: "100%" }]}
+            source={{ uri: item.workout.image }}
+          />
 
-            {/* <ProgressBar progress={challenge.percent} /> */}
-            <Text style={styles.cardSubtitle}>
-              {`${moment(challenge.startDate).format("DD MMM")} - ${moment(
-                challenge.endDate
-              ).format("DD MMM")}`}
-            </Text>
-          </>
-        )}
-      </View>
-    </TouchableOpacity>
-  );
+          <Text
+            style={[
+              styles.absoluteText,
+              { color: colors.green, fontSize: FontSize.small },
+              {
+                backgroundColor: "#3C3C3C",
+                position: "absolute",
+                borderRadius: 15,
+                bottom: height * 0.02,
+                right: height * 0.02,
+                justifyContent: "center",
+                alignItems: "center",
+                paddingHorizontal: width * 0.04,
+                paddingVertical: width * 0.02,
+              },
+            ]}
+          >
+            {`${moment(item.startDate).format("DD MMM")} - ${moment(
+              item.endDate
+            ).format("DD MMM")}`}
+          </Text>
+        </View>
+
+        <View style={styles.cardContent}>
+          <Text style={styles.challengeTitle}>{item.workout.name}</Text>
+          <Text style={styles.cardSubtitle}>{item.workout.description}</Text>
+          {enrolledChallenges.some((c) => c._id.toString() === item._id) && (
+            <>
+              <View style={styles.cardHeader}>
+                <Text style={[styles.cardSubtitle, { color: colors.green }]}>
+                  {item.dayStats.filter((d) => d.isDayCompleted).length > 0
+                    ? (
+                        (item.dayStats.filter((d) => d.isDayCompleted).length /
+                          item.workout?.days.length) *
+                        100
+                      ).toFixed(2)
+                    : 0}{" "}
+                  %
+                </Text>
+              </View>
+
+              <ProgressBar
+                progress={
+                  item.dayStats.filter((d) => d.isDayCompleted).length > 0
+                    ? (item.dayStats.filter((d) => d.isDayCompleted).length /
+                        item.workout?.days.length) *
+                      100
+                    : 0
+                }
+              />
+            </>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   // Calculate progress percentage for the progress bar
   const calculateProgressPercentage = () => {
@@ -426,7 +431,9 @@ const ChallengesScreen = () => {
         showsVerticalScrollIndicator={false}
         ListFooterComponent={activeTab === "Challenges" && renderFooter}
         ListEmptyComponent={
-          activeTab === "Challenges" ? <Text>No Challenge</Text> : null
+          activeTab === "Challenges" ? (
+            <Text style={{ color: "white" }}>No Challenge</Text>
+          ) : null
         }
       />
 

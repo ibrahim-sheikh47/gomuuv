@@ -13,9 +13,14 @@ const CustomButton = ({
   textStyle,
   btnIcon,
   iconStyle,
+  disabled,
 }) => {
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.button, style]}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={[styles.button, style]}
+      disabled={disabled}
+    >
       {btnIcon && <Image style={iconStyle} source={btnIcon} />}
       <Text style={[styles.buttonText, textStyle]}>{title}</Text>
     </TouchableOpacity>
@@ -26,7 +31,6 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: colors.green,
     height: 50,
-    width: "100%",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,

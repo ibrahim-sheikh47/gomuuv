@@ -23,10 +23,11 @@ const Header = ({
         justifyContent: "space-between",
         width: "100%",
         marginTop: 20,
+        gap: 20,
       }}
     >
       {/* Back Button */}
-      <View style={{ flex: 1 }}>
+      <View>
         {showBackButton && (
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={20} color="#fff" />
@@ -37,9 +38,10 @@ const Header = ({
       {/* Centered Title */}
       <View
         style={{
+          flex: 1,
           alignItems: "center",
           justifyContent: "center",
-          width: 205,
+          // width: 205,
         }}
       >
         <Text
@@ -56,7 +58,6 @@ const Header = ({
       {/* Right Icons */}
       <View
         style={{
-          flex: 1,
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "flex-end",

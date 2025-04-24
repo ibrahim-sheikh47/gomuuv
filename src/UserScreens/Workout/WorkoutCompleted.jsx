@@ -17,22 +17,14 @@ import { FontSize } from "../../utils/font";
 
 const WorkoutCompleted = ({ route }) => {
   const navigation = useNavigation();
-  const {
-    title,
-    duration,
-    image,
-    level,
-    calories,
-    lastExerciseId,
-    workoutSessionId,
-  } = route.params;
+  const { title, duration, image, level, calories, isChallenge } = route.params;
   const { token } = useSelector((state) => ({
     token: state.Auth?.token,
   }));
 
   // Navigate back to home or workouts list
   const handleNavigate = () => {
-    navigation.navigate("Workout"); // Change "Home" to your desired screen
+    navigation.goBack();
   };
 
   return (
@@ -73,7 +65,23 @@ const WorkoutCompleted = ({ route }) => {
         <View style={{ padding: 16 }}>
           <CustomButton title={"Close"} onPress={handleNavigate} />
           <CustomButton
-            onPress={() => navigation.navigate("ViewAllWorkouts")}
+            onPress={() =>
+              navigation.reset({
+                routes: [
+                  {
+                    name: "TabNavigator",
+                    params: {
+                      screen: isChallenge ? "Challenges" : "Workouts", // Navigate to the "Chats" screen within the TabNavigator
+                    },
+                  },
+                  {
+                    name: isChallenge ? "CategoryList" : "ViewAllWorkouts",
+                    params: { category: "" },
+                  },
+                ],
+                index: 1,
+              })
+            }
             title={"Start Again"}
             style={{
               borderColor: colors.green,

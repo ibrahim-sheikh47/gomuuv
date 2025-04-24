@@ -15,19 +15,28 @@ import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
 import CustomModal from "../../components/CustomModal";
 import StrengthIcon from "../../assets/svgs/StrengthIcon";
+import moment from "moment";
 
 const ChallengeDetail = () => {
   const route = useRoute();
   const navigation = useNavigation();
-  const { challenge } = route.params; // Access challenge data from params
+  const { challenge: item } = route.params; // Access challenge data from params
   const { token, userData } = useSelector((state) => ({
     token: state.Auth?.token,
     userData: state.Auth?.data,
   }));
+  const [challenge, setChallenge] = useState(item);
+
+  const date = moment().format("DD/MM/yyyy");
+  const dayStat = challenge.dayStats.find((d) => d.date === date);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTitle, setSelectedTitle] = useState("");
-  const [selectedPeriod, setSelectedPeriod] = useState("Day 1");
+  const [selectedPeriod, setSelectedPeriod] = useState(
+    challenge.workout.days[
+      dayStat ? challenge.dayStats.indexOf(dayStat) : challenge.dayStats.length
+    ].shortName
+  );
 
   const openModal = (title) => {
     setSelectedTitle(title);
@@ -41,14 +50,36 @@ const ChallengeDetail = () => {
 
     navigation.navigate("StartWorkout", {
       title: challenge.workout.name,
-      image: images.chestWorkout,
-      time: challenge.workout.workoutTime,
+      image: challenge.workout?.image,
+      time: dayStat
+        ? challenge.workout.workoutTime * 60 - dayStat.duration
+        : challenge.workout.workoutTime * 60,
+      workoutTime: challenge.workout.workoutTime,
       exercises: selectedExercises,
       level: challenge.workout.level,
       calories: challenge.workout.calories,
       workoutSessionId: challenge._id,
       isChallenge: true,
+      refreshChallenge: () => {
+        fetchChallenge();
+      },
     });
+  };
+
+  const fetchChallenge = async () => {
+    try {
+      const res = await API.get(
+        `${END_POINTS.CHALLENGES}/${challenge._id}`,
+        null,
+        token
+      );
+      if (res.data.success) {
+        console.log("challenge fetched");
+        setChallenge(res.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching challenge:", error);
+    }
   };
 
   const handleJoinChallenge = async () => {
@@ -61,6 +92,7 @@ const ChallengeDetail = () => {
       );
       if (res.data.success) {
         openModal(challenge.workout.name);
+        fetchChallenge();
       }
     } catch (error) {
       console.error("Error enrolling into challenge:", error);
@@ -81,14 +113,17 @@ const ChallengeDetail = () => {
     return dayData ? dayData.exercises : [];
   };
 
-  const selectedExercises = getExercisesForDay(selectedPeriod);
+  const selectedExercises = getExercisesForDay(selectedPeriod).filter(
+    (ex) =>
+      !challenge.exercisesCompleted.some(
+        (exx) => ex._id.toString() === exx.exercise.toString()
+      )
+  );
+  console.log(challenge);
+  console.log(selectedExercises);
   return (
     <Container>
-      <Header
-        title={"Challenges & Goals"}
-        showBackButton={true}
-        rightIcon1={<SearchIcon />}
-      />
+      <Header title={"Challenge"} showBackButton={true} />
       <ScrollView>
         {/* <Image source={challenge.image} style={styles.challengeImage} /> */}
         <Image
@@ -151,7 +186,10 @@ const ChallengeDetail = () => {
 
       {challenge.participants.includes(userData._id) && (
         <CustomButton
-          title={"Continue Challenge"}
+          title={
+            dayStat?.isDayCompleted ? "Day Completed" : "Continue Challenge"
+          }
+          disabled={dayStat?.isDayCompleted}
           style={{ marginTop: 20 }}
           onPress={closeModal}
         />

@@ -22,7 +22,6 @@ const InputField = ({
   autoFocus = false,
   placeholder, // Accept placeholder prop
 }) => {
-  console.log(value);
   const [isFocused, setIsFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -54,6 +53,7 @@ const InputField = ({
     setShowDatePicker(false);
     if (date) {
       setSelectedDate(date);
+      console.log(date.toISOString().split("T")[0]);
       onChangeText(date.toISOString().split("T")[0]); // Send formatted date to parent
     }
   };
@@ -66,9 +66,24 @@ const InputField = ({
       {type === "date" ? (
         <TouchableOpacity
           onPress={() => setShowDatePicker(true)}
-          style={[styles.input, styles.dateInput]}
+          style={[
+            styles.input,
+            { flexDirection: "row-reverse", alignItems: "center" },
+          ]}
         >
-          <Text style={styles.dateText}>
+          <Text
+            style={[
+              styles.input,
+              {
+                flex: 1,
+                textAlignVertical: "center",
+                height: "auto",
+                borderWidth: 0,
+              },
+              { ...(isFocused && { borderColor: colors.green }) },
+              cusStyles,
+            ]}
+          >
             {selectedDate?.toDateString() ?? (placeholder || "Select Date")}
           </Text>
           <Icon name="calendar" size={20} color={"#888"} style={styles.icon} />
@@ -129,7 +144,7 @@ const styles = StyleSheet.create({
   input: {
     height: 50,
     borderWidth: 1,
-    borderColor: "#1A1919", // Default border color
+    borderColor: "#444444", // Default border color
     backgroundColor: "#1A1919",
     color: "#fff",
     fontSize: FontSize.medium,

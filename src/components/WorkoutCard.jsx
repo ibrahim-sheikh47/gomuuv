@@ -8,34 +8,41 @@ import { IconButton } from "react-native-paper";
 import { colors } from "../constants/colors";
 import { FontSize } from "../utils/font";
 
-const WorkoutCard = ({ title, calories, time, category, image, onPress }) => (
-  <TouchableOpacity style={styles.sessionContainer} onPress={onPress}>
-    <Image source={{ uri: image }} style={styles.sessionImage} />
-    <Text style={styles.sessionTitleText} numberOfLines={2}>
-      {title}
-    </Text>
-    <View style={styles.sessionDetailsContainer}>
-      <View style={styles.sessionDetail}>
-        <CaloriesIcon width={15} height={15} />
-        <Text style={styles.detailText}>{calories}</Text>
-      </View>
-      <View style={styles.sessionDetail}>
-        <TimeIcon />
-        <Text style={styles.detailText}>{time} mins</Text>
-      </View>
-      {/* <View style={styles.sessionDetail}>
+const WorkoutCard = ({ title, calories, time, category, image, onPress }) => {
+  console.log(image);
+  return (
+    <TouchableOpacity style={styles.sessionContainer} onPress={onPress}>
+      <Image
+        source={{ uri: image }}
+        style={styles.sessionImage}
+        onError={(e) => console.log("Image failed to load", e.nativeEvent)}
+      />
+      <Text style={styles.sessionTitleText} numberOfLines={2}>
+        {title}
+      </Text>
+      <View style={styles.sessionDetailsContainer}>
+        <View style={styles.sessionDetail}>
+          <CaloriesIcon width={15} height={15} />
+          <Text style={styles.detailText}>{calories}</Text>
+        </View>
+        <View style={styles.sessionDetail}>
+          <TimeIcon />
+          <Text style={styles.detailText}>{time} mins</Text>
+        </View>
+        {/* <View style={styles.sessionDetail}>
         <StrengthIcon />
         <Text style={styles.detailText}>{category}</Text>
       </View> */}
-      <IconButton
-        icon="chevron-right"
-        size={20} // Adjust the size as needed
-        color="#aaa" // Adjust the color as needed
-        style={styles.nextIcon}
-      />
-    </View>
-  </TouchableOpacity>
-);
+        <IconButton
+          icon="chevron-right"
+          size={20} // Adjust the size as needed
+          color="#aaa" // Adjust the color as needed
+          style={styles.nextIcon}
+        />
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   sessionContainer: {

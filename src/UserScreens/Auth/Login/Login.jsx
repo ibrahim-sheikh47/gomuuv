@@ -31,8 +31,8 @@ const Login = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: "test@gmail.com",
-    password: "Aa@123456",
+    email: "ahmad.muzaffar@gomuuv.com",
+    password: "Abcd@12345",
     rememberMe: false,
   });
 

@@ -1,11 +1,12 @@
-export const SERVER_URL = "https://gomuuv-446812.de.r.appspot.com/api";
-// export const SERVER_URL = "http://10.50.46.239:4200/api";
+// export const SERVER_URL = "https://gomuuv-446812.de.r.appspot.com/api";
+export const SERVER_URL = "http://192.168.18.3:4200/api";
 export const END_POINTS = {
   SIGNUP: `/users`,
   LOGIN: `/users/login`,
   FORGOT_PASSWORD: `/users/forgot-password`,
   UPDATE_USER: `/users/`,
-  UPDATE_PROFILE_PICTURE: `/users/update-profile-picture`,
+  UPDATE_PROFILE_PICTURE: `/users/profile/update-profile-picture`,
+  CHANGE_PASSWORD: "/users/change-password",
   GET_CATEGORIES: `/categories`,
   GET_ALL_PRODUCTS: `/products`,
   ADD_TO_CART: `/cart/add-to-cart`,
@@ -30,4 +31,6 @@ export const END_POINTS = {
   PHYSICAL_ACTIVITIES: "/physical-activities",
   ORDERS: "/orders",
   CHALLENGES: "/challenges",
+  UPDATE_DAY_STATS: "/challenges/update-day-stats",
+  COMPLETE_CHALLENGE_EXERCISE: "/challenges/complete-exercise",
 };

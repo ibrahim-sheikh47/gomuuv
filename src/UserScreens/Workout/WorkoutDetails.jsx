@@ -104,7 +104,7 @@ const WorkoutDetails = () => {
         dispatch(setTodaySessions([res?.data?.data]));
         navigation.navigate("StartWorkout", {
           title: workout.name,
-          image: images.chestWorkout,
+          image: workout.image,
           time: workout.workoutTime,
           exercises: selectedExercises,
           level: workout.level,
@@ -118,7 +118,7 @@ const WorkoutDetails = () => {
   };
 
   return (
-    <Container cusStyles={{ padding: 0 }}>
+    <Container cusStyles={{ marginTop: 20 }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
         <View style={{ position: "relative" }}>
           <TouchableOpacity
@@ -129,7 +129,10 @@ const WorkoutDetails = () => {
           </TouchableOpacity>
 
           <View>
-            <Image source={images.chestWorkout} style={styles.workoutImage} />
+            <Image
+              source={{ uri: workout.image }}
+              style={styles.workoutImage}
+            />
             <Text style={styles.absoluteTitle}>{workout.name}</Text>
 
             <View
