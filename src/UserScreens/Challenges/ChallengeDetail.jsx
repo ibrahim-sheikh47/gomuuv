@@ -16,6 +16,7 @@ import { END_POINTS } from "../../config/routes";
 import CustomModal from "../../components/CustomModal";
 import StrengthIcon from "../../assets/svgs/StrengthIcon";
 import moment from "moment";
+import Toast from "react-native-toast-message";
 
 const ChallengeDetail = () => {
   const route = useRoute();
@@ -26,15 +27,15 @@ const ChallengeDetail = () => {
     userData: state.Auth?.data,
   }));
   const [challenge, setChallenge] = useState(item);
-
   const date = moment().format("DD/MM/yyyy");
-  const dayStat = challenge.dayStats.find((d) => d.date === date);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTitle, setSelectedTitle] = useState("");
   const [selectedPeriod, setSelectedPeriod] = useState(
-    challenge.workout.days[
-      dayStat ? challenge.dayStats.indexOf(dayStat) : challenge.dayStats.length
+    challenge?.workout?.days[
+      challenge?.workout?.days?.indexOf(
+        challenge?.workout?.days?.find((d) => d.date === date)
+      )
     ].shortName
   );
 
@@ -47,23 +48,30 @@ const ChallengeDetail = () => {
     setModalVisible(false);
     setSelectedTitle("");
     // navigation.goBack();
+    const day = challenge.workout.days.find(
+      (d) => d.shortName === selectedPeriod && date === d.date
+    );
 
-    navigation.navigate("StartWorkout", {
-      title: challenge.workout.name,
-      image: challenge.workout?.image,
-      time: dayStat
-        ? challenge.workout.workoutTime * 60 - dayStat.duration
-        : challenge.workout.workoutTime * 60,
-      workoutTime: challenge.workout.workoutTime,
-      exercises: selectedExercises,
-      level: challenge.workout.level,
-      calories: challenge.workout.calories,
-      workoutSessionId: challenge._id,
-      isChallenge: true,
-      refreshChallenge: () => {
-        fetchChallenge();
-      },
-    });
+    if (day) {
+      navigation.navigate("StartWorkout", {
+        title: challenge.workout.name,
+        image: challenge.workout?.image,
+        time: challenge.workout.workoutTime * 60 - day.durationCompleted,
+        workoutTime: challenge.workout.workoutTime,
+        exercises: selectedExercises,
+        level: challenge.workout.level,
+        calories: challenge.workout.calories,
+        workoutSessionId: challenge._id,
+        isChallenge: true,
+        refresh: () => {
+          fetchChallenge();
+        },
+      });
+    } else
+      Toast.show({
+        text1: "You can not do other days tasks",
+        type: "error",
+      });
   };
 
   const fetchChallenge = async () => {
@@ -100,38 +108,52 @@ const ChallengeDetail = () => {
   };
 
   const renderDayExercise = (dayExercises) => {
-    return dayExercises.map((exercise) => (
-      <View key={exercise._id} style={styles.exerciseContainer}>
+    console.log(dayExercises);
+    return dayExercises.map((e) => (
+      <View key={e.exercise._id} style={styles.exerciseContainer}>
         <Image source={images.chestWorkout} style={styles.exerciseImage} />
-        <Text style={styles.exerciseTitle}>{exercise.name}</Text>
-        <Text style={styles.exerciseReps}>{exercise.reps}</Text>
+        <Text style={styles.exerciseTitle}>{e.exercise.name}</Text>
+        <Text style={styles.exerciseReps}>{e.exercise.reps}</Text>
+
+        {e.isCompleted && <Text style={styles.exerciseReps}>Done</Text>}
       </View>
     ));
   };
   const getExercisesForDay = (day) => {
     const dayData = challenge.workout.days.find((d) => d.shortName === day);
-    return dayData ? dayData.exercises : [];
+    let exercises = dayData ? dayData.exercises : [];
+    // console.log(exercises);
+    return exercises;
   };
 
-  const selectedExercises = getExercisesForDay(selectedPeriod).filter(
-    (ex) =>
-      !challenge.exercisesCompleted.some(
-        (exx) => ex._id.toString() === exx.exercise.toString()
-      )
-  );
-  console.log(challenge);
-  console.log(selectedExercises);
+  const selectedExercises = getExercisesForDay(selectedPeriod);
+  // console.log(selectedExercises);
   return (
     <Container>
       <Header title={"Challenge"} showBackButton={true} />
       <ScrollView>
         {/* <Image source={challenge.image} style={styles.challengeImage} /> */}
-        <Image
-          source={{ uri: challenge.workout.image }}
-          style={styles.challengeImage}
-        />
-        <Text style={styles.title}>{challenge.workout.name}</Text>
-        {/* <Text style={styles.cardSubtitle}>{challenge.workout.description}</Text> */}
+        <View>
+          <Image
+            source={{ uri: challenge.workout.image }}
+            style={styles.workoutImage}
+          />
+          <Text style={styles.absoluteTitle}>{challenge.workout.name}</Text>
+
+          <View
+            style={{
+              backgroundColor: colors.bgColor,
+              borderRadius: 10,
+              width: 50,
+              padding: 5,
+              position: "absolute",
+              bottom: -25,
+              left: 20,
+            }}
+          >
+            <Text style={styles.dayTitle}>{selectedPeriod}</Text>
+          </View>
+        </View>
 
         <Text style={styles.sectionTitle}>Description</Text>
         <Text style={styles.description}>{challenge.workout.description}</Text>
@@ -187,9 +209,25 @@ const ChallengeDetail = () => {
       {challenge.participants.includes(userData._id) && (
         <CustomButton
           title={
-            dayStat?.isDayCompleted ? "Day Completed" : "Continue Challenge"
+            challenge?.workout?.days
+              .find((d) => d.shortName === selectedPeriod && date === d.date)
+              ?.exercises.some((ex) => !ex.isCompleted) === undefined ||
+            challenge?.workout?.days
+              .find((d) => d.shortName === selectedPeriod && date === d.date)
+              ?.exercises.some((ex) => !ex.isCompleted)
+              ? "Continue Challenge"
+              : "Day Completed"
           }
-          disabled={dayStat?.isDayCompleted}
+          disabled={
+            !(
+              challenge?.workout?.days
+                .find((d) => d.shortName === selectedPeriod && date === d.date)
+                ?.exercises.some((ex) => !ex.isCompleted) === undefined ||
+              challenge?.workout?.days
+                .find((d) => d.shortName === selectedPeriod && date === d.date)
+                ?.exercises.some((ex) => !ex.isCompleted)
+            )
+          }
           style={{ marginTop: 20 }}
           onPress={closeModal}
         />

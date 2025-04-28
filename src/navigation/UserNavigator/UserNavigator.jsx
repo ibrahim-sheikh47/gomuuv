@@ -41,6 +41,7 @@ import Login from "../../UserScreens/Auth/Login/Login";
 import FinalizePlan from "../../UserScreens/Nutrition/FinalizePlan";
 import VideoPlayerScreen from "../../UserScreens/Workout/VideoPlayerScreen";
 import MapScreen from "../../UserScreens/Map/MapScreen";
+import NutritionPlan from "../../UserScreens/Nutrition/NutritionPlan";
 
 const Stack = createNativeStackNavigator();
 
@@ -80,6 +81,7 @@ export default function UserNavigator() {
       <Stack.Screen name="CreatePlan" component={CreatePlan} />
       <Stack.Screen name="SetWaterGoal" component={SetWaterGoal} />
       <Stack.Screen name="NutritionPlans" component={NutritionPlans} />
+      <Stack.Screen name="NutritionPlan" component={NutritionPlan} />
       <Stack.Screen name="FinalizePlan" component={FinalizePlan} />
 
       <Stack.Screen name="EquipmentDetails" component={EquipmentDetails} />

@@ -1,6 +1,6 @@
 // screens/WorkoutListScreen.js
 
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,6 +16,8 @@ import images from "../../constants/images";
 const ViewAllWorkouts = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const { category } = useRoute().params;
+
   const { token, trendingData } = useSelector((state) => ({
     token: state.Auth?.token,
     trendingData: state.Workout.trendingData,
@@ -23,7 +25,13 @@ const ViewAllWorkouts = () => {
 
   const getTrendingWorkouts = async () => {
     try {
-      const res = await API.get(END_POINTS.WORKOUTS, null, token);
+      const res = await API.get(
+        `${END_POINTS.WORKOUTS}${
+          category ? "?equipments=" + category.value : ""
+        }`,
+        null,
+        token
+      );
       if (res.data.success) {
         dispatch(setTrendingWorkouts(res?.data?.data));
       }
@@ -60,7 +68,7 @@ const ViewAllWorkouts = () => {
   return (
     <Container>
       <Header
-        title={"Trending Workouts"}
+        title={category ? category.label : "Trending Workouts"}
         showBackButton={true}
         rightIcon1={<SearchIcon />}
       />

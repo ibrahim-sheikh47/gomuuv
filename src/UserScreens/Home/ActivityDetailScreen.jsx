@@ -27,17 +27,19 @@ import CaloriesIcon from "../../assets/svgs/CaloriesIcon";
 import HeartRateIcon from "../../assets/svgs/HeartRateIcon";
 import GoalIcon from "../../assets/svgs/GoalIcon";
 import { FontSize } from "../../utils/font";
+import { END_POINTS } from "../../config/routes";
+import { API } from "../../config/apiClient";
+import { useSelector } from "react-redux";
+import moment from "moment";
+import Toast from "react-native-toast-message";
 
 const ActivityDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const {
-    activityName,
-    distance = null,
-    time = null,
-    distanceUnit = null,
-  } = route.params || {};
+  const { activityType, activityName, goal: item } = route.params || {};
 
+  const [goal, setGoal] = useState(item);
+  const date = moment().format("DD/MM/yyyy");
   const duration = ["Today", "Weekly", "Monthly", "Quarterly", "Yearly"];
   const [selectedPeriod, setSelectedPeriod] = useState("Today");
   const [activityResult, setActivityResult] = useState({
@@ -46,6 +48,9 @@ const ActivityDetailScreen = () => {
     coordinates: [],
   });
 
+  const { token } = useSelector((state) => ({
+    token: state.Auth?.token,
+  }));
   // Button dimensions
   const buttonWidth = 300; // Adjust this to match your button width
   const maxDragDistance = buttonWidth; // Icon width is 48, padding is 24
@@ -88,11 +93,20 @@ const ActivityDetailScreen = () => {
         pan.flattenOffset();
 
         if (pan.x._value > dragThreshold) {
-          navigation.navigate("Map", {
-            activityName,
-            heartRate,
-            calories,
-          });
+          if (goal) {
+            navigation.navigate("Map", {
+              goal,
+              activityName,
+              activityType,
+              heartRate,
+              calories,
+            });
+          } else {
+            Toast.show({
+              text1: "Kindly set a goal before starting",
+              type: "error",
+            });
+          }
 
           // navigation.navigate("FinishActivity", {
           //   activityName: activityName,
@@ -116,6 +130,23 @@ const ActivityDetailScreen = () => {
   const heartRate = "0bpm";
   const calories = "0kcal";
 
+  const fetchActiveGoal = async () => {
+    try {
+      const response = await API.get(
+        `${END_POINTS.GOALS}/type/${activityType}`,
+        {},
+        token
+      );
+
+      if (response?.data?.success) {
+        console.log(response?.data?.success);
+        setGoal(response?.data?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Container>
       <Header title={`${activityName}`} showBackButton={true} />
@@ -132,7 +163,13 @@ const ActivityDetailScreen = () => {
           <TouchableOpacity
             style={styles.goalButton}
             onPress={() =>
-              navigation.navigate("ActivityScreen", { activityName })
+              navigation.navigate("ActivityScreen", {
+                activityName,
+                activityType,
+                refresh: () => {
+                  fetchActiveGoal();
+                },
+              })
             }
           >
             <GoalIcon />
@@ -144,21 +181,44 @@ const ActivityDetailScreen = () => {
           <CustomCard
             label="Distance"
             icon={DistanceIcon}
-            goal={"Goal: 2mi daily"}
-            message={activityResult.distance}
+            showProgress={true}
+            current={
+              goal.activities.find((a) => a.date === date)?.distance?.value || 0
+            }
+            target={goal?.targetDistance?.value || 0}
+            hideGoal={!goal?.distance}
+            goal={`Goal: ${goal?.targetDistance?.value} ${goal?.targetDistance?.unit}`}
+            message={`${
+              goal.activities.find((a) => a.date === date)?.distance?.value || 0
+            } ${
+              goal.activities.find((a) => a.date === date)?.distance?.unit ||
+              "mi"
+            }`}
           />
           <CustomCard
             label="Time"
             icon={TimeIcon}
-            goal={"Goal: 45min"}
-            message={activityResult.time}
+            hideGoal={!goal?.duration}
+            goal={`Goal: ${goal?.targetDuration?.value} ${goal?.targetDuration?.unit}`}
+            message={`${
+              goal.activities.find((a) => a.date === date)?.duration?.value || 0
+            } ${
+              goal.activities.find((a) => a.date === date)?.duration?.unit ||
+              "mins"
+            }`}
           />
         </View>
 
         <View style={styles.gridContainer}>
-          <CustomCard label="Calories" icon={CaloriesIcon} message={calories} />
+          <CustomCard
+            label="Calories"
+            hideGoal={true}
+            icon={CaloriesIcon}
+            message={calories}
+          />
           <CustomCard
             label="Heart Rate"
+            hideGoal={true}
             icon={HeartRateIcon}
             message={heartRate}
           />
@@ -200,8 +260,8 @@ const styles = StyleSheet.create({
   },
   goalButton: {
     backgroundColor: colors.green,
-    width: 92,
-    height: 28,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 7,

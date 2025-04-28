@@ -249,26 +249,26 @@ export const nutritionPlans = [
   {
     id: "1",
     title: "Weight Loss Plan",
-    type: "weightloss",
+    type: "weight_loss_plan",
     icon: <WeightLossIcon />,
   },
   {
     id: "2",
     title: "Muscle Gain Plan",
-    type: "musclegain",
+    type: "muscle_gain_plan",
     icon: <StrengthIcon width={24} height={24} />,
   },
   {
     id: "3",
     title: "Maintenance Plan",
-    type: "maintenance",
+    type: "maintenance_plan",
     icon: <MaintenanceIcon />,
   },
-  { id: "4", title: "Keto Plan", type: "keto", icon: <KetoIcon /> },
+  { id: "4", title: "Keto Plan", type: "keto_plan", icon: <KetoIcon /> },
   {
     id: "5",
     title: "Vegetarian Plan",
-    type: "vegetarian",
+    type: "vegetarian_plan",
     icon: <VegetarianIcon />,
   },
 ];

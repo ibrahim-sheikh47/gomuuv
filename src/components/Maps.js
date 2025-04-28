@@ -19,6 +19,7 @@ const Map = (props) => {
   const intervalRef = useRef(null); // For tracking location updates
   const timerRef = useRef(null); // For tracking elapsed time
 
+  const [mapReady, setMapReady] = useState(false);
   Geocoder.init("AIzaSyCSz-v30_BxTuT6a23e78UUy0ANbRd0gC4");
 
   useEffect(() => {
@@ -58,15 +59,43 @@ const Map = (props) => {
   }, [locationHistory.length]);
 
   useEffect(() => {
-    if (onLocationUpdate) {
-      onLocationUpdate({
-        address,
-        distance: totalDistance,
-        time: elapsedTime,
-        pathCoordinates: locationHistory,
-      });
-    }
+    const updateLocationWithSnapshot = async () => {
+      if (onLocationUpdate && mapReady) {
+        const snapshotUri = await takeMapSnapshot(); // <-- WAIT for snapshot first!
+
+        onLocationUpdate({
+          address,
+          distance: totalDistance,
+          time: elapsedTime,
+          pathCoordinates: locationHistory,
+          snapshot: snapshotUri, // <-- Now snapshot will not be null
+        });
+      }
+    };
+
+    updateLocationWithSnapshot(); // call async function
   }, [address, totalDistance, elapsedTime]);
+
+  const takeMapSnapshot = async () => {
+    if (!map.current || !mapReady) {
+      console.log("Map not ready or ref missing");
+      return null;
+    }
+
+    try {
+      const snapshotUri = await map.current.takeSnapshot({
+        width: 300,
+        height: 300,
+        format: "png",
+        result: "file",
+      });
+      console.log("Snapshot taken:", snapshotUri);
+      return snapshotUri;
+    } catch (error) {
+      console.log("Error taking snapshot:", error);
+      return null;
+    }
+  };
 
   // Fetch location function
   const fetchLocation = async () => {
@@ -150,6 +179,7 @@ const Map = (props) => {
   return (
     <View style={{ flex: 1 }}>
       <MapView
+        onMapReady={() => setMapReady(true)}
         customMapStyle={MapStyle}
         provider={PROVIDER_GOOGLE}
         style={{ flex: 1 }} // Ensure the map takes up the full container

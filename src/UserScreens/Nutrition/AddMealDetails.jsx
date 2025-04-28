@@ -75,6 +75,12 @@ const AddMealDetails = ({ route }) => {
             calories={item.calories}
             time={item.preparationTime}
             showDelIcon={true}
+            onPress={() =>
+              navigation.navigate("MealDetailScreen", {
+                meal: item,
+                source: "popularRecipes",
+              })
+            }
           />
         )}
         ListHeaderComponent={

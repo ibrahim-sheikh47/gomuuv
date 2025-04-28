@@ -15,6 +15,9 @@ import CustomButton from "../../components/CustomButton";
 import { colors } from "../../constants/colors";
 import EditIcon from "../../assets/svgs/EditIcon";
 import { FontSize } from "../../utils/font";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import { useSelector } from "react-redux";
 
 const ActivityScreen = () => {
   const route = useRoute();
@@ -28,6 +31,9 @@ const ActivityScreen = () => {
     distanceUnit: "mi",
   });
   const [modalVisible, setModalVisible] = useState(false);
+  const { token } = useSelector((state) => ({
+    token: state.Auth?.token,
+  }));
 
   const distanceUnits = [
     { label: "Miles", value: "mi" },
@@ -42,13 +48,49 @@ const ActivityScreen = () => {
     }));
   };
 
+  function convertToMinutes(hours, minutes) {
+    return hours * 60 + minutes;
+  }
+
+  const createGoal = async () => {
+    try {
+      console.log(activityType);
+      const response = await API.post(
+        `${END_POINTS.GOALS}`,
+        {
+          type: activityType,
+          targetDistance: {
+            value: formValues.distance,
+            unit: formValues.distanceUnit,
+          },
+          targetDuration: {
+            value: convertToMinutes(
+              formValues.timeHours,
+              formValues.timeMinutes
+            ),
+            unit: "minute",
+          },
+        },
+        token
+      );
+
+      if (response?.data?.success) {
+        route?.params?.refresh();
+        navigation.goBack();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleSave = () => {
-    navigation.navigate("ActivityDetailScreen", {
-      activityName: activityName,
-      distance: formValues.distance,
-      time: `${formValues.timeHours}h ${formValues.timeMinutes}m`,
-      distanceUnit: formValues.distanceUnit,
-    });
+    createGoal();
+    // navigation.navigate("ActivityDetailScreen", {
+    //   activityName: activityName,
+    //   distance: formValues.distance,
+    //   time: `${formValues.timeHours}h ${formValues.timeMinutes}m`,
+    //   distanceUnit: formValues.distanceUnit,
+    // });
   };
 
   const toggleModal = () => {

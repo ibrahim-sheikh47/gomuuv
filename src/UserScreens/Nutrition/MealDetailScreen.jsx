@@ -45,19 +45,12 @@ const MealDetailScreen = ({ route }) => {
     {
       type: "ingredients",
       id: "ingredients",
-      ingredients: meal.ingredients.map((ingredient, index) => ({
-        id: index.toString(), // Generate a unique key
-        name: ingredient,
-        quantity: "", // Add quantity if available
-      })),
+      ingredients: meal.ingredients,
     },
     {
       type: "steps",
       id: "steps",
-      steps: meal.recipe.map((step, index) => ({
-        id: index.toString(), // Generate a unique key
-        step: step,
-      })),
+      steps: meal.steps,
     },
   ];
 
@@ -80,18 +73,28 @@ const MealDetailScreen = ({ route }) => {
   const handleClose = () => {
     setModalVisible(false);
     setTimeout(() => {
-      navigation.navigate("Nutrition");
+      navigation.reset({
+        routes: [
+          {
+            name: "TabNavigator",
+            params: {
+              screen: "Nutrition", // Navigate to the "Chats" screen within the TabNavigator
+            },
+          },
+        ],
+        index: 0,
+      });
     }, 500);
   };
 
   const renderItem = ({ item }) => {
+    console.log(item);
+
     if (item.type === "mealInfo") {
       // Check if the mealImage is a valid URL or an object with a URI
-      const imageSource =
-        item.meal.image &&
-        (typeof item.meal.image === "string" || item.meal.image?.uri)
-          ? { uri: item.meal.image?.uri || item.meal.image }
-          : images.lunch;
+      const imageSource = item.meal.image
+        ? { uri: item.meal.image }
+        : images.lunch;
       return (
         <View style={{ position: "relative" }}>
           {/* Back Button */}
@@ -108,7 +111,7 @@ const MealDetailScreen = ({ route }) => {
           </TouchableOpacity>
           <Image source={imageSource} style={styles.image} />
           <View style={{ padding: 20 }}>
-            <Text style={styles.mealName}>{item.meal?.name}</Text>
+            <Text style={styles.mealName}>{item.meal?.mealName}</Text>
             <Text style={styles.title}>{item.meal?.title}</Text>
 
             {/* Meal Stats Container */}
@@ -195,6 +198,7 @@ const MealDetailScreen = ({ route }) => {
         </>
       );
     }
+
     if (item.type === "steps") {
       return (
         <View style={{ padding: 20 }}>

@@ -24,7 +24,17 @@ const WorkoutCompleted = ({ route }) => {
 
   // Navigate back to home or workouts list
   const handleNavigate = () => {
-    navigation.goBack();
+    navigation.reset({
+      routes: [
+        {
+          name: "TabNavigator",
+          params: {
+            screen: isChallenge ? "Challenges" : "Workout", // Navigate to the "Chats" screen within the TabNavigator
+          },
+        },
+      ],
+      index: 0,
+    });
   };
 
   return (
@@ -32,7 +42,9 @@ const WorkoutCompleted = ({ route }) => {
       <View style={styles.imageContainer}>
         <ImageBackground source={{ uri: image }} style={styles.backgroundImage}>
           <View style={styles.overlayContent}>
-            <Text style={styles.completed}>Workout Completed</Text>
+            <Text style={styles.completed}>
+              {isChallenge ? "Day" : "Workout"} Completed
+            </Text>
             <Text style={styles.workoutTitle}>{title}</Text>
 
             <View
@@ -52,12 +64,14 @@ const WorkoutCompleted = ({ route }) => {
               <View>
                 <Text style={styles.durationLabel}>Duration</Text>
                 {/* Display the formatted duration */}
-                <Text style={styles.durationText}>{duration}</Text>
+                <Text style={styles.durationText}>
+                  {parseInt(duration / 60)} (mins)
+                </Text>
               </View>
               <View>
                 <Text style={styles.durationLabel}>Burned</Text>
                 {/* Display the formatted duration */}
-                <Text style={styles.durationText}>{calories}</Text>
+                <Text style={styles.durationText}>{calories} (kcal)</Text>
               </View>
             </View>
           </View>
@@ -71,7 +85,7 @@ const WorkoutCompleted = ({ route }) => {
                   {
                     name: "TabNavigator",
                     params: {
-                      screen: isChallenge ? "Challenges" : "Workouts", // Navigate to the "Chats" screen within the TabNavigator
+                      screen: isChallenge ? "Challenges" : "Workout", // Navigate to the "Chats" screen within the TabNavigator
                     },
                   },
                   {
@@ -82,7 +96,7 @@ const WorkoutCompleted = ({ route }) => {
                 index: 1,
               })
             }
-            title={"Start Again"}
+            title={isChallenge ? "More Challenges" : "Start Again"}
             style={{
               borderColor: colors.green,
               borderWidth: 2,

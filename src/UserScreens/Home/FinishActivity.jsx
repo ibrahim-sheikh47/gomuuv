@@ -14,25 +14,84 @@ import TimeIcon from "../../assets/svgs/TimeIcon";
 import DistanceIcon from "../../assets/svgs/DistanceIcon";
 import PaceIcon from "../../assets/svgs/PaceIcon";
 import { FontSize } from "../../utils/font";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import { useSelector } from "react-redux";
 
 const FinishActivity = () => {
   const route = useRoute();
-  const { activityName, distance, distanceUnit, time, heartRate, calories } =
-    route.params;
+  const {
+    activityName,
+    activityType,
+    distance,
+    distanceUnit,
+    time,
+    heartRate,
+    calories,
+    snapshot,
+  } = route.params;
+
   const navigation = useNavigation();
+  const { token } = useSelector((state) => ({
+    token: state.Auth?.token,
+  }));
 
   // Convert time from seconds (assuming time is given in seconds)
   const timeInSeconds = time; // time is in seconds from params
   const distanceInMiles = distance; // Assuming distance is in miles
 
   // Calculate Time Per Mile (in minutes and seconds)
-  const timePerMileInSeconds = timeInSeconds / distanceInMiles;
-  const minutesPerMile = Math.floor(timePerMileInSeconds / 60);
-  const secondsPerMile = Math.round(timePerMileInSeconds % 60);
+  const timePerMileInSeconds =
+    timeInSeconds / (distanceInMiles > 0.0 ? distanceInMiles : 1);
+
+  const minutesPerMile = Math.floor(timePerMileInSeconds / 60) || 0;
+  const secondsPerMile = Math.round(timePerMileInSeconds % 60) || 0;
 
   // Calculate Pace (in miles per hour)
-  const paceInHours = distanceInMiles / (timeInSeconds / 3600); // timeInSeconds is divided by 3600 to convert time to hours
+  const paceInHours = distanceInMiles / (timeInSeconds / 60); // timeInSeconds is divided by 3600 to convert time to hours
   const pace = paceInHours.toFixed(2); // Format the pace to 2 decimal places
+
+  const finishActivity = async () => {
+    try {
+      const response = await API.patch(
+        `${END_POINTS.GOALS}`,
+        {
+          type: activityType,
+          distance: {
+            value: distance,
+            unit: "mi",
+          },
+          duration: {
+            value: time / 60,
+            unit: "minute",
+          },
+        },
+        token
+      );
+
+      if (response?.data?.success) {
+        navigation.reset({
+          routes: [
+            {
+              name: "TabNavigator",
+              params: {
+                screen: "Home",
+              },
+            },
+            {
+              name: "ActivityDetailScreen",
+              params: {
+                goal,
+              },
+            },
+          ],
+          index: 1,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <Container>
@@ -89,10 +148,18 @@ const FinishActivity = () => {
             </Text>
           </View>
         </View>
-        <Image
-          source={images.walkingGraph}
-          style={{ width: "100%", height: 200, marginVertical: 20 }}
-        />
+        {snapshot && (
+          <Image
+            source={{ uri: snapshot }}
+            style={{
+              width: "100%",
+              height: 170,
+              marginVertical: 20,
+              resizeMode: "cover",
+              borderRadius: 20,
+            }}
+          />
+        )}
         <View style={styles.gridContainer}>
           <CustomCard
             label="Time Per Mile"
@@ -109,7 +176,11 @@ const FinishActivity = () => {
           />
         </View>
         <View style={styles.gridContainer}>
-          <CustomCard label="Pace" icon={PaceIcon} message={`${pace} mi/hr`} />
+          <CustomCard
+            label="Pace"
+            icon={PaceIcon}
+            message={`${pace} mi/minute`}
+          />
           <CustomCard
             label="Distance"
             icon={DistanceIcon}
@@ -121,9 +192,7 @@ const FinishActivity = () => {
       <CustomButton
         title={"Finish"}
         style={{ marginTop: 20 }}
-        onPress={() => {
-          navigation.navigate("Home");
-        }}
+        onPress={finishActivity}
       />
     </Container>
   );

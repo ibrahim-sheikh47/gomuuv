@@ -32,6 +32,7 @@ import {
   setTrendingWorkouts,
 } from "../../redux/reducers/WorkoutSlice";
 import { FontSize } from "../../utils/font";
+import moment from "moment";
 
 const WorkoutScreen = () => {
   const dispatch = useDispatch();
@@ -39,6 +40,9 @@ const WorkoutScreen = () => {
   const [activeTab, setActiveTab] = useState("Workout");
   const tabs = ["Workout", "Fasting"];
   const duration = ["Today", "Weekly", "Monthly", "Quarterly", "Yearly"];
+
+  const date = moment().format("DD/MM/yyyy");
+  const dayName = moment().format("dddd");
   const [selectedPeriod, setSelectedPeriod] = useState("Today");
   const { token, trendingData, todaySessions } = useSelector((state) => ({
     token: state.Auth?.token,
@@ -76,7 +80,11 @@ const WorkoutScreen = () => {
     }
   };
 
-  const handleTabClick = (tab) => setActiveTab(tab);
+  const handleTabClick = (tab) => {
+    if (tab === "Fasting") {
+      navToFasting();
+    } else setActiveTab(tab);
+  };
 
   const navToFasting = () => {
     setTimeout(() => {
@@ -86,10 +94,10 @@ const WorkoutScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   const sessionCategories = [
-    { label: "Treadmill", icon: <TreadMillIcon /> },
-    { label: "Dumbbells", icon: <DumbbellIcon /> },
-    { label: "Jump Rope", icon: <JumpRopeIcon /> },
-    { label: "Pull-Up Bar", icon: <PullupBarIcon /> },
+    { label: "Treadmill", value: "treadmill", icon: <TreadMillIcon /> },
+    { label: "Dumbbells", value: "dumbells", icon: <DumbbellIcon /> },
+    { label: "Jump Rope", value: "jump_rope", icon: <JumpRopeIcon /> },
+    { label: "Pull-Up Bar", value: "pull_up_assist", icon: <PullupBarIcon /> },
   ];
 
   const handleCategorySelect = (index) => {
@@ -97,7 +105,10 @@ const WorkoutScreen = () => {
 
     // Navigate to the next screen with selected category
     const selectedCategoryValue = sessionCategories[index];
-    navigation.navigate("EquipmentDetails", {
+    // navigation.navigate("EquipmentDetails", {
+    //   category: selectedCategoryValue,
+    // });
+    navigation.navigate("ViewAllWorkouts", {
       category: selectedCategoryValue,
     });
   };
@@ -133,7 +144,10 @@ const WorkoutScreen = () => {
 
   return (
     <Container>
-      <Header title={"Workout"} rightIcon1={<SearchIcon />} />
+      <Header
+        title={"Workout"}
+        //  rightIcon1={<SearchIcon />}
+      />
       <TabContainer
         activeTab={activeTab}
         onTabClick={handleTabClick}
@@ -196,22 +210,32 @@ const WorkoutScreen = () => {
                   time={todaySessions[0]?.workout?.workoutTime}
                   isTodayWorkout={true}
                   onPress={async () => {
-                    const incompleteExercises =
-                      await getIncompleteExercisesForDay(
-                        todaySessions[0]?.workout,
-                        todaySessions[0]?.exercisesCompleted,
-                        "Day 1"
+                    try {
+                      const day = todaySessions[0]?.workout?.days?.find(
+                        (d) => date === d.date || d.weekDay === dayName
                       );
-                    navigation.navigate("StartWorkout", {
-                      title: todaySessions[0]?.workout?.name,
-                      image: todaySessions[0]?.workout?.image,
-                      time: todaySessions[0]?.workout?.workoutTime,
-                      exercises: incompleteExercises,
-                      level: todaySessions[0]?.workout?.level,
-                      calories: todaySessions[0]?.workout?.calories,
-                      workoutSessionId: todaySessions[0]?._id,
-                      exercisesCompleted: todaySessions[0]?.exercisesCompleted,
-                    });
+                      const incompleteExercises = day.exercises.filter(
+                        (e) => !e.isCompleted
+                      );
+
+                      navigation.navigate("StartWorkout", {
+                        title: todaySessions[0]?.workout?.name,
+                        image: todaySessions[0]?.workout?.image,
+                        time:
+                          todaySessions[0]?.workout?.workoutTime * 60 -
+                          day.durationCompleted,
+                        workoutTime: todaySessions[0]?.workout?.workoutTime,
+                        exercises: incompleteExercises,
+                        level: todaySessions[0]?.workout?.level,
+                        calories: todaySessions[0]?.workout?.calories,
+                        workoutSessionId: todaySessions[0]?._id,
+                        refresh: () => {
+                          getTodaySessions();
+                        },
+                      });
+                    } catch (err) {
+                      console.log(err);
+                    }
                   }}
                 />
               </View>
@@ -256,7 +280,6 @@ const WorkoutScreen = () => {
             </View>
           </>
         )}
-        {activeTab === "Fasting" && navToFasting()}
       </ScrollView>
     </Container>
   );

@@ -83,7 +83,9 @@ const ChallengesScreen = () => {
   };
 
   const handleCardPress = (challenge) => {
-    navigation.navigate("ChallengeDetail", { challenge });
+    navigation.navigate("ChallengeDetail", {
+      challenge: JSON.parse(JSON.stringify(challenge)),
+    });
   };
 
   const categoryIcons = {
@@ -175,24 +177,20 @@ const ChallengesScreen = () => {
             <>
               <View style={styles.cardHeader}>
                 <Text style={[styles.cardSubtitle, { color: colors.green }]}>
-                  {item.dayStats.filter((d) => d.isDayCompleted).length > 0
-                    ? (
-                        (item.dayStats.filter((d) => d.isDayCompleted).length /
-                          item.workout?.days.length) *
-                        100
-                      ).toFixed(2)
-                    : 0}{" "}
+                  {(
+                    item.workout?.days?.filter(
+                      (d) => !d?.exercises?.some((e) => !e.isCompleted)
+                    ).length / item.workout?.days.length || 0
+                  ).toFixed(3)}{" "}
                   %
                 </Text>
               </View>
 
               <ProgressBar
                 progress={
-                  item.dayStats.filter((d) => d.isDayCompleted).length > 0
-                    ? (item.dayStats.filter((d) => d.isDayCompleted).length /
-                        item.workout?.days.length) *
-                      100
-                    : 0
+                  (item.workout?.days?.filter(
+                    (d) => !d?.exercises?.some((e) => !e.isCompleted)
+                  ).length / item.workout?.days.length || 0) * 100
                 }
               />
             </>
@@ -217,6 +215,7 @@ const ChallengesScreen = () => {
 
   const renderGoalsSection = () => (
     <View>
+      {/* Header Section */}
       <Text style={[styles.sectionTitle, { fontSize: 14, marginBottom: 5 }]}>
         Current Weight
       </Text>
@@ -230,22 +229,36 @@ const ChallengesScreen = () => {
         {currentWeight ? `${currentWeight} kg` : "N/A"}
       </Text>
 
-      {/* Weight graph with dropdown */}
+      {/* Graph + Yearly Dropdown */}
       <View
         style={{
+          marginTop: 10,
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          marginTop: 10,
         }}
       >
-        <TouchableOpacity>
+        <View style={{ flex: 1 }}>
+          {/* Graph */}
+          <Image
+            source={images.weightGraph}
+            style={{
+              height: 180,
+              width: "100%",
+              resizeMode: "contain",
+            }}
+          />
+        </View>
+
+        {/* Dropdown */}
+        <TouchableOpacity style={{ position: "absolute", top: 10, right: 10 }}>
           <View
             style={{
               flexDirection: "row",
               alignItems: "center",
               backgroundColor: "#242425",
-              padding: 8,
+              paddingVertical: 5,
+              paddingHorizontal: 10,
               borderRadius: 8,
             }}
           >
@@ -263,14 +276,8 @@ const ChallengesScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <Image
-        source={images.weightGraph}
-        style={{ height: 205, width: "100%", marginTop: 10 }}
-      />
-
+      {/* Progress Section */}
       <Text style={styles.sectionTitle}>Your Progress</Text>
-
-      {/* Updated Progress Section with Progress Bar */}
       <View style={styles.progressContainer}>
         <View style={styles.progressLabels}>
           <View>
@@ -289,7 +296,7 @@ const ChallengesScreen = () => {
           </View>
         </View>
 
-        {/* Custom Progress Bar */}
+        {/* Progress Bar */}
         <View style={styles.customProgressBarContainer}>
           <View
             style={[
@@ -309,8 +316,14 @@ const ChallengesScreen = () => {
         </View>
       </View>
 
-      {/* Buttons */}
-      <View style={styles.buttonsContainer}>
+      {/* Update Weight & Set Target Buttons */}
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginTop: 20,
+        }}
+      >
         <CustomButton
           style={styles.updateWeightButton}
           title={"Update Your Weight"}
@@ -326,8 +339,9 @@ const ChallengesScreen = () => {
       </View>
 
       {/* BMI Section */}
-      <Text style={styles.sectionTitle}>Your BMI</Text>
+      <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Your BMI</Text>
       <View style={styles.bmiContainer}>
+        {/* BMI Value */}
         <View style={styles.bmiValueContainer}>
           <Text style={styles.bmiValue}>
             {bmiValue ? bmiValue.toString() : "N/A"}
@@ -350,8 +364,6 @@ const ChallengesScreen = () => {
                 />
               ))}
           </View>
-
-          {/* Scale numbers */}
           <View style={styles.bmiScaleNumbers}>
             <Text style={styles.bmiScaleNumber}>10</Text>
             <Text style={styles.bmiScaleNumber}>20</Text>
@@ -409,7 +421,7 @@ const ChallengesScreen = () => {
 
   return (
     <Container>
-      <Header title="Challenges & Goals" rightIcon1={<SearchIcon />} />
+      <Header title="Challenges & Goals" />
       <TabContainer
         activeTab={activeTab}
         onTabClick={setActiveTab}
@@ -431,7 +443,8 @@ const ChallengesScreen = () => {
         showsVerticalScrollIndicator={false}
         ListFooterComponent={activeTab === "Challenges" && renderFooter}
         ListEmptyComponent={
-          activeTab === "Challenges" ? (
+          activeTab === "Challenges" &&
+          (upcomingChallenges.length > 0 || enrolledChallenges.length > 0) ? (
             <Text style={{ color: "white" }}>No Challenge</Text>
           ) : null
         }

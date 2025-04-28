@@ -28,6 +28,7 @@ const HomeScreen = () => {
   const completionPercentage = 0;
   const [isFirstTime, setIsFirstTime] = useState(true); // Track if it's the user's first time
   const [stats, setStats] = useState(null); // Track if it's the user's first time
+  const [goals, setGoals] = useState(null); // Track if it's the user's first time
 
   const { token } = useSelector((state) => ({
     token: state.Auth?.token,
@@ -44,6 +45,7 @@ const HomeScreen = () => {
   useFocusEffect(
     useCallback(() => {
       fetchStats();
+      fetchGoals();
     }, [])
   );
 
@@ -63,8 +65,20 @@ const HomeScreen = () => {
       const response = await API.post(`${END_POINTS.SIGNUP}/stats`, {}, token);
 
       if (response?.data?.success) {
-        console.log(response?.data?.data);
         setStats(response?.data?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchGoals = async () => {
+    try {
+      const response = await API.get(`${END_POINTS.GOALS}`, {}, token);
+
+      if (response?.data?.success) {
+        console.log(response?.data?.data);
+        setGoals(response?.data?.data);
       }
     } catch (error) {
       console.log(error);
@@ -103,10 +117,30 @@ const HomeScreen = () => {
               label={activity}
               onPress={() => {
                 handleInteraction();
-                navigation.navigate("ActivityDetailScreen", {
-                  activityType: activity,
-                  activityName: activity,
-                });
+                const goal = goals?.find((g) => g.type === activity);
+
+                if (goal) {
+                  navigation.navigate("ActivityDetailScreen", {
+                    activityType: goal.type,
+                    activityName: goal.type,
+                    goal,
+                  });
+                } else {
+                  navigation.navigate("ActivityDetailScreen", {
+                    activityType: activity,
+                    activityName: activity,
+                  });
+                }
+                // else {
+                //   const heartRate = "0bpm";
+                //   const calories = "0kcal";
+
+                //   navigation.navigate("Map", {
+                //     activityName: activity,
+                //     heartRate,
+                //     calories,
+                //   });
+                // }
               }}
             />
           ))}

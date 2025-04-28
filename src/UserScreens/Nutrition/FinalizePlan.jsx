@@ -68,7 +68,23 @@ const FinalizePlan = ({ route }) => {
           text1: "Success!",
           text2: "Plan finalized successfully!",
         });
-        navigation.replace("ViewAllMeals", { title: "My Daily Plan" });
+        navigation.reset({
+          routes: [
+            {
+              name: "TabNavigator",
+              params: {
+                screen: "Nutrition", // Navigate to the "Chats" screen within the TabNavigator
+              },
+            },
+            {
+              name: "ViewAllMeals",
+              params: {
+                title: "My Daily Plan",
+              },
+            },
+          ],
+          index: 1,
+        });
       }
     } catch (error) {
       console.error("Error finalizing plan:", JSON.stringify(error, null, 2));

@@ -7,7 +7,7 @@ import { colors } from "../constants/colors";
 import GlassIcon from "../assets/svgs/GlassIcon";
 import { FontSize } from "../utils/font";
 
-const WaterIntake = ({ consumedGlasses, totalGlasses, onAddWater }) => {
+const WaterIntake = ({ consumedGlasses, totalGlasses, totalVolume, onAddWater }) => {
   const waterProgress = Math.min((consumedGlasses / totalGlasses) * 100, 100);
 
   return (
@@ -23,7 +23,7 @@ const WaterIntake = ({ consumedGlasses, totalGlasses, onAddWater }) => {
       <Text
         style={{ textAlign: "right", color: "#A4A4A4", marginVertical: 10 }}
       >
-        1250 ml{" "}
+        {totalVolume} ml{" "}
       </Text>
     </TouchableOpacity>
   );
@@ -33,7 +33,6 @@ export default WaterIntake;
 
 const styles = StyleSheet.create({
   waterIntakeContainer: {
-    height: 130,
     backgroundColor: "#252525",
     borderRadius: 15,
     marginTop: 10,

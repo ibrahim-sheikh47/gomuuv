@@ -1,5 +1,5 @@
-import { useNavigation } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -29,17 +29,25 @@ import {
 } from "../../redux/reducers/NutritionSlice";
 import { nutritionPlans } from "../../utils/data";
 import { FontSize } from "../../utils/font";
+import moment from "moment";
 
 // Meal Item Component
 
 const NutritionScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const [eatenCalories, setEatenCalories] = useState(200);
-  const [burnedCalories, setBurnedCalories] = useState(200);
-  const [totalCalories, setTotalCalories] = useState(1500);
-  const [consumedGlasses, setConsumedGlasses] = useState(0);
-  const [totalGlasses, setTotalGlasses] = useState(0); // Default to 8 glasses
+  const [eatenCalories, setEatenCalories] = useState(0);
+  const [burnedCalories, setBurnedCalories] = useState(0);
+  const [totalCalories, setTotalCalories] = useState(0);
+  const [goal, setGoal] = useState(null);
+  const date = moment().format("DD/MM/yyyy");
+
+  const [consumedGlasses, setConsumedGlasses] = useState(
+    goal?.activities.find((a) => a.date === date)?.distance?.value || 0
+  );
+  const [totalGlasses, setTotalGlasses] = useState(
+    goal?.targetDistance?.value || 0
+  ); // Default to 8 glasses
   const [totalIntakeGoal, setTotalIntakeGoal] = useState(0);
   const { token, dailyPlans, nutritionMeals } = useSelector((state) => ({
     token: state.Auth?.token,
@@ -48,9 +56,9 @@ const NutritionScreen = () => {
   }));
 
   // State for nutrients (carbs, proteins, fats)
-  const [carbs, setCarbs] = useState({ current: 30, total: 30 });
-  const [proteins, setProteins] = useState({ current: 10, total: 30 });
-  const [fats, setFats] = useState({ current: 20, total: 30 });
+  const [carbs, setCarbs] = useState({ current: 0, total: 30 });
+  const [proteins, setProteins] = useState({ current: 0, total: 30 });
+  const [fats, setFats] = useState({ current: 0, total: 30 });
 
   // Calculate remaining calories
   const remainingCalories = totalCalories - eatenCalories;
@@ -59,6 +67,12 @@ const NutritionScreen = () => {
   const fillPercentage = (remainingCalories / totalCalories) * 100;
 
   const waterProgress = (consumedGlasses / totalGlasses) * 100;
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchActiveGoal();
+    }, [])
+  );
 
   useEffect(() => {
     getNutritionMeals();
@@ -79,11 +93,32 @@ const NutritionScreen = () => {
       console.error("Error fetching meals:", error);
     }
   };
+
   const getDailyPlans = async () => {
     try {
       const res = await API.get(END_POINTS.DAILY_PLANS, null, token);
       if (res.data.success) {
         dispatch(setDailyPlans(res?.data?.data?.meals || []));
+
+        let totalCalories = 0,
+          totalCarbs = 0,
+          totalProteins = 0,
+          totalSugar = 0,
+          totalFats = 0,
+          totalVitamins = 0;
+        for (meal of res?.data?.data?.meals) {
+          totalCalories += meal.calories;
+          totalCarbs += meal.carbs;
+          totalFats += meal.fats;
+          totalProteins += meal.protein;
+          totalSugar += meal.sugar;
+          totalVitamins += meal.vitamins;
+        }
+
+        setTotalCalories(totalCalories);
+        setProteins({ current: 0, total: totalProteins });
+        setCarbs({ current: 0, total: totalCarbs });
+        setFats({ current: 0, total: totalFats });
       }
     } catch (error) {
       console.error("Error fetching meals:", error);
@@ -92,7 +127,7 @@ const NutritionScreen = () => {
 
   const handleAddWater = () => {
     // Check if consumed glasses have reached the total glasses limit (equal but not exceeded)
-    if (consumedGlasses === totalGlasses) {
+    if (consumedGlasses >= totalGlasses - 1) {
       // Show a notification that the daily limit is reached
       Alert.alert(
         "Daily Limit Reached",
@@ -100,24 +135,70 @@ const NutritionScreen = () => {
         [
           {
             text: "Continue Drinking",
-            onPress: () =>
-              setConsumedGlasses((prevConsumed) => prevConsumed + 1),
+            onPress: () => updateWaterIntake(),
           },
-          { text: "Close", style: "cancel" },
+          {
+            text: "Close",
+            style: "cancel",
+            onPress: () => updateWaterIntake(),
+          },
         ]
       );
     } else {
-      // If not reached the limit, simply increment
-      setConsumedGlasses((prevConsumed) => prevConsumed + 1);
+      updateWaterIntake();
     }
   };
 
   // The rest of the component remains the same
   const handleSetGoal = () => {
-    navigation.navigate("SetWaterGoal", {
-      setTotalIntakeGoal,
-      setTotalGlasses,
-    });
+    navigation.navigate("SetWaterGoal");
+  };
+
+  const updateWaterIntake = async () => {
+    try {
+      const response = await API.patch(
+        `${END_POINTS.GOALS}`,
+        {
+          type: "Drinking",
+          distance: {
+            value: consumedGlasses + 1,
+          },
+          duration: {
+            value: (consumedGlasses + 1) * goal?.targetDuration.value,
+          },
+        },
+        token
+      );
+
+      if (response?.data?.success) {
+        setConsumedGlasses((prev) => prev + 1);
+        // fetchActiveGoal();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchActiveGoal = async () => {
+    try {
+      const response = await API.get(
+        END_POINTS.GOALS + "/type/Drinking",
+        {},
+        token
+      );
+
+      if (response?.data?.success) {
+        setGoal(response?.data?.data);
+        setTotalGlasses(parseInt(goal?.targetDistance?.value || 0));
+        setConsumedGlasses(
+          parseInt(
+            goal?.activities.find((a) => a.date === date)?.distance?.value || 0
+          )
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // Data for daily meal plan
@@ -192,6 +273,7 @@ const NutritionScreen = () => {
         <WaterIntake
           consumedGlasses={consumedGlasses}
           totalGlasses={totalGlasses}
+          totalVolume={goal?.targetDuration.value}
           onAddWater={handleAddWater}
         />
 
@@ -398,8 +480,8 @@ const styles = StyleSheet.create({
   },
   goalButton: {
     backgroundColor: colors.green,
-    width: 92,
-    height: 28,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 7,

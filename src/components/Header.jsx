@@ -27,13 +27,11 @@ const Header = ({
       }}
     >
       {/* Back Button */}
-      <View>
-        {showBackButton && (
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="chevron-back" size={20} color="#fff" />
-          </TouchableOpacity>
-        )}
-      </View>
+      {showBackButton && (
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="chevron-back" size={20} color="#fff" />
+        </TouchableOpacity>
+      )}
 
       {/* Centered Title */}
       <View

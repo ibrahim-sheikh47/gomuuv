@@ -185,6 +185,12 @@ const FastingPlanDetail = () => {
             mealImage={item.mealImage}
             calories={item.calories}
             time={item?.preparationTime}
+            onPress={() => {
+              navigation.navigate("MealDetailScreen", {
+                meal: item,
+                source: "dailyPlan",
+              });
+            }}
           />
         )}
         contentContainerStyle={{ gap: 10, marginBottom: 20 }}

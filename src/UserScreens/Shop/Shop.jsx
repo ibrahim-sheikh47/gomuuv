@@ -79,7 +79,7 @@ const ShopScreen = () => {
     <Container>
       <Header
         title="Shop"
-        rightIcon1={<CartIcon />}
+        // rightIcon1={<CartIcon />}
         rightIcon2Press={() => {
           navigation.navigate("Cart");
         }}
@@ -89,7 +89,7 @@ const ShopScreen = () => {
       {/* Use ScrollView to enable scrolling for the entire screen */}
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         {/* Search Bar */}
-        <SearchBar searchQuery={searchQuery} onChangeSearch={onChangeSearch} />
+        {/* <SearchBar searchQuery={searchQuery} onChangeSearch={onChangeSearch} /> */}
 
         {/* Categories Filter */}
         <Selectable

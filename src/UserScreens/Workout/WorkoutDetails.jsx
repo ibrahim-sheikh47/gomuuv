@@ -20,6 +20,7 @@ import { END_POINTS } from "../../config/routes";
 import { useDispatch, useSelector } from "react-redux";
 import { setTodaySessions } from "../../redux/reducers/WorkoutSlice";
 import { FontSize } from "../../utils/font";
+import moment from "moment";
 
 const SwitchItem = ({ label, isSwitchOn, onToggleSwitch }) => (
   <View style={styles.switchContainer}>
@@ -35,16 +36,36 @@ const SwitchItem = ({ label, isSwitchOn, onToggleSwitch }) => (
 const WorkoutDetails = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const { workout } = useRoute().params;
-  const [selectedPeriod, setSelectedPeriod] = useState("Day 1");
-  const [isWarmUpVisible, setIsWarmUpVisible] = useState(false);
-  const [isStretchVisible, setIsStretchVisible] = useState(false);
+  const { workout: item } = useRoute().params;
+
+  const date = moment().format("DD/MM/yyyy");
+  const dayName = moment().format("dddd");
+
+  const [workout, setWorkout] = useState(item);
+
+  const [selectedPeriod, setSelectedPeriod] = useState(
+    workout?.days[
+      workout?.days?.indexOf(
+        workout?.days?.find((d) => d.date === date || d.weekDay === dayName)
+      )
+    ].shortName
+  );
+  const [isWarmUpVisible, setIsWarmUpVisible] = useState(
+    workout?.days?.find((d) => d.date === date || d.weekDay === dayName)
+      .startWithWarmup || false
+  );
+  const [isStretchVisible, setIsStretchVisible] = useState(
+    workout?.days?.find((d) => d.date === date || d.weekDay === dayName)
+      .stretchAfterWorkout || false
+  );
   const { token, userData } = useSelector((state) => ({
     token: state.Auth?.token,
     userData: state.Auth?.data,
   }));
   const getExercisesForDay = (day) => {
-    const dayData = workout.days.find((d) => d.shortName === day);
+    const dayData = workout.days.find(
+      (d) => d.shortName === day && (d.date === date || d.weekDay === dayName)
+    );
     return {
       exercises: dayData ? dayData.exercises : [],
       warmupExercises:
@@ -61,25 +82,31 @@ const WorkoutDetails = () => {
     stretchExercises,
   } = selectedDayData;
 
-  const renderExercise = (heading, exercises) => (
-    <>
-      <Text style={styles.exerciseHeading}>{heading}</Text>
-      {exercises.map((exercise) => (
-        <View key={exercise._id} style={styles.exerciseContainer}>
-          <Image source={images.chestWorkout} style={styles.exerciseImage} />
-          <Text style={styles.exerciseTitle}>{exercise.name}</Text>
-          <Text style={styles.exerciseReps}>{exercise.reps}</Text>
-        </View>
-      ))}
-    </>
-  );
+  const getExerciseParam = (e) => {
+    return e.exercise ? e.exercise : e;
+  };
+
+  const renderExercise = (heading, exercises) => {
+    return (
+      <>
+        <Text style={styles.exerciseHeading}>{heading}</Text>
+        {exercises.map((e) => (
+          <View key={getExerciseParam(e)._id} style={styles.exerciseContainer}>
+            <Image source={images.chestWorkout} style={styles.exerciseImage} />
+            <Text style={styles.exerciseTitle}>{getExerciseParam(e).name}</Text>
+            <Text style={styles.exerciseReps}>{getExerciseParam(e).reps}</Text>
+          </View>
+        ))}
+      </>
+    );
+  };
 
   const renderDayExercise = (dayExercises) => {
-    return dayExercises.map((exercise) => (
-      <View key={exercise._id} style={styles.exerciseContainer}>
+    return dayExercises.map((e) => (
+      <View key={getExerciseParam(e)._id} style={styles.exerciseContainer}>
         <Image source={images.chestWorkout} style={styles.exerciseImage} />
-        <Text style={styles.exerciseTitle}>{exercise.name}</Text>
-        <Text style={styles.exerciseReps}>{exercise.reps}</Text>
+        <Text style={styles.exerciseTitle}>{getExerciseParam(e).name}</Text>
+        <Text style={styles.exerciseReps}>{getExerciseParam(e).reps}</Text>
       </View>
     ));
   };
@@ -102,14 +129,22 @@ const WorkoutDetails = () => {
       const res = await API.post(END_POINTS.WORKOUT_SESSIONS, payload, token);
       if (res.data.success) {
         dispatch(setTodaySessions([res?.data?.data]));
+
+        const day = workout?.days?.find(
+          (d) => date === d.date || d.weekDay === dayName
+        );
+
         navigation.navigate("StartWorkout", {
           title: workout.name,
           image: workout.image,
-          time: workout.workoutTime,
-          exercises: selectedExercises,
+          time: workout.workoutTime * 60,
+          exercises: selectedExercises.filter((e) => !e.isCompleted),
           level: workout.level,
           calories: workout.calories,
           workoutSessionId: res?.data?.data?._id,
+          refresh: () => {
+            fetchWorkout();
+          },
         });
       }
     } catch (error) {
@@ -117,8 +152,23 @@ const WorkoutDetails = () => {
     }
   };
 
+  const fetchWorkout = async () => {
+    try {
+      const res = await API.get(
+        `${END_POINTS.WORKOUTS}/${workout._id}`,
+        null,
+        token
+      );
+      if (res.data.success) {
+        setWorkout(res.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching challenge:", error);
+    }
+  };
+
   return (
-    <Container cusStyles={{ marginTop: 20 }}>
+    <Container cusStyles={{ marginTop: 0, paddingHorizontal: 0 }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
         <View style={{ position: "relative" }}>
           <TouchableOpacity
@@ -149,6 +199,13 @@ const WorkoutDetails = () => {
               <Text style={styles.dayTitle}>{selectedPeriod}</Text>
             </View>
           </View>
+
+          <Text style={[styles.sectionTitle, { padding: 20 }]}>
+            Description
+          </Text>
+          <Text style={[styles.description, { paddingHorizontal: 20 }]}>
+            {workout.description}
+          </Text>
 
           <View style={{ padding: 16 }}>
             <View style={styles.infoBox}>
@@ -314,6 +371,7 @@ const styles = StyleSheet.create({
   },
   exerciseTitle: {
     marginLeft: 16,
+    flex: 1,
     color: "#F8F8F8",
     fontFamily: "Poppins-Regular",
     fontSize: FontSize.regular,
@@ -323,7 +381,7 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
     color: colors.green,
     fontFamily: "Poppins-Medium",
-    fontSize: FontSize.regular,
+    fontSize: FontSize.small,
   },
   dayTitle: {
     fontSize: FontSize.regular,

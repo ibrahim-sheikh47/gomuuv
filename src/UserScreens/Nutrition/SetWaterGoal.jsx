@@ -16,17 +16,45 @@ import CustomButton from "../../components/CustomButton";
 import EditIcon from "../../assets/svgs/EditIcon";
 import { colors } from "../../constants/colors";
 import { FontSize } from "../../utils/font";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import { useSelector } from "react-redux";
 
 const SetWaterGoal = ({ navigation, route }) => {
   const [glassQuantity, setGlassQuantity] = useState("");
   const [volumePerGlass, setVolumePerGlass] = useState(250);
 
+  const { token } = useSelector((state) => ({
+    token: state.Auth?.token,
+  }));
+
   const handleSaveGoal = () => {
     if (glassQuantity && volumePerGlass) {
-      const totalIntake = glassQuantity * volumePerGlass; // Calculate total intake in ml
-      route.params?.setTotalIntakeGoal(totalIntake); // Pass total intake back
-      route.params?.setTotalGlasses(glassQuantity); // Pass total glasses back
-      navigation.goBack(); // Go back to the previous screen
+      createGoal();
+    }
+  };
+
+  const createGoal = async () => {
+    try {
+      const response = await API.post(
+        `${END_POINTS.GOALS}`,
+        {
+          type: "Drinking",
+          targetDistance: {
+            value: glassQuantity,
+          },
+          targetDuration: {
+            value: glassQuantity * volumePerGlass,
+          },
+        },
+        token
+      );
+
+      if (response?.data?.success) {
+        navigation.goBack();
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 

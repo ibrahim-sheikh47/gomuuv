@@ -16,13 +16,21 @@ const MapScreen = ({ route }) => {
   const [totalDistance, setTotalDistance] = useState(0); // To store total distance
   const [elapsedTime, setElapsedTime] = useState(0); // To store the elapsed time
   const [coordinates, setCoordinates] = useState([]);
+  const [snapshot, setSnapshot] = useState(null);
   const [tracking, setTracking] = useState(false);
 
-  const onLocationUpdate = ({ address, distance, time, pathCoordinates }) => {
+  const onLocationUpdate = ({
+    address,
+    distance,
+    time,
+    pathCoordinates,
+    snapshot,
+  }) => {
     setLocation(address);
     setTotalDistance(distance);
     setElapsedTime(time);
     setCoordinates(pathCoordinates);
+    setSnapshot(snapshot);
   };
 
   const startTracking = () => {
@@ -33,12 +41,15 @@ const MapScreen = ({ route }) => {
   const stopTracking = () => {
     setTracking(false);
     navigation.navigate("FinishActivity", {
+      goal: params.goal,
       activityName: params.activityName,
+      activityType: params.activityType,
       distance: (totalDistance / 1609.34).toFixed(2),
       time: elapsedTime,
       distanceUnit: "mi",
       heartRate: params.heartRate,
       calories: params.calories,
+      snapshot: snapshot,
     });
   };
 

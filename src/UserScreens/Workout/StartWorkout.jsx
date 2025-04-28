@@ -46,6 +46,7 @@ const StartWorkout = () => {
 
   const [secondsRemaining, setSecondsRemaining] = useState(time);
   const secondsRemainingValue = useRef(time);
+  const movingNext = useRef();
 
   // Format seconds into MM:SS
   const formatTime = (seconds) => {
@@ -54,10 +55,14 @@ const StartWorkout = () => {
     return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
   };
 
+  const getExerciseParam = (e) => {
+    return e.exercise ? e.exercise : e;
+  };
+
   useEffect(() => {
     return () => {
-      if (isChallenge) {
-        updateDayStats();
+      if (!movingNext.current) {
+        updateDayStats(false, getExerciseParam(exercises[currentExerciseIndex])?._id);
       }
     };
   }, []);
@@ -68,16 +73,24 @@ const StartWorkout = () => {
       const payload = {
         duration: time - secondsRemainingValue.current,
         exercise,
-        isDayComplete,
+        isCompleted: isDayComplete,
       };
-      console.log(payload);
+
       const res = await API.patch(
-        `${END_POINTS.UPDATE_DAY_STATS}/${workoutSessionId}`,
+        `${
+          isChallenge
+            ? END_POINTS.UPDATE_DAY_STATS
+            : END_POINTS.WORKOUTS_UPDATE_DAY_STATS
+        }/${workoutSessionId}`,
         payload,
         token
       );
       if (res.data.success) {
-        if (isDayComplete) {
+        setCurrentExerciseIndex(currentExerciseIndex + 1);
+        if (
+          isDayComplete &&
+          getExerciseParam(exercises[currentExerciseIndex])._id.toString === exercise
+        ) {
           navigation.reset({
             routes: [
               {
@@ -102,8 +115,9 @@ const StartWorkout = () => {
             ],
             index: 1,
           });
+          movingNext.current = true;
         }
-        route.params.refreshChallenge();
+        route?.params?.refresh();
       }
     } catch (error) {
       console.log("Workout exercises error", error);
@@ -133,70 +147,16 @@ const StartWorkout = () => {
     return `${mins} min`; // Return in the format "X min"
   };
 
-  const exerciseCompleted = async (exerciseId) => {
-    try {
-      const payload = {
-        exerciseId,
-        workoutSessionId,
-      };
-      const res = await API.post(END_POINTS.EXERCISE_COMPLETED, payload, token);
-      if (res.data.success) {
-        console.log("Exercise Completed");
-      }
-    } catch (error) {
-      console.log("Workout exercises error", error);
-    }
-  };
-
-  const completeChallengeExercise = async (exercise) => {
-    try {
-      const payload = {
-        exercise,
-      };
-      const res = await API.patch(
-        `${END_POINTS.COMPLETE_CHALLENGE_EXERCISE}/${workoutSessionId}`,
-        payload,
-        token
-      );
-      if (res.data.success) {
-        console.log("Exercise Completed");
-        setCurrentExerciseIndex((prevIndex) => prevIndex + 1);
-      }
-    } catch (error) {
-      console.log("Workout exercises error", error);
-    }
-  };
-
   const sessionCompleted = async (exerciseId) => {
     try {
+      toggleTimer();
       const payload = {
         lastExerciseId: exerciseId,
         workoutSessionId,
+        duration: time - secondsRemainingValue.current,
       };
       const res = await API.post(END_POINTS.SESSION_COMPLETED, payload, token);
       if (res.data.success) {
-        console.log("Session Completed");
-      }
-    } catch (error) {
-      console.log("Workout session error", error);
-    }
-  };
-
-  // Handle button press
-  const handleButtonPress = () => {
-    if (isChallenge) {
-      if (
-        exercises.length === 1 ||
-        currentExerciseIndex == exercises.length - 1
-      ) {
-        updateDayStats(true, exercises[currentExerciseIndex]._id);
-      } else {
-        completeChallengeExercise(exercises[currentExerciseIndex]._id);
-      }
-    } else {
-      if (isWorkoutComplete) {
-        sessionCompleted(exercises[currentExerciseIndex]._id);
-        // Calculate the total time spent
         const workoutDuration = time - secondsRemainingValue.current; // Total time - remaining time
         const formattedDuration = formatMinutes(workoutDuration); // Format to show only minutes
 
@@ -207,23 +167,31 @@ const StartWorkout = () => {
           title: title,
           level: level,
           calories: calories,
-          lastExerciseId: exercises[currentExerciseIndex]._id,
+          lastExerciseId: getExerciseParam(exercises[currentExerciseIndex])._id,
           workoutSessionId: workoutSessionId,
           isChallenge,
         });
+      }
+    } catch (error) {
+      console.log("Workout session error", error);
+    }
+  };
+
+  // Handle button press
+  const handleButtonPress = () => {
+    if (isChallenge) {
+      updateDayStats(
+        true,
+        getExerciseParam(exercises[currentExerciseIndex])._id
+      );
+    } else {
+      if (currentExerciseIndex === exercises.length - 1) {
+        sessionCompleted(getExerciseParam(exercises[currentExerciseIndex])._id);
       } else {
-        // Check if the current exercise is the last one
-        if (currentExerciseIndex < exercises.length - 1) {
-          // Move to the next exercise
-          setCurrentExerciseIndex((prevIndex) => prevIndex + 1);
-          // Mark the current exercise as complete
-          exerciseCompleted(exercises[currentExerciseIndex]._id);
-        } else {
-          // Mark workout as complete if all exercises are done
-          setIsWorkoutComplete(true);
-          // Mark the last exercise as complete
-          exerciseCompleted(exercises[currentExerciseIndex]._id);
-        }
+        updateDayStats(
+          true,
+          getExerciseParam(exercises[currentExerciseIndex])._id
+        );
       }
     }
   };
@@ -240,21 +208,24 @@ const StartWorkout = () => {
               <TouchableOpacity
                 style={styles.firstExerciseTitle}
                 onPress={() => {
-                  if (exercises[currentExerciseIndex].videoUrl !== "") {
+                  if (
+                    getExerciseParam(exercises[currentExerciseIndex]).videoUrl !== ""
+                  ) {
                     navigation.navigate("VideoPlayerScreen", {
-                      videoUrl: exercises[currentExerciseIndex].videoUrl, // Assuming each exercise has a videoUrl property
+                      videoUrl:
+                      getExerciseParam(exercises[currentExerciseIndex]).videoUrl, // Assuming each exercise has a videoUrl property
                     });
                   }
                 }}
               >
-                {exercises[currentExerciseIndex].videoUrl !== "" && (
+                {getExerciseParam(exercises[currentExerciseIndex]).videoUrl !== "" && (
                   <Icon name="play-circle" size={24} color={colors.green} />
                 )}
                 <Text style={[styles.title, { color: colors.green }]}>
-                  {exercises[currentExerciseIndex].name}
+                  {getExerciseParam(exercises[currentExerciseIndex]).name}
                 </Text>
                 <Text style={[styles.title]}>
-                  {exercises[currentExerciseIndex].reps}
+                  {getExerciseParam(exercises[currentExerciseIndex]).reps}
                 </Text>
               </TouchableOpacity>
             )}
@@ -313,10 +284,10 @@ const StartWorkout = () => {
                             style={styles.exerciseImage}
                           />
                           <Text style={styles.exerciseTitle}>
-                            {exercise.name}
+                            {getExerciseParam(exercise).name}
                           </Text>
                           <Text style={styles.exerciseReps}>
-                            {exercise.reps}
+                            {getExerciseParam(exercise).reps}
                           </Text>
                         </View>
                       ))}
