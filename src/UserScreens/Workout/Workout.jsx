@@ -1,5 +1,5 @@
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Image,
   ScrollView,
@@ -37,6 +37,7 @@ import moment from "moment";
 const WorkoutScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const [stats, setStats] = useState(null);
   const [activeTab, setActiveTab] = useState("Workout");
   const tabs = ["Workout", "Fasting"];
   const duration = ["Today", "Weekly", "Monthly", "Quarterly", "Yearly"];
@@ -57,11 +58,30 @@ const WorkoutScreen = () => {
     }, [])
   );
 
+  useEffect(() => {
+    getStats();
+  }, [selectedPeriod]);
+
   const getTrendingWorkouts = async () => {
     try {
       const res = await API.get(END_POINTS.WORKOUTS, null, token);
       if (res.data.success) {
         dispatch(setTrendingWorkouts(res?.data?.data));
+      }
+    } catch (error) {
+      console.error("Error fetching workouts:", error);
+    }
+  };
+
+  const getStats = async () => {
+    try {
+      const res = await API.get(
+        `${END_POINTS.WORKOUTS}/stats/${selectedPeriod}`,
+        null,
+        token
+      );
+      if (res.data.success) {
+        setStats(res?.data?.data);
       }
     } catch (error) {
       console.error("Error fetching workouts:", error);
@@ -113,34 +133,11 @@ const WorkoutScreen = () => {
     });
   };
 
-  const handleOnPress = (workout) => {
-    // Navigate to the WorkoutDetail screen with the selected workout data
-    navigation.navigate("WorkoutDetails", { workout });
-  };
-  const steps = 2000;
-  const km = 10.5;
-  const stepsTotal = 5000;
+  const steps = 0;
+  const km = 0;
+  const stepsTotal = 0;
 
   const workout = trendingData?.[0];
-
-  function getIncompleteExercisesForDay(
-    workoutData,
-    exercisesCompleted,
-    dayName
-  ) {
-    const completedIds = exercisesCompleted.map((exercise) => exercise._id);
-
-    const day = workoutData.days.find((day) => day.shortName === dayName);
-    if (!day) {
-      return [];
-    }
-
-    const incompleteExercises = day.exercises.filter(
-      (exercise) => !completedIds.includes(exercise._id)
-    );
-
-    return incompleteExercises;
-  }
 
   return (
     <Container>
@@ -195,10 +192,15 @@ const WorkoutScreen = () => {
               <MetricBox
                 label="Calories"
                 icon={CaloriesIcon}
-                value="65"
+                value={stats?.totalCalories || 0}
                 unit="kcal"
               />
-              <MetricBox label="Time" icon={TimeIcon} value="20" unit="mins" />
+              <MetricBox
+                label="Time"
+                icon={TimeIcon}
+                value={(stats?.totalDuration || 0) / 60}
+                unit="mins"
+              />
             </View>
             {todaySessions?.length > 0 ? (
               <View>

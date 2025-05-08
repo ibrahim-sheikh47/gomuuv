@@ -75,6 +75,7 @@ yarn-error.*
 *.tsbuildinfo
 
 *.lock
+*.json
 
 # @end expo-cli
 /android

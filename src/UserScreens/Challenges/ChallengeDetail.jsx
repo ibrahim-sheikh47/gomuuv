@@ -108,7 +108,6 @@ const ChallengeDetail = () => {
   };
 
   const renderDayExercise = (dayExercises) => {
-    console.log(dayExercises);
     return dayExercises.map((e) => (
       <View key={e.exercise._id} style={styles.exerciseContainer}>
         <Image source={images.chestWorkout} style={styles.exerciseImage} />

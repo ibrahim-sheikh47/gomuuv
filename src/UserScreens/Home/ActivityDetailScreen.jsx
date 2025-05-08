@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -39,6 +39,7 @@ const ActivityDetailScreen = () => {
   const { activityType, activityName, goal: item } = route.params || {};
 
   const [goal, setGoal] = useState(item);
+  const [stats, setStats] = useState(null);
   const date = moment().format("DD/MM/yyyy");
   const duration = ["Today", "Weekly", "Monthly", "Quarterly", "Yearly"];
   const [selectedPeriod, setSelectedPeriod] = useState("Today");
@@ -68,6 +69,10 @@ const ActivityDetailScreen = () => {
       }).start();
     }, [])
   );
+
+  useEffect(() => {
+    fetchActiveGoal();
+  }, [selectedPeriod]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -133,14 +138,14 @@ const ActivityDetailScreen = () => {
   const fetchActiveGoal = async () => {
     try {
       const response = await API.get(
-        `${END_POINTS.GOALS}/type/${activityType}`,
+        `${END_POINTS.GOALS}/type/${activityType}?filter=${selectedPeriod}`,
         {},
         token
       );
 
       if (response?.data?.success) {
-        console.log(response?.data?.success);
-        setGoal(response?.data?.data);
+        setGoal(response?.data?.data?.goal);
+        setStats(response?.data?.data?.stats);
       }
     } catch (error) {
       console.log(error);
@@ -182,30 +187,18 @@ const ActivityDetailScreen = () => {
             label="Distance"
             icon={DistanceIcon}
             showProgress={true}
-            current={
-              goal.activities.find((a) => a.date === date)?.distance?.value || 0
-            }
+            current={stats?.distance || 0}
             target={goal?.targetDistance?.value || 0}
             hideGoal={!goal?.distance}
             goal={`Goal: ${goal?.targetDistance?.value} ${goal?.targetDistance?.unit}`}
-            message={`${
-              goal.activities.find((a) => a.date === date)?.distance?.value || 0
-            } ${
-              goal.activities.find((a) => a.date === date)?.distance?.unit ||
-              "mi"
-            }`}
+            message={`${stats?.distance || 0} ${goal?.targetDistance?.unit}`}
           />
           <CustomCard
             label="Time"
             icon={TimeIcon}
             hideGoal={!goal?.duration}
             goal={`Goal: ${goal?.targetDuration?.value} ${goal?.targetDuration?.unit}`}
-            message={`${
-              goal.activities.find((a) => a.date === date)?.duration?.value || 0
-            } ${
-              goal.activities.find((a) => a.date === date)?.duration?.unit ||
-              "mins"
-            }`}
+            message={`${stats?.duration} ${goal?.targetDuration?.unit}`}
           />
         </View>
 

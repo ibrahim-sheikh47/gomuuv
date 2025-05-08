@@ -160,7 +160,7 @@ const EquipmentDetails = () => {
         </View>
         {workoutDetails ? (
           <TouchableOpacity style={styles.sessionContainer}>
-            <Image source={images.treadmill} style={styles.sessionImage} />
+            <Image source={images.device} style={styles.sessionImage} />
             <Text style={styles.sessionTitleText}>
               {workoutDetails.workoutName}
             </Text>
