@@ -65,8 +65,8 @@ const ActivityScreen = () => {
           },
           targetDuration: {
             value: convertToMinutes(
-              formValues.timeHours,
-              formValues.timeMinutes
+              parseInt(formValues.timeHours),
+              parseInt(formValues.timeMinutes)
             ),
             unit: "minute",
           },

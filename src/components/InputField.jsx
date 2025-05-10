@@ -97,7 +97,7 @@ const InputField = ({
               { ...(isFocused && { borderColor: colors.green }) },
               cusStyles,
             ]}
-            value={value}
+            value={value?.toString()}
             onChangeText={onChangeText}
             onFocus={handleFocus}
             onBlur={handleBlur}

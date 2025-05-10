@@ -165,12 +165,7 @@ const Cart = () => {
   if (!cartItems || cartItems.length === 0) {
     return (
       <Container>
-        <Header
-          title={"Cart"}
-          showBackButton={true}
-          rightIcon1={<CartIcon />}
-          rightIcon2={<ShopIcon fill="white" />}
-        />
+        <Header title={"Cart"} showBackButton={true} />
         <View style={styles.emptyCartContainer}>
           <Text style={styles.emptyCartText}>No items in the cart.</Text>
           <CustomButton
@@ -185,12 +180,7 @@ const Cart = () => {
 
   return (
     <Container>
-      <Header
-        title={"Cart"}
-        showBackButton={true}
-        rightIcon1={<CartIcon />}
-        rightIcon2={<ShopIcon fill="white" />}
-      />
+      <Header title={"Cart"} showBackButton={true} />
       <ScrollView style={styles.scrollView}>
         <View style={styles.container}>
           <Text style={styles.sectionTitle}>Items</Text>
@@ -205,7 +195,9 @@ const Cart = () => {
             return (
               <View key={index} style={styles.productContainer}>
                 <Image
-                  source={product?.product?.image || images.product1}
+                  source={
+                    product?.product?.image ? { uri: product?.product?.image } : images.product1
+                  }
                   style={[
                     styles.image,
                     { width: imageWidth, height: imageHeight },

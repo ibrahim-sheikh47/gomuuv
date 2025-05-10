@@ -5,7 +5,7 @@ import { colors } from "../constants/colors";
 import { useEffect } from "react";
 import { FontSize } from "../utils/font";
 
-export const FastingCard = ({ plan, selectedPlan }) => {
+export const FastingCard = ({ plan, currentPlan }) => {
   const navigation = useNavigation();
   const handlePlanSelect = (event) => {
     event.persist();
@@ -14,6 +14,7 @@ export const FastingCard = ({ plan, selectedPlan }) => {
       title: plan.name,
       type: plan.type,
       description: plan.description,
+      currentPlan,
     });
   };
 

@@ -43,7 +43,7 @@ const NutritionScreen = () => {
   const date = moment().format("DD/MM/yyyy");
 
   const [consumedGlasses, setConsumedGlasses] = useState(
-    goal?.activities.find((a) => a.date === date)?.distance?.value || 0
+    goal?.activities?.find((a) => a.date === date)?.distance?.value || 0
   );
   const [totalGlasses, setTotalGlasses] = useState(
     goal?.targetDistance?.value || 0
@@ -164,7 +164,7 @@ const NutritionScreen = () => {
             value: consumedGlasses + 1,
           },
           duration: {
-            value: (consumedGlasses + 1) * goal?.targetDuration.value,
+            value: (consumedGlasses + 1) * goal?.targetDuration?.value,
           },
         },
         token
@@ -192,7 +192,7 @@ const NutritionScreen = () => {
         setTotalGlasses(parseInt(goal?.targetDistance?.value || 0));
         setConsumedGlasses(
           parseInt(
-            goal?.activities.find((a) => a.date === date)?.distance?.value || 0
+            goal?.activities?.find((a) => a.date === date)?.distance?.value || 0
           )
         );
       }
@@ -273,7 +273,7 @@ const NutritionScreen = () => {
         <WaterIntake
           consumedGlasses={consumedGlasses}
           totalGlasses={totalGlasses}
-          totalVolume={goal?.targetDuration.value}
+          totalVolume={goal?.targetDuration?.value}
           onAddWater={handleAddWater}
         />
 

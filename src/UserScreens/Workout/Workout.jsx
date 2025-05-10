@@ -118,17 +118,65 @@ const WorkoutScreen = () => {
     { label: "Dumbbells", value: "dumbells", icon: <DumbbellIcon /> },
     { label: "Jump Rope", value: "jump_rope", icon: <JumpRopeIcon /> },
     { label: "Pull-Up Bar", value: "pull_up_assist", icon: <PullupBarIcon /> },
+    { label: "Kettle Bells", value: "pull_up_assist", icon: <PullupBarIcon /> },
   ];
+
+  const activityData = [
+    { day: "M", value: 0 },
+    { day: "T", value: 0 },
+    { day: "W", value: 0 },
+    { day: "T", value: 0 },
+    { day: "F", value: 0 },
+    { day: "S", value: 0 },
+    { day: "S", value: 0 },
+  ];
+
+  const BarGraph = () => {
+    const maxHeight = 150;
+
+    return (
+      <View style={styles.barOuterContainer}>
+        {activityData.map((item, index) => {
+          const barHeight = (item.value / 100) * maxHeight;
+
+          return (
+            <View key={index} style={styles.barContainer}>
+              <View
+                style={[
+                  styles.bar,
+                  {
+                    height: barHeight,
+                    backgroundColor: "#C2FF59",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.label,
+                    {
+                      color: "#000",
+                    },
+                  ]}
+                >
+                  {item.value}
+                </Text>
+              </View>
+              <Text style={styles.label}>{item.day}</Text>
+            </View>
+          );
+        })}
+      </View>
+    );
+  };
 
   const handleCategorySelect = (index) => {
     setSelectedCategory(index);
 
     // Navigate to the next screen with selected category
     const selectedCategoryValue = sessionCategories[index];
-    // navigation.navigate("EquipmentDetails", {
-    //   category: selectedCategoryValue,
-    // });
-    navigation.navigate("ViewAllWorkouts", {
+    navigation.navigate("EquipmentDetails", {
       category: selectedCategoryValue,
     });
   };
@@ -182,10 +230,12 @@ const WorkoutScreen = () => {
                   </Text>
                 </View>
 
-                <Image
+                <BarGraph />
+
+                {/* <Image
                   source={images.stepsGraph}
                   style={{ height: 59, width: 178 }}
-                />
+                /> */}
               </View>
             </View>
             <View style={[styles.row, styles.metricsContainer]}>
@@ -198,7 +248,7 @@ const WorkoutScreen = () => {
               <MetricBox
                 label="Time"
                 icon={TimeIcon}
-                value={(stats?.totalDuration || 0) / 60}
+                value={Math.floor((stats?.totalDuration || 0) / 60)}
                 unit="mins"
               />
             </View>
@@ -310,7 +360,6 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     marginTop: 20,
-    height: 118,
     backgroundColor: colors.bgColor,
     borderRadius: 15,
     padding: 12,
@@ -429,5 +478,25 @@ const styles = StyleSheet.create({
     fontSize: FontSize.small,
     fontFamily: "Poppins-Bold",
     color: colors.green,
+  },
+  barOuterContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    padding: 20, // optional dark background
+    maxHeight: 200,
+  },
+  barContainer: {
+    alignItems: "center",
+    width: 30,
+  },
+  bar: {
+    width: 30,
+    borderRadius: 3,
+    marginBottom: 6,
+  },
+  label: {
+    color: "#aaa",
+    fontSize: 14,
   },
 });

@@ -162,11 +162,11 @@ const Checkout = () => {
 
   // Consolidate all input values into a single state object
   const [formData, setFormData] = useState({
-    contact: "Test@gmail.com",
+    contact: "",
     country: "",
     firstName: "",
     lastName: "",
-    address: "House# 232, Model Town, Lahore",
+    address: "",
     city: "",
     postalCode: "",
     paymentMethod: "",
@@ -343,7 +343,6 @@ const Checkout = () => {
         saveInfo: saveInfoForNextTime,
         discount: discountApplied ? discountCode : null,
       };
-      console.log(JSON.stringify(payload, null, 2));
       // Send API request to place the order
       const response = await API.post(END_POINTS.PLACE_ORDER, payload, token);
 
@@ -352,7 +351,7 @@ const Checkout = () => {
         setTimeout(() => {
           dispatch(setCartData([])); // Clear the cart after placing the order
           setModalVisible(false);
-          navigation.replace("CompletedOrder");
+          navigation.replace("CompletedOrder", { order: response?.data?.data });
         }, 2000);
       } else {
         Toast.show({
@@ -424,8 +423,6 @@ const Checkout = () => {
       <Header
         title={"Checkout"}
         showBackButton={true}
-        rightIcon1={<CartIcon />}
-        rightIcon2={<ShopIcon fill="white" />}
       />
       <ScrollView
         style={{ marginBottom: 30 }}

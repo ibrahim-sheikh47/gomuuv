@@ -7,29 +7,12 @@ import CartIcon from "../../assets/svgs/CartIcon";
 import ShopIcon from "../../assets/svgs/ShopIcon";
 import { FontSize } from "../../utils/font";
 import images from "../../constants/images";
+import { useRoute } from "@react-navigation/native";
 
 const CompletedOrder = () => {
+  const route = useRoute();
+  const { order } = route.params;
   const [showOrderSummary, setShowOrderSummary] = useState(true);
-
-  // Sample order data
-  const orderItems = [
-    {
-      id: 1,
-      name: "Whey Protein",
-      image: images.product1,
-      quantity: "01",
-      price: 25.3,
-      weight: "02 Lbs",
-    },
-    {
-      id: 2,
-      name: "Adjustable Dumbbells",
-      image: images.product1,
-      quantity: "01",
-      price: 25.3,
-      weight: "02 Lbs",
-    },
-  ];
 
   // Calculate total
   const totalPrice = orderItems.reduce((total, item) => total + item.price, 0);
@@ -64,7 +47,7 @@ const CompletedOrder = () => {
 
         {showOrderSummary && (
           <View style={styles.orderSummaryContent}>
-            {orderItems.map((item, index) => (
+            {order.cartItems.map((item, index) => (
               <View key={index} style={styles.orderItemContainer}>
                 <Image source={item.image} style={styles.itemImage} />
                 <View style={styles.itemDetails}>

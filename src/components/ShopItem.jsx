@@ -8,6 +8,7 @@ import { setCartData } from "../redux/reducers/CartSlice";
 import { API } from "../config/apiClient";
 import { END_POINTS } from "../config/routes";
 import { FontSize } from "../utils/font";
+import images from "../constants/images";
 
 const ShopItem = ({ productImage, title, amount, onPress, product }) => {
   const dispatch = useDispatch(); // Initialize dispatch
@@ -73,24 +74,29 @@ const ShopItem = ({ productImage, title, amount, onPress, product }) => {
     <View style={styles.container}>
       {/* Product Image */}
       <TouchableOpacity onPress={handlePress}>
-        <Image source={productImage} style={styles.productImage} />
+        <Image
+          source={productImage ? { uri: productImage } : images.product1}
+          style={styles.productImage}
+        />
       </TouchableOpacity>
 
-      {/* Product Details */}
-      <TouchableOpacity style={styles.detailsContainer} onPress={handlePress}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.amount}>{`$${amount}`}</Text>
-      </TouchableOpacity>
+      <View style={{ padding: 10 }}>
+        {/* Product Details */}
+        <TouchableOpacity style={styles.detailsContainer} onPress={handlePress}>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.amount}>{`$${amount}`}</Text>
+        </TouchableOpacity>
 
-      {/* Add to Cart Button */}
-      <TouchableOpacity
-        style={styles.addToCartButton}
-        onPress={handleAddToCartPress}
-      >
-        <Text style={styles.buttonText}>
-          {itemAddedToCart ? "Remove" : "Add to Cart"}
-        </Text>
-      </TouchableOpacity>
+        {/* Add to Cart Button */}
+        <TouchableOpacity
+          style={styles.addToCartButton}
+          onPress={handleAddToCartPress}
+        >
+          <Text style={styles.buttonText}>
+            {itemAddedToCart ? "Remove" : "Add to Cart"}
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -103,21 +109,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     width: 178,
-    height: 178,
     marginBottom: 20,
     flexDirection: "column",
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 5,
-    padding: 8,
     gap: 10,
     marginRight: 12,
   },
   productImage: {
-    width: 160,
-    height: 80,
+    width: "100%",
+    height: 100,
     borderRadius: 8,
   },
   detailsContainer: {

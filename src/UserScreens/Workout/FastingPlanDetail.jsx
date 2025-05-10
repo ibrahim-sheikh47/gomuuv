@@ -12,11 +12,12 @@ import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
 import { useSelector } from "react-redux";
 import { FontSize } from "../../utils/font";
+import { colors } from "../../constants/colors";
 
 const FastingPlanDetail = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { title, type, description, selectedPlan } = route.params;
+  const { title, type, description, selectedPlan, currentPlan } = route.params;
 
   const [startTime, setStartTime] = useState(null);
   const [showPicker, setShowPicker] = useState(false);
@@ -55,18 +56,13 @@ const FastingPlanDetail = () => {
         token
       );
       if (res.data.success) {
-        console.log("Session Start", JSON.stringify(res.data, null, 2));
         const currentTime = new Date();
         openModal();
         setStartTime(currentTime); // Set current time as start time
         setShowPicker(false); // Close the picker if it was open
 
-        navigation.navigate("FastingScreen", {
-          selectedPlan,
-          title,
-          type,
-          description,
-        });
+        navigation.goBack();
+        navigation.goBack();
       }
     } catch (error) {
       console.log(error);
@@ -112,41 +108,55 @@ const FastingPlanDetail = () => {
         Elapsed Time: {selectedPlan?.duration?.value} hrs
       </Text>
 
-      <View style={styles.buttonContainer}>
-        <View>
-          <CustomButton
-            title={"Start Now"}
-            style={{ width: 118, height: 33 }}
-            textStyle={{ fontSize: 14 }}
-            onPress={handleStartNow}
-          />
+      {!currentPlan && (
+        <View style={styles.buttonContainer}>
           <View>
-            <Text style={styles.timeText}>Start Time:</Text>
-            <Text style={styles.timeDetail}>
-              {selectedPlan?.fastingTime?.start
-                ? formatDateTime(new Date(selectedPlan?.fastingTime?.start))
-                : "Not Set"}
-              {/* Display formatted start time */}
-            </Text>
-          </View>
-        </View>
-        <View>
-          <CustomButton
-            title={"Start Later"}
-            style={{ width: 118, height: 33 }}
-            textStyle={{ fontSize: 14 }}
-            onPress={() => setShowPicker(true)}
-          />
-          {endTime && (
+            <CustomButton
+              title={"Start Now"}
+              style={{ width: 118, height: 33 }}
+              textStyle={{ fontSize: 14 }}
+              onPress={handleStartNow}
+            />
             <View>
-              <Text style={styles.timeText}>End Time</Text>
+              <Text style={styles.timeText}>Start Time:</Text>
               <Text style={styles.timeDetail}>
-                {endTime ? formatDateTime(endTime) : "Not Set"}
+                {selectedPlan?.fastingTime?.start
+                  ? formatDateTime(new Date(selectedPlan?.fastingTime?.start))
+                  : "Not Set"}
+                {/* Display formatted start time */}
               </Text>
             </View>
-          )}
+          </View>
+          <View>
+            <CustomButton
+              title={"Start Later"}
+              style={{ width: 118, height: 33 }}
+              textStyle={{ fontSize: 14 }}
+              onPress={() => setShowPicker(true)}
+            />
+            {endTime && (
+              <View>
+                <Text style={styles.timeText}>End Time</Text>
+                <Text style={styles.timeDetail}>
+                  {endTime ? formatDateTime(endTime) : "Not Set"}
+                </Text>
+              </View>
+            )}
+          </View>
         </View>
-      </View>
+      )}
+
+      {currentPlan && (
+        <Text
+          style={{
+            color: colors.green,
+            fontSize: FontSize.xlarge,
+            fontFamily: "Poppins-SemiBold",
+          }}
+        >
+          You are already fasting, two fasts cannot start at a time
+        </Text>
+      )}
 
       {/* Date/Time Picker for Start Time */}
       {showPicker && (

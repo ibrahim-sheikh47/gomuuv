@@ -61,12 +61,14 @@ const Splash = () => {
         {/* Bottom Container */}
         <View style={styles.bottomContainer}>
           <CustomButton
+            style={{ width: "100%" }}
             title="Join Now As User"
             onPress={() => {
               navigation.navigate("UserApp");
             }}
           />
           <CustomButton
+            style={{ width: "100%" }}
             title="Join Now As Trainer"
             onPress={() => {
               navigation.navigate("TrainerApp");

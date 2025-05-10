@@ -7,8 +7,12 @@ import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
 import { useSelector } from "react-redux";
 import { FontSize } from "../../utils/font";
+import { useRoute } from "@react-navigation/native";
 
 const FastingPlans = (props) => {
+  const route = useRoute();
+  const { currentPlan } = route.params;
+
   const [fastingPlans, setFastingPlans] = useState([]);
   const { token } = useSelector((state) => ({
     token: state.Auth?.token,
@@ -29,7 +33,9 @@ const FastingPlans = (props) => {
     }
   };
 
-  const renderItem = ({ item }) => <FastingCard plan={item} />;
+  const renderItem = ({ item }) => (
+    <FastingCard plan={item} currentPlan={currentPlan} />
+  );
 
   return (
     <Container>

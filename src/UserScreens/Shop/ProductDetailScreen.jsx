@@ -121,7 +121,6 @@ const ProductDetailScreen = ({ route }) => {
         title={"Shop"}
         showBackButton={true}
         rightIcon1={<CartIcon />}
-        rightIcon2={<ShopIcon fill="white" />}
       />
 
       <ScrollView
@@ -129,7 +128,7 @@ const ProductDetailScreen = ({ route }) => {
         showsVerticalScrollIndicator={false}
       >
         <Image
-          source={product?.image || images.product1}
+          source={product?.image ? { uri: product?.image } : images.product1}
           style={styles.image}
         />
 

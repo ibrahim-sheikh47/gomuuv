@@ -1,5 +1,5 @@
-import { useNavigation } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import CartIcon from "../../assets/svgs/CartIcon";
@@ -35,9 +35,11 @@ const ShopScreen = () => {
 
   const [isModalVisible, setModalVisible] = useState(false);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [])
+  );
 
   useEffect(() => {
     if (selectedCategory === "All") {

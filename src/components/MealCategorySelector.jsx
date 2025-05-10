@@ -1,12 +1,22 @@
 // MealCategorySelector.js
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { FontSize } from "../utils/font";
 import { colors } from "../constants/colors"; // Import your colors
 
 const MealCategorySelector = ({ categories, selectedCategory, onSelect }) => {
   return (
-    <View style={styles.cardContainer}>
+    <ScrollView
+      horizontal
+      contentContainerStyle={styles.cardContainer}
+      showsHorizontalScrollIndicator={false}
+    >
       {categories.map((category, index) => {
         const isSelected = selectedCategory === category.value; // Compare with value instead of index
         return (
@@ -22,7 +32,7 @@ const MealCategorySelector = ({ categories, selectedCategory, onSelect }) => {
           </TouchableOpacity>
         );
       })}
-    </View>
+    </ScrollView>
   );
 };
 
@@ -32,10 +42,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   card: {
-    flex: 1,
     margin: 5,
     borderRadius: 10,
     height: 80,
+    width: 80,
     paddingHorizontal: 5,
     alignItems: "center",
     justifyContent: "center",

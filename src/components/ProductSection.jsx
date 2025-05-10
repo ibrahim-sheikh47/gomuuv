@@ -63,7 +63,7 @@ const ProductSection = ({ title, products }) => {
 
   const renderItem = ({ item }) => (
     <ShopItem
-      productImage={item?.productImage || images.product1}
+      productImage={item?.image}
       title={item.name}
       amount={item?.price}
       onPress={() => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Image,
   StyleSheet,
@@ -6,10 +6,15 @@ import {
   TouchableOpacity,
   View,
   Alert,
+  ScrollView,
 } from "react-native";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import { AnimatedCircularProgress } from "react-native-circular-progress"; // Import Circular Progress
 import { colors } from "../../constants/colors";
 import CustomButton from "../../components/CustomButton";
@@ -21,36 +26,127 @@ import TimeIcon from "../../assets/svgs/TimeIcon";
 import StrengthIcon from "../../assets/svgs/StrengthIcon";
 import { IconButton } from "react-native-paper";
 import { FontSize } from "../../utils/font";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import moment, { duration } from "moment";
+import { useSelector } from "react-redux";
 
 const EquipmentDetails = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { category, workoutDetails } = route.params; // Destructure workoutDetails from params
+  const { category } = route.params; // Destructure workoutDetails from params
 
+  const date = moment().format("DD/MM/yyyy");
   const [fill, setFill] = useState(0);
   const [remainingTime, setRemainingTime] = useState(0);
+  const secondsRemainingValue = useRef(0);
   const [totalDuration, setTotalDuration] = useState(0); // Total duration in seconds
   const [isTimerRunning, setIsTimerRunning] = useState(false); // Timer state
+  const [workouts, setWorkouts] = useState([]);
+  const [selectedWorkout, setSelectedWorkout] = useState(null);
+
+  const { token } = useSelector((state) => ({
+    token: state.Auth?.token,
+  }));
+
+  useFocusEffect(
+    useCallback(() => {
+      getEquipmentWorkouts();
+
+      return () => {
+        if (isTimerRunning) {
+          setIsTimerRunning(false);
+          updateDaysStats();
+        }
+      };
+    }, [isTimerRunning])
+  );
 
   useEffect(() => {
-    if (workoutDetails) {
-      const durationInSeconds = parseInt(workoutDetails.duration) * 60; // Convert minutes to seconds
+    if (selectedWorkout) {
+      const durationInSeconds = parseInt(selectedWorkout.duration.value) * 60; // Convert minutes to seconds
+      const todaysActivity = selectedWorkout.activities.find(
+        (a) => a.date === date
+      );
       setTotalDuration(durationInSeconds);
-      setRemainingTime(durationInSeconds);
+      setRemainingTime(
+        todaysActivity
+          ? durationInSeconds - todaysActivity.duration.value * 60
+          : durationInSeconds
+      );
+
+      secondsRemainingValue.current = todaysActivity
+        ? durationInSeconds - todaysActivity.duration.value * 60
+        : durationInSeconds;
     }
-  }, [workoutDetails]);
+  }, [selectedWorkout]);
 
   useEffect(() => {
     let interval;
     if (remainingTime > 0 && isTimerRunning) {
       interval = setInterval(() => {
         setRemainingTime((prev) => prev - 1);
-        setFill((prev) => prev + 100 / totalDuration); // Increment fill based on total duration
+
+        let fillValue = totalDuration - (remainingTime + 1);
+        let normalizedFill = (fillValue / totalDuration) * 100;
+        setFill(normalizedFill);
+        secondsRemainingValue.current = remainingTime - 1;
       }, 1000); // Update every second
     }
 
     return () => clearInterval(interval);
   }, [remainingTime, totalDuration, isTimerRunning]);
+
+  const getEquipmentWorkouts = async () => {
+    try {
+      const res = await API.get(
+        `${END_POINTS.EQUIPMENTS_WORKOUTS}?type=${category.label
+          .replace(" ", "_")
+          .replace("-", "")
+          .toLowerCase()}`,
+        null,
+        token
+      );
+      if (res.data.success) {
+        setWorkouts(res?.data?.data);
+        if (res?.data?.data.length > 0) {
+          setSelectedWorkout(res?.data?.data[0]);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching workouts:", error);
+    }
+  };
+
+  const updateDaysStats = async (isReset = false) => {
+    try {
+      console.log(totalDuration);
+      console.log(secondsRemainingValue.current);
+      console.log(
+        parseFloat((totalDuration - secondsRemainingValue.current) / 60.0)
+      );
+      const res = await API.patch(
+        `${END_POINTS.UPDATE_EQUIPMENTS_WORKOUTS}/${selectedWorkout._id}`,
+        {
+          duration: {
+            value: isReset
+              ? 0
+              : parseFloat(
+                  (totalDuration - secondsRemainingValue.current) / 60.0
+                ),
+            unit: "minute",
+          },
+          calories: 0,
+        },
+        token
+      );
+      if (res.data.success) {
+        getEquipmentWorkouts();
+      }
+    } catch (error) {
+      console.error("Error fetching workouts:", error);
+    }
+  };
 
   const formattedTime = (timeInSeconds) => {
     const hours = Math.floor(timeInSeconds / 3600)
@@ -67,14 +163,12 @@ const EquipmentDetails = () => {
     setRemainingTime(0); // Reset remaining time
     setFill(0); // Reset circular progress fill
     setIsTimerRunning(false); // Stop timer
+
+    updateDaysStats(true);
   };
 
   const handleStart = () => {
-    if (
-      !workoutDetails ||
-      !workoutDetails.duration ||
-      workoutDetails.duration === "0"
-    ) {
+    if (!selectedWorkout || !selectedWorkout.duration) {
       Alert.alert("No Workout Time", "Please create a workout first.");
     } else {
       setIsTimerRunning(true); // Start the timer
@@ -83,6 +177,7 @@ const EquipmentDetails = () => {
 
   const handlePause = () => {
     setIsTimerRunning(false); // Pause the timer
+    updateDaysStats();
   };
 
   const handleContinue = () => {
@@ -108,7 +203,9 @@ const EquipmentDetails = () => {
               <>
                 <Text style={styles.remainingTime}>Remaining time</Text>
                 <Text style={styles.remaining}>
-                  {formattedTime(remainingTime)}
+                  {`${formattedTime(remainingTime)} /\n${formattedTime(
+                    totalDuration
+                  )}`}
                 </Text>
               </>
             )}
@@ -154,38 +251,59 @@ const EquipmentDetails = () => {
           >
             Saved Workout
           </Text>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("NewWorkout", {
+                category,
+                workout: selectedWorkout,
+              });
+            }}
+          >
             <EditIcon />
           </TouchableOpacity>
         </View>
-        {workoutDetails ? (
-          <TouchableOpacity style={styles.sessionContainer}>
-            <Image source={images.device} style={styles.sessionImage} />
-            <Text style={styles.sessionTitleText}>
-              {workoutDetails.workoutName}
-            </Text>
-            <View style={styles.sessionDetailsContainer}>
-              <View style={styles.sessionDetail}>
-                <CaloriesIcon width={20} height={20} />
-                <Text style={styles.detailText}>{workoutDetails.speed}</Text>
-              </View>
-              <View style={styles.sessionDetail}>
-                <TimeIcon />
-                <Text style={styles.detailText}>{workoutDetails.incline}</Text>
-              </View>
-              <View style={styles.sessionDetail}>
-                <StrengthIcon />
-                <Text style={styles.detailText}>Quadriceps</Text>
-              </View>
+        {workouts.length > 0 ? (
+          <ScrollView horizontal contentContainerStyle={{ width: "100%" }}>
+            {workouts.map((workout, index) => {
+              return (
+                <TouchableOpacity
+                  style={styles.sessionContainer}
+                  // onPress={() => setSelectedWorkout(workout)}
+                >
+                  <Image
+                    source={images.chestWorkout}
+                    style={styles.sessionImage}
+                  />
+                  <Text style={styles.sessionTitleText}>{workout.name}</Text>
+                  <View style={styles.sessionDetailsContainer}>
+                    <View style={styles.sessionDetail}>
+                      <CaloriesIcon width={20} height={20} />
+                      <Text style={styles.detailText}>
+                        {workout.speed?.value}
+                      </Text>
+                    </View>
+                    <View style={styles.sessionDetail}>
+                      <TimeIcon />
+                      <Text style={styles.detailText}>
+                        {workout.duration?.value}
+                      </Text>
+                    </View>
+                    <View style={styles.sessionDetail}>
+                      <StrengthIcon />
+                      <Text style={styles.detailText}>{workout.level}</Text>
+                    </View>
 
-              <IconButton
-                icon="arrow-right"
-                size={20} // Adjust the size as needed
-                color="#aaa" // Adjust the color as needed
-                style={styles.nextIcon}
-              />
-            </View>
-          </TouchableOpacity>
+                    <IconButton
+                      icon="arrow-right"
+                      size={20} // Adjust the size as needed
+                      color="#aaa" // Adjust the color as needed
+                      style={styles.nextIcon}
+                    />
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
         ) : (
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -197,7 +315,7 @@ const EquipmentDetails = () => {
                 fontSize: FontSize.regular,
               }}
             >
-              No Saved Workouts
+              No Saved Workout
             </Text>
           </View>
         )}
@@ -225,11 +343,11 @@ const styles = StyleSheet.create({
   },
   remaining: {
     color: colors.green,
-    fontSize: 26,
+    fontSize: FontSize.large,
     fontFamily: "Poppins-SemiBold",
   },
   sessionContainer: {
-    position: "relative",
+    width: "100%",
     height: 200,
     marginTop: 30,
   },
@@ -255,7 +373,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 60,
     left: 10,
-    width: 103,
   },
   sessionDetailsContainer: {
     position: "absolute",

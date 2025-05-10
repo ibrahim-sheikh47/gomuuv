@@ -11,7 +11,8 @@
         "EXPO_PUBLIC_PROJECT_ID": "qick-86a7c",
         "EXPO_PUBLIC_STORAGE_BUCKET": "qick-86a7c.firebasestorage.app",
         "EXPO_PUBLIC_MESSAGING_SENDER_ID": "589872331000",
-        "EXPO_PUBLIC_APP_ID": "1:589872331000:web:4af27a8a7f67c4f434e30d"
+        "EXPO_PUBLIC_APP_ID": "1:589872331000:web:4af27a8a7f67c4f434e30d",
+        "NODE_ENV": "development"
       },
       "developmentClient": true,
       "distribution": "internal"
@@ -23,7 +24,8 @@
         "EXPO_PUBLIC_PROJECT_ID": "qick-86a7c",
         "EXPO_PUBLIC_STORAGE_BUCKET": "qick-86a7c.firebasestorage.app",
         "EXPO_PUBLIC_MESSAGING_SENDER_ID": "589872331000",
-        "EXPO_PUBLIC_APP_ID": "1:589872331000:web:4af27a8a7f67c4f434e30d"
+        "EXPO_PUBLIC_APP_ID": "1:589872331000:web:4af27a8a7f67c4f434e30d",
+        "NODE_ENV": "staging"
       },
       "distribution": "internal",
       "developmentClient": false,
@@ -39,7 +41,8 @@
         "EXPO_PUBLIC_PROJECT_ID": "qick-86a7c",
         "EXPO_PUBLIC_STORAGE_BUCKET": "qick-86a7c.firebasestorage.app",
         "EXPO_PUBLIC_MESSAGING_SENDER_ID": "589872331000",
-        "EXPO_PUBLIC_APP_ID": "1:589872331000:web:4af27a8a7f67c4f434e30d"
+        "EXPO_PUBLIC_APP_ID": "1:589872331000:web:4af27a8a7f67c4f434e30d",
+        "NODE_ENV": "production"
       },
       "autoIncrement": true,
       "android": {
