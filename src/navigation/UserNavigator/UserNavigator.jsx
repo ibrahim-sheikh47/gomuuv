@@ -42,6 +42,7 @@ import FinalizePlan from "../../UserScreens/Nutrition/FinalizePlan";
 import VideoPlayerScreen from "../../UserScreens/Workout/VideoPlayerScreen";
 import MapScreen from "../../UserScreens/Map/MapScreen";
 import NutritionPlan from "../../UserScreens/Nutrition/NutritionPlan";
+import Orders from "../../UserScreens/Shop/Orders";
 
 const Stack = createNativeStackNavigator();
 
@@ -108,6 +109,7 @@ export default function UserNavigator() {
       <Stack.Screen name="Cart" component={Cart} />
       <Stack.Screen name="Checkout" component={Checkout} />
       <Stack.Screen name="CompletedOrder" component={CompletedOrder} />
+      <Stack.Screen name="Orders" component={Orders} />
       <Stack.Screen name="Map" component={MapScreen} />
     </Stack.Navigator>
   );

@@ -74,10 +74,12 @@ const NutritionScreen = () => {
     }, [])
   );
 
-  useEffect(() => {
-    getNutritionMeals();
-    getDailyPlans();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getNutritionMeals();
+      getDailyPlans();
+    }, [])
+  );
 
   const getNutritionMeals = async () => {
     try {

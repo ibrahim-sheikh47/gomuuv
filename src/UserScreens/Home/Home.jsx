@@ -25,7 +25,7 @@ import { END_POINTS } from "../../config/routes";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
-  const completionPercentage = 0;
+  const [completionPercentage, setCompletionPercentage] = useState(0);
   const [isFirstTime, setIsFirstTime] = useState(true); // Track if it's the user's first time
   const [stats, setStats] = useState(null); // Track if it's the user's first time
   const [goals, setGoals] = useState(null); // Track if it's the user's first time
@@ -65,7 +65,26 @@ const HomeScreen = () => {
       const response = await API.post(`${END_POINTS.SIGNUP}/stats`, {}, token);
 
       if (response?.data?.success) {
-        setStats(response?.data?.data);
+        const stat = response?.data?.data;
+        setStats(stat);
+
+        let percentage = 0;
+        if (stat.ordersCount > 0) {
+          percentage += 20;
+        }
+        if (stat.challengesCount > 0) {
+          percentage += 20;
+        }
+        if (stat.workoutSessionsCount > 0) {
+          percentage += 20;
+        }
+        if (stat.totalCaloriesBurned > 0) {
+          percentage += 20;
+        }
+        if (stat.totalDistanceCovered > 0) {
+          percentage += 20;
+        }
+        setCompletionPercentage(percentage);
       }
     } catch (error) {
       console.log(error);
@@ -77,7 +96,6 @@ const HomeScreen = () => {
       const response = await API.get(`${END_POINTS.GOALS}`, {}, token);
 
       if (response?.data?.success) {
-        console.log(response?.data?.data);
         setGoals(response?.data?.data);
       }
     } catch (error) {

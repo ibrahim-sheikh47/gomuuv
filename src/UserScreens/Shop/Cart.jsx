@@ -166,12 +166,12 @@ const Cart = () => {
     return (
       <Container>
         <Header title={"Cart"} showBackButton={true} />
-        <View style={styles.emptyCartContainer}>
+        <View style={[styles.emptyCartContainer]}>
           <Text style={styles.emptyCartText}>No items in the cart.</Text>
           <CustomButton
             title={"Start Shopping"}
             onPress={handleContinueShopping}
-            style={{ marginTop: 20 }}
+            style={{ marginTop: 20, width: width * 0.8 }}
           />
         </View>
       </Container>
@@ -196,7 +196,9 @@ const Cart = () => {
               <View key={index} style={styles.productContainer}>
                 <Image
                   source={
-                    product?.product?.image ? { uri: product?.product?.image } : images.product1
+                    product?.product?.image
+                      ? { uri: product?.product?.image }
+                      : images.product1
                   }
                   style={[
                     styles.image,

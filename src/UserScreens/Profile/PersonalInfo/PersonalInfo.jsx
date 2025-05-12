@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import EditIcon from "../../../assets/svgs/EditIcon";
 import BackHeader from "../../../components/BackHeader";
 import Container from "../../../components/Container";
@@ -22,15 +29,48 @@ const PersonalInfoScreen = () => {
     userData: state.Auth?.data,
     token: state.Auth?.token,
   }));
-  // State for personal information fields
   const [personalInfo, setPersonalInfo] = useState({
     firstName: userData?.firstName || "",
     lastName: userData?.lastName || "",
-    height: userData?.height || "",
+    height: "",
+    heightInches: "",
+    heightUnit: "cm",
     weight: userData?.weight || "",
+    weightUnit: "kg",
     date: userData?.dob || "",
   });
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (userData?.height?.includes("ft")) {
+      const [ft, inch] = userData.height.split(" ");
+      setPersonalInfo((prev) => ({
+        ...prev,
+        height: ft.replace("ft", ""),
+        heightInches: inch?.replace("in", "") || "",
+        heightUnit: "ft-in",
+      }));
+    } else if (userData?.height?.includes("cm")) {
+      setPersonalInfo((prev) => ({
+        ...prev,
+        height: userData.height.replace("cm", ""),
+        heightUnit: "cm",
+      }));
+    }
+    if (userData?.weight?.includes("lbs")) {
+      setPersonalInfo((prev) => ({
+        ...prev,
+        weight: userData.weight.replace("lbs", ""),
+        weightUnit: "lbs",
+      }));
+    } else if (userData?.weight?.includes("kg")) {
+      setPersonalInfo((prev) => ({
+        ...prev,
+        weight: userData.weight.replace("kg", ""),
+        weightUnit: "kg",
+      }));
+    }
+  }, []);
 
   const handleInputChange = (field, value) => {
     console.log(field, value);
@@ -46,7 +86,9 @@ const PersonalInfoScreen = () => {
     if (
       !personalInfo.firstName ||
       !personalInfo.lastName ||
-      !personalInfo.height ||
+      (personalInfo.heightUnit === "cm"
+        ? !personalInfo.height
+        : !personalInfo.height || !personalInfo.heightInches) ||
       !personalInfo.weight ||
       !personalInfo.date
     ) {
@@ -86,12 +128,18 @@ const PersonalInfoScreen = () => {
     if (!validateFields()) return;
     setIsLoading(true);
 
+    let heightFormatted =
+      personalInfo.heightUnit === "cm"
+        ? `${personalInfo.height}cm`
+        : `${personalInfo.height}ft ${personalInfo.heightInches}in`;
+    let weightFormatted = `${personalInfo.weight}${personalInfo.weightUnit}`;
+
     try {
       const updatedData = {
         firstName: personalInfo.firstName,
         lastName: personalInfo.lastName,
-        height: personalInfo.height,
-        weight: personalInfo.weight,
+        height: heightFormatted,
+        weight: weightFormatted,
         dob: personalInfo.date,
       };
       const response = await API.patch(
@@ -133,28 +181,106 @@ const PersonalInfoScreen = () => {
     { label: "Date Of Birth", key: "date" },
   ];
 
+  // Custom modal selection component
+  const SelectionModal = ({ visible, onClose, options, onSelect, title }) => {
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={visible}
+        onRequestClose={onClose}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{title}</Text>
+            <FlatList
+              data={options}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.modalItem}
+                  onPress={() => {
+                    onSelect(item);
+                    onClose();
+                  }}
+                >
+                  <Text style={styles.modalItemText}>{item}</Text>
+                </TouchableOpacity>
+              )}
+            />
+            <TouchableOpacity style={styles.modalCloseButton} onPress={onClose}>
+              <Text style={styles.modalCloseButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
   return (
     <Container>
       <BackHeader title={"Personal Information"} showBackButton={true} />
       <FlatList
         style={{ marginTop: 30 }}
         data={dummyData}
-        renderItem={({ item }) => (
-          <View style={styles.fieldContainer}>
-            <View>
-              <InputField
-                type={item.key}
-                label={item.label}
-                value={personalInfo[item.key]}
-                onChangeText={(value) => handleInputChange(item.key, value)}
-                keyboardType={item.keyboardType || "default"} // Use keyboardType if specified
-              />
-              {/* <TouchableOpacity style={styles.editIcon}>
+        renderItem={({ item }) => {
+          const isHeight = item.key === "height";
+          const isWeight = item.key === "weight";
+
+          return (
+            <View style={styles.fieldContainer}>
+              <View>
+                <InputField
+                  type={item.key}
+                  label={item.label}
+                  value={personalInfo[item.key]}
+                  onChangeText={(value) => handleInputChange(item.key, value)}
+                  keyboardType={item.keyboardType || "default"} // Use keyboardType if specified
+                  compositeFields={
+                    personalInfo.heightUnit === "ft-in"
+                      ? [
+                          {
+                            key: "height", // feet
+                            value: personalInfo.height,
+                            onChangeText: (text) =>
+                              handleInputChange("height", text),
+                            placeholder: "Feet",
+                          },
+                          {
+                            key: "heightInches", // inches
+                            value: personalInfo.heightInches,
+                            onChangeText: (text) =>
+                              handleInputChange("heightInches", text),
+                            placeholder: "Inches",
+                          },
+                        ]
+                      : []
+                  }
+                  unitType={
+                    isHeight ? "height" : isWeight ? "weight" : undefined
+                  }
+                  unitValue={
+                    isHeight
+                      ? personalInfo.heightUnit
+                      : isWeight
+                      ? personalInfo.weightUnit
+                      : undefined
+                  }
+                  onUnitChange={(unit) => {
+                    if (isHeight)
+                      setPersonalInfo({ ...personalInfo, heightUnit: unit });
+                    else if (isWeight)
+                      setPersonalInfo({ ...personalInfo, weightUnit: unit });
+                  }}
+                />
+
+                {/* <TouchableOpacity style={styles.editIcon}>
                 <EditIcon />
               </TouchableOpacity> */}
+              </View>
             </View>
-          </View>
-        )}
+          );
+        }}
         keyExtractor={(item) => item.key}
         contentContainerStyle={styles.scrollContainer}
       />

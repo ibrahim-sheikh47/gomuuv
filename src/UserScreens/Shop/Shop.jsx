@@ -1,6 +1,6 @@
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import React, { useCallback, useEffect, useState } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, Text } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import CartIcon from "../../assets/svgs/CartIcon";
 import ShopIcon from "../../assets/svgs/ShopIcon";
@@ -16,6 +16,7 @@ import {
   setCategoriesData,
   setProductsData,
 } from "../../redux/reducers/ShopSlice";
+import { colors } from "../../constants/colors";
 const ShopScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -80,8 +81,12 @@ const ShopScreen = () => {
   return (
     <Container>
       <Header
+        showBackButton
         title="Shop"
-        // rightIcon1={<CartIcon />}
+        rightIcon1={<CartIcon />}
+        rightIcon1Press={() => {
+          navigation.navigate("Orders");
+        }}
         rightIcon2Press={() => {
           navigation.navigate("Cart");
         }}
@@ -92,7 +97,6 @@ const ShopScreen = () => {
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         {/* Search Bar */}
         {/* <SearchBar searchQuery={searchQuery} onChangeSearch={onChangeSearch} /> */}
-
         {/* Categories Filter */}
         <Selectable
           items={["All", ...categories.map((cat) => cat.name)]}
@@ -101,7 +105,6 @@ const ShopScreen = () => {
           label="Categories"
           description="Filter by category"
         />
-
         {/* Render Product Sections */}
         {categories
           .filter(
@@ -123,6 +126,26 @@ const ShopScreen = () => {
               )}
             />
           ))}
+
+        {categories
+          .filter(
+            (category) =>
+              selectedCategory === "All" || category?.name === selectedCategory
+          )
+          .filter((category) =>
+            products.some((product) => product?.category?._id === category?._id)
+          ).length === 0 && (
+          <Text
+            style={{
+              color: "white",
+              alignSelf: "center",
+              justifyContent: "center",
+              marginTop: 30,
+            }}
+          >
+            No products available.
+          </Text>
+        )}
       </ScrollView>
       <CustomModal
         visible={isModalVisible}

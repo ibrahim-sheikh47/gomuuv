@@ -37,7 +37,8 @@ const Signup = (props) => {
     firstName: "",
     lastName: "",
     height: "",
-    heightUnit: "ft", // Default unit
+    heightInches: "",
+    heightUnit: "cm", // Default unit
     weight: "",
     weightUnit: "kg", // Default unit
     age: "",
@@ -46,14 +47,6 @@ const Signup = (props) => {
     confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
-
-  // States for modal visibility
-  const [heightModalVisible, setHeightModalVisible] = useState(false);
-  const [weightModalVisible, setWeightModalVisible] = useState(false);
-
-  // Options for the dropdowns
-  const heightUnitOptions = ["cm", "ft"];
-  const weightUnitOptions = ["kg", "lb"];
 
   const handleInputChange = (field, value) => {
     setForm((prevState) => ({
@@ -67,7 +60,9 @@ const Signup = (props) => {
     if (
       !form.firstName ||
       !form.lastName ||
-      !form.height ||
+      (form.heightUnit === "cm"
+        ? !form.height
+        : !form.height || !form.heightInches) ||
       !form.weight ||
       !form.age ||
       !form.email ||
@@ -101,6 +96,12 @@ const Signup = (props) => {
         text2: "Passwords do not match.",
       });
       return false;
+    }
+
+    if (form.heightUnit === "ft-in") {
+      form.height = `${form.height}ft ${form.heightInches}in`;
+    } else {
+      form.height = `${form.height}cm`;
     }
 
     return true;
@@ -173,42 +174,6 @@ const Signup = (props) => {
     }
   };
 
-  // Custom modal selection component
-  const SelectionModal = ({ visible, onClose, options, onSelect, title }) => {
-    return (
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={visible}
-        onRequestClose={onClose}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{title}</Text>
-            <FlatList
-              data={options}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.modalItem}
-                  onPress={() => {
-                    onSelect(item);
-                    onClose();
-                  }}
-                >
-                  <Text style={styles.modalItemText}>{item}</Text>
-                </TouchableOpacity>
-              )}
-            />
-            <TouchableOpacity style={styles.modalCloseButton} onPress={onClose}>
-              <Text style={styles.modalCloseButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    );
-  };
-
   return (
     <Container>
       <StatusBar style="light" backgroundColor="#121212" />
@@ -234,37 +199,57 @@ const Signup = (props) => {
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
               <InputField
+                type="height"
                 label="Height"
                 value={form.height}
                 onChangeText={(value) => handleInputChange("height", value)}
                 placeholder="Enter your height"
                 keyboardType="numeric" // Ensure only numbers are entered
+                compositeFields={
+                  form.heightUnit === "ft-in"
+                    ? [
+                        {
+                          key: "height", // feet
+                          value: form.height,
+                          onChangeText: (text) =>
+                            handleInputChange("height", text),
+                          placeholder: "Feet",
+                        },
+                        {
+                          key: "heightInches", // inches
+                          value: form.heightInches,
+                          onChangeText: (text) =>
+                            handleInputChange("heightInches", text),
+                          placeholder: "Inches",
+                        },
+                      ]
+                    : []
+                }
+                unitType={"height"}
+                unitValue={form.heightUnit}
+                onUnitChange={(unit) => {
+                  handleInputChange("heightUnit", unit);
+                }}
               />
             </View>
-            <TouchableOpacity
-              style={styles.unitSelector}
-              onPress={() => setHeightModalVisible(true)}
-            >
-              <Text style={styles.unitSelectorText}>{form.heightUnit}</Text>
-            </TouchableOpacity>
           </View>
 
           <View style={styles.row}>
             <View style={{ flex: 1 }}>
               <InputField
+                type="weight"
                 label="Weight"
                 value={form.weight}
                 onChangeText={(value) => handleInputChange("weight", value)}
                 placeholder="Enter your weight"
                 keyboardType="numeric" // Ensure only numbers are entered
+                unitType={"weight"}
+                unitValue={form.weightUnit}
+                onUnitChange={(unit) => {
+                  handleInputChange("weightUnit", unit);
+                }}
               />
             </View>
-            <TouchableOpacity
-              style={styles.unitSelector}
-              onPress={() => setWeightModalVisible(true)}
-            >
-              <Text style={styles.unitSelectorText}>{form.weightUnit}</Text>
-            </TouchableOpacity>
           </View>
 
           <InputField
@@ -324,24 +309,6 @@ const Signup = (props) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-
-      {/* Height Unit Selection Modal */}
-      <SelectionModal
-        visible={heightModalVisible}
-        onClose={() => setHeightModalVisible(false)}
-        options={heightUnitOptions}
-        onSelect={(value) => handleInputChange("heightUnit", value)}
-        title="Select Height Unit"
-      />
-
-      {/* Weight Unit Selection Modal */}
-      <SelectionModal
-        visible={weightModalVisible}
-        onClose={() => setWeightModalVisible(false)}
-        options={weightUnitOptions}
-        onSelect={(value) => handleInputChange("weightUnit", value)}
-        title="Select Weight Unit"
-      />
 
       <Loader isLoading={loading} message="Processing your request..." />
     </Container>

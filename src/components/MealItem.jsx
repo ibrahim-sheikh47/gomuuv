@@ -16,6 +16,7 @@ import { FontSize } from "../utils/font";
 
 export const MealItem = ({
   title,
+  mealId,
   mealName,
   mealImage,
   calories,
@@ -26,6 +27,7 @@ export const MealItem = ({
   forFinalizePlan, // New prop to check if used for Finalize Plan
   isAdded,
   handleAddRemove,
+  onDelete,
   mealItemOrientation,
 }) => {
   // Check if the mealImage is a valid URL or an object with a URI
@@ -51,7 +53,7 @@ export const MealItem = ({
             {mealName}
           </Text>
           {!forFinalizePlan && iconType === "delete" && (
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => onDelete(mealId)}>
               <Ionicons name="trash-outline" size={15} color="#AFAFAF" />
             </TouchableOpacity>
           )}
