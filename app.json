@@ -13,15 +13,18 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "googleServicesFile": "./GoogleService-Info.plist",
       "supportsTablet": true,
       "bundleIdentifier": "com.gomuuv.ios",
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "This app requires access to the photo library to update your profile picture.",
         "NSCameraUsageDescription": "This app requires access to the camera to take profile pictures.",
         "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show your position on the map."
-      }
+      },
+      "buildNumber": "1"
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -63,7 +66,17 @@
           "photosPermission": "The app accesses your photos to let you share them with your friends.",
           "cameraPermission": "The app needs access to your camera to take photos."
         }
-      ]
+      ],
+      ["react-native-maps", { "config": { "googleMapsApiKey": "AIzaSyBwh9rxGr03bkOMgDgkrRajui1pl7k-8qU" }, "useGoogleMaps": false }],
+      "@react-native-firebase/app",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
     ]
   }
 }
