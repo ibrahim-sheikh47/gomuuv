@@ -81,7 +81,9 @@ const FinishActivity = () => {
             {
               name: "ActivityDetailScreen",
               params: {
-                goal,
+                goal: response.data.data,
+                activityType,
+                activityName,
               },
             },
           ],

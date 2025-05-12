@@ -191,14 +191,14 @@ const ActivityDetailScreen = () => {
             target={goal?.targetDistance?.value || 0}
             hideGoal={goal?.distance == null || false}
             goal={`Goal: ${goal?.targetDistance?.value || 0} ${goal?.targetDistance?.unit || "mi"}`}
-            message={`${stats?.distance || 0} ${goal?.targetDistance?.unit || "mi"}`}
+            message={`${Math.floor(stats?.distance) || 0} ${goal?.targetDistance?.unit || "mi"}`}
           />
           <CustomCard
             label="Time"
             icon={TimeIcon}
             hideGoal={goal?.duration == null || false}
             goal={`Goal: ${goal?.targetDuration?.value || 0} ${goal?.targetDuration?.unit || "mins"}`}
-            message={`${stats?.duration || 0} ${goal?.targetDuration?.unit || "mins"}`}
+            message={`${Math.floor(stats?.duration) || 0} ${goal?.targetDuration?.unit || "mins"}`}
           />
         </View>
 
