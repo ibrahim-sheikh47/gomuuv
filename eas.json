@@ -15,9 +15,13 @@
         "NODE_ENV": "development"
       },
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "channel": "development"
     },
-    "preview": {
+    "staging": {
       "env": {
         "EXPO_PUBLIC_API_KEY": "AIzaSyC4DL5mfh5URjf6o8pNdKJlvUPYo9V3tDg",
         "EXPO_PUBLIC_AUTH_DOMAIN": "qick-86a7c.firebaseapp.com",
@@ -27,12 +31,17 @@
         "EXPO_PUBLIC_APP_ID": "1:589872331000:web:4af27a8a7f67c4f434e30d",
         "NODE_ENV": "staging"
       },
-      "distribution": "internal",
       "developmentClient": false,
+      "distribution": "internal",
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleDebug"
-      }
+      },
+      "ios": {
+        "simulator": true
+      },
+      "channel": "staging",
+      "autoIncrement": true
     },
     "production": {
       "env": {
@@ -44,14 +53,33 @@
         "EXPO_PUBLIC_APP_ID": "1:589872331000:web:4af27a8a7f67c4f434e30d",
         "NODE_ENV": "production"
       },
-      "autoIncrement": true,
+      "developmentClient": false,
+      "distribution": "store",
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleRelease"
-      }
+      },
+      "ios": {},
+      "channel": "production",
+      "autoIncrement": true
     }
   },
   "submit": {
-    "production": {}
+    "staging": {
+      "android": {
+        "track": "internal"
+      },
+      "ios": {
+        "appleId": "com.gomuuv.ios"
+      }
+    },
+    "production": {
+      "android": {
+        "track": "production"
+      },
+      "ios": {
+        "appleId": "com.gomuuv.ios"
+      }
+    }
   }
 }

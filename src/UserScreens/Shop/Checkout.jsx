@@ -327,6 +327,15 @@ const Checkout = () => {
       return;
     }
 
+    if (!cartItems.length) {
+      Toast.show({
+        type: "error",
+        text1: "Cart is empty",
+        text2: "Please add products to your cart before placing an order",
+      });
+      return;
+    }
+
     try {
       const payload = {
         contact: {
@@ -420,10 +429,7 @@ const Checkout = () => {
 
   return (
     <Container>
-      <Header
-        title={"Checkout"}
-        showBackButton={true}
-      />
+      <Header title={"Checkout"} showBackButton={true} />
       <ScrollView
         style={{ marginBottom: 30 }}
         showsVerticalScrollIndicator={false}
@@ -444,7 +450,11 @@ const Checkout = () => {
           cartItems.map((item, index) => (
             <View key={index} style={styles.productContainer}>
               <Image
-                source={item?.product?.image || images.product1}
+                source={
+                  item?.product?.image
+                    ? { uri: item.product.image }
+                    : images.product1
+                }
                 style={styles.image}
               />
               <View style={styles.productDetails}>
@@ -493,7 +503,8 @@ const Checkout = () => {
                   <TouchableOpacity
                     onPress={() => {
                       const updateCartItems = cartItems.filter(
-                        (item) => item?.product?._id !== item?.product?._id
+                        (cartItem) =>
+                          cartItem?.product?._id !== item?.product?._id
                       );
                       dispatch(setCartData(updateCartItems));
                       callProductRemoveApi(item?.product?._id);
@@ -599,13 +610,17 @@ const Checkout = () => {
           <Text style={styles.discountLabel}>Discount Code</Text>
           <View style={styles.discountInputContainer}>
             <InputField
+              type="discount"
               placeholder={"Enter discount code"}
               value={discountCode}
               onChangeText={setDiscountCode}
-              containerStyle={{ flex: 1, marginBottom: 0 }}
+              containerStyle={{ width: 1, marginBottom: 0 }}
             />
             <TouchableOpacity
-              style={styles.applyButton}
+              style={[
+                styles.applyButton,
+                { width: "25%", alignItems: "center" },
+              ]}
               onPress={applyDiscountCode}
               disabled={discountApplied}
             >
@@ -967,8 +982,6 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   discountInputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
     gap: 10,
   },
   applyButton: {

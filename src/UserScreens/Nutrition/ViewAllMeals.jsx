@@ -67,6 +67,22 @@ const ViewAllMeals = ({ route, navigation }) => {
     }
   };
 
+  const removeMealFromPlan = async (mealId) => {
+    try {
+      const res = await API.post(
+        `${END_POINTS.DAILY_PLANS}/remove-meal`,
+        { mealId },
+        token
+      );
+      if (res.data.success) {
+        dispatch(setDailyPlans(dailyPlans.filter((d) => d._id !== mealId)));
+        setFilteredData(filteredData.filter((d) => d._id !== mealId));
+      }
+    } catch (error) {
+      console.error("Error fetching meals:", error);
+    }
+  };
+
   const onChangeSearch = (query) => {
     setSearchQuery(query);
     filterMeals(query, selectedCategory);
@@ -143,10 +159,11 @@ const ViewAllMeals = ({ route, navigation }) => {
 
       <FlatList
         data={filteredData}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <MealItem
             style={styles.ViewAll}
+            mealId={item?._id}
             mealName={item?.name}
             mealImage={item?.image}
             calories={item?.calories}
@@ -155,6 +172,7 @@ const ViewAllMeals = ({ route, navigation }) => {
             onPress={() =>
               navigation.navigate("MealDetailScreen", { meal: item })
             }
+            onDelete={(mealId) => removeMealFromPlan(mealId)}
           />
         )}
         numColumns={1}

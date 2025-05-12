@@ -48,8 +48,8 @@ const FinishActivity = () => {
   const secondsPerMile = Math.round(timePerMileInSeconds % 60) || 0;
 
   // Calculate Pace (in miles per hour)
-  const paceInHours = distanceInMiles / (timeInSeconds / 60); // timeInSeconds is divided by 3600 to convert time to hours
-  const pace = paceInHours.toFixed(2); // Format the pace to 2 decimal places
+  const paceInHours = distanceInMiles / (timeInSeconds / 60) || 0; // timeInSeconds is divided by 3600 to convert time to hours
+  const pace = paceInHours.toFixed(2) || 0; // Format the pace to 2 decimal places
 
   const finishActivity = async () => {
     try {

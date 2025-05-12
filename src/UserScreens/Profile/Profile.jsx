@@ -129,8 +129,8 @@ const Profile = ({ navigation }) => {
         </View>
 
         <View style={styles.statsContainer}>
-          <StatCard label="Height" value={height} unit={"cm"} />
-          <StatCard label="Weight" value={weight} unit={"kg"} />
+          <StatCard label="Height" value={height} unit={""} />
+          <StatCard label="Weight" value={weight} unit={""} />
           <StatCard label="Age" value={age} />
         </View>
 

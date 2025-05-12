@@ -19,7 +19,8 @@
         "NSPhotoLibraryUsageDescription": "This app requires access to the photo library to update your profile picture.",
         "NSCameraUsageDescription": "This app requires access to the camera to take profile pictures.",
         "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show your position on the map."
-      }
+      },
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
@@ -28,7 +29,7 @@
       },
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyBwh9rxGr03bkOMgDgkrRajui1pl7k-8qU"
+          "apiKey": "AIzaSyCSz-v30_BxTuT6a23e78UUy0ANbRd0gC4"
         }
       },
       "package": "com.gomuuv.android",
@@ -39,10 +40,14 @@
         "READ_MEDIA_IMAGES",
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION"
-      ]
+      ],
+      "versionCode": 1
     },
     "web": {
       "favicon": "./src/assets/favicon.png"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     },
     "extra": {
       "eas": {
@@ -57,6 +62,14 @@
       "expo-font",
       "react-native-video",
       "expo-video",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
       [
         "expo-image-picker",
         {
