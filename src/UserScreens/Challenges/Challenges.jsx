@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Modal,
   FlatList,
   useWindowDimensions,
 } from "react-native";
@@ -45,15 +46,21 @@ const ChallengesScreen = () => {
   const [enrolledChallenges, setEnrolledChallenges] = useState([]);
   const [upcomingChallenges, setUpcomingChallenges] = useState([]);
 
-  const [currentWeight, setCurrentWeight] = useState(63); // Set to 63 to match your screenshot
-  const [targetWeight, setTargetWeight] = useState(54); // Set to 54 to match your screenshot
-  const [progressPercentage, setProgressPercentage] = useState(0); // Set to 54 to match your screenshot
-  const [bmiValue, setBmiValue] = useState(23.0); // Initial BMI value
-
   const { token, userData } = useSelector((state) => ({
     token: state.Auth?.token,
     userData: state.Auth?.data,
   }));
+
+  const [currentWeight, setCurrentWeight] = useState(
+    userData?.weight.replace("kg", "").replace("lbs", "") || 0
+  ); // Set to 63 to match your screenshot
+  const [targetWeight, setTargetWeight] = useState(0); // Set to 54 to match your screenshot
+  const [progressPercentage, setProgressPercentage] = useState(0); // Set to 54 to match your screenshot
+  const [bmiValue, setBmiValue] = useState(0); // Initial BMI value
+
+  const [rangeModalVisible, setRangeModalVisible] = useState(false);
+  const [selectedRange, setSelectedRange] = useState("Weekly");
+  const [graphData, setGraphData] = useState([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -61,6 +68,49 @@ const ChallengesScreen = () => {
       getUpcomingChallenges();
     }, [])
   );
+
+  useEffect(() => {
+    const calculateBMI = () => {
+      let heightInMeters;
+
+      if (!currentWeight) return;
+
+      if (userData?.height.toLowerCase().includes("cm")) {
+        const cmValue = parseFloat(userData?.height.replace("cm", "").trim());
+        heightInMeters = cmValue / 100;
+      } else if (userData?.height.includes("ft")) {
+        // handle height in ft'in format (e.g., 5'9)
+        const [feet, inches] = userData?.height
+          .split(" ")
+          .map((val) => parseFloat(val.replace(/[^0-9.]/g, "")));
+        const totalInches = (feet || 0) * 12 + (inches || 0);
+        const meters = totalInches * 0.0254;
+        heightInMeters = meters;
+      } else {
+        // fallback: assume meters directly
+        heightInMeters = parseFloat(userData?.height);
+      }
+
+      if (heightInMeters > 0) {
+        const bmi = currentWeight / (heightInMeters * heightInMeters);
+        setBmiValue(parseFloat(bmi.toFixed(1)));
+      }
+    };
+
+    calculateBMI();
+  }, [currentWeight]);
+
+  useEffect(() => {
+    const data = generateGraphData(selectedRange);
+    setGraphData(data);
+  }, [selectedRange]);
+
+  const getBmiLabel = (bmi) => {
+    if (bmi < 18.5) return "Underweight";
+    if (bmi < 24.9) return "Normal";
+    if (bmi < 29.9) return "Overweight";
+    return "Obese";
+  };
 
   const handleUpdateWeight = (newWeight) => {
     setCurrentWeight(newWeight); // Update the current weight
@@ -213,22 +263,72 @@ const ChallengesScreen = () => {
     setProgressPercentage(calculateProgressPercentage());
   }, [currentWeight, targetWeight]);
 
+  const weeklyData = [
+    { day: "M", value: 10 },
+    { day: "T", value: 0 },
+    { day: "W", value: 0 },
+    { day: "T", value: 15 },
+    { day: "F", value: 0 },
+    { day: "S", value: 22 },
+    { day: "S", value: 0 },
+  ];
+
+  const yearlyData = [
+    { day: "Jan", value: 0 },
+    { day: "Feb", value: 12 },
+    { day: "Mar", value: 0 },
+    { day: "Apr", value: 44 },
+    { day: "May", value: 0 },
+    { day: "Jun", value: 0 },
+    { day: "Jul", value: 34 },
+    { day: "Sep", value: 0 },
+    { day: "Oct", value: 55 },
+    { day: "Nov", value: 56 },
+    { day: "Dec", value: 87 },
+  ];
+
+  const BarGraph = ({ data }) => {
+    const maxHeight = 150;
+
+    return (
+      <View style={styles.barOuterContainer}>
+        {data.map((item, index) => {
+          const barHeight = (item.value / 100) * maxHeight;
+
+          return (
+            <View key={index} style={styles.barContainer}>
+              <View
+                style={[
+                  styles.bar,
+                  {
+                    height: barHeight,
+                    backgroundColor: "#C2FF59",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.label,
+                    {
+                      color: "#000",
+                    },
+                  ]}
+                >
+                  {item.value}
+                </Text>
+              </View>
+              <Text style={styles.label}>{item.day}</Text>
+            </View>
+          );
+        })}
+      </View>
+    );
+  };
+
   const renderGoalsSection = () => (
     <View>
-      {/* Header Section */}
-      <Text style={[styles.sectionTitle, { fontSize: 14, marginBottom: 5 }]}>
-        Current Weight
-      </Text>
-      <Text
-        style={{
-          color: colors.green,
-          fontSize: FontSize.xxlarge,
-          fontFamily: "Poppins-Bold",
-        }}
-      >
-        {currentWeight ? `${currentWeight} kg` : "N/A"}
-      </Text>
-
       {/* Graph + Yearly Dropdown */}
       <View
         style={{
@@ -238,42 +338,31 @@ const ChallengesScreen = () => {
           alignItems: "center",
         }}
       >
-        <View style={{ flex: 1 }}>
-          {/* Graph */}
-          <Image
-            source={images.weightGraph}
-            style={{
-              height: 180,
-              width: "100%",
-              resizeMode: "contain",
-            }}
-          />
-        </View>
+        <View>
+          {/* Header Section */}
+          <Text
+            style={[styles.sectionTitle, { fontSize: 14, marginBottom: 5 }]}
+          >
+            Current Weight
+          </Text>
 
-        {/* Dropdown */}
-        <TouchableOpacity style={{ position: "absolute", top: 10, right: 10 }}>
-          <View
+          <Text
             style={{
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "#242425",
-              paddingVertical: 5,
-              paddingHorizontal: 10,
-              borderRadius: 8,
+              color: colors.green,
+              fontSize: FontSize.xxlarge,
+              fontFamily: "Poppins-Bold",
             }}
           >
-            <Text
-              style={{
-                color: "white",
-                fontSize: FontSize.small,
-                marginRight: 4,
-              }}
-            >
-              Yearly
-            </Text>
-            <Text style={{ color: "white" }}>▼</Text>
-          </View>
+            {userData?.weight || "N/A"}
+          </Text>
+        </View>
+
+        <TouchableOpacity style={{borderWidth: 1, borderColor: "#c2c2c2", borderRadius: 8}} onPress={() => setRangeModalVisible(true)}>
+          <Text style={styles.rangeSelectText}>{selectedRange} ▼</Text>
         </TouchableOpacity>
+      </View>
+      <View style={{ flex: 1 }}>
+        <BarGraph data={graphData} />
       </View>
 
       {/* Progress Section */}
@@ -346,7 +435,7 @@ const ChallengesScreen = () => {
           <Text style={styles.bmiValue}>
             {bmiValue ? bmiValue.toString() : "N/A"}
           </Text>
-          <Text style={styles.bmiLabel}>Normal</Text>
+          <Text style={styles.bmiLabel}>{getBmiLabel(bmiValue)}</Text>
         </View>
 
         {/* BMI Scale */}
@@ -419,6 +508,41 @@ const ChallengesScreen = () => {
     </>
   );
 
+  const generateGraphData = (range) => {
+    if (range === "Weekly") {
+      return weeklyData;
+    } else {
+      return yearlyData;
+    }
+  };
+
+  const RangeModal = ({ visible, onClose, onSelect }) => (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={visible}
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalTitle}>Select Range</Text>
+          {["Weekly", "Yearly"].map((range) => (
+            <TouchableOpacity
+              key={range}
+              style={styles.modalButton}
+              onPress={() => {
+                onSelect(range);
+                onClose();
+              }}
+            >
+              <Text style={styles.modalButtonText}>{range}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+    </Modal>
+  );
+
   return (
     <Container>
       <Header title="Challenges & Goals" />
@@ -449,7 +573,6 @@ const ChallengesScreen = () => {
           ) : null
         }
       />
-
       {/* Modals for Update Weight and Set Target */}
       <GoalModal
         visible={weightModalVisible}
@@ -486,6 +609,12 @@ const ChallengesScreen = () => {
             source={require("../../assets/icons/setTargetIcon.png")}
           />
         }
+      />
+
+      <RangeModal
+        visible={rangeModalVisible}
+        onClose={() => setRangeModalVisible(false)}
+        onSelect={setSelectedRange}
       />
     </Container>
   );
@@ -676,6 +805,58 @@ const styles = StyleSheet.create({
     color: "#888",
     fontSize: 12,
     fontFamily: "Poppins-Regular",
+  },
+  barOuterContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    padding: 20, // optional dark background
+    maxHeight: 200,
+  },
+  barContainer: {
+    alignItems: "center",
+    width: 30,
+  },
+  bar: {
+    width: 30,
+    borderRadius: 3,
+    marginBottom: 6,
+  },
+  label: {
+    color: "#aaa",
+    fontSize: 14,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContainer: {
+    backgroundColor: "white",
+    margin: 30,
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 15,
+  },
+  modalButton: {
+    paddingVertical: 10,
+    width: "100%",
+    alignItems: "center",
+  },
+  modalButtonText: {
+    fontSize: 16,
+    color: "#007AFF",
+  },
+  rangeSelectText: {
+    fontSize: 16,
+    fontWeight: "500",
+    margin: 10,
+    color: "white",
   },
 });
 
