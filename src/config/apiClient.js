@@ -69,8 +69,16 @@ apiClient.interceptors.response.use(
 const API = {
   get: (url, params, token) =>
     apiClient.get(url, { params, authorized: true, token }),
-  post: (url, data, token) =>
-    apiClient.post(url, data, { authorized: true, token }),
+  post: (url, data, token, isMultipart = false) =>
+    apiClient.post(url, data, {
+      authorized: true,
+      token,
+      headers: isMultipart
+        ? {
+            "Content-Type": "multipart/form-data",
+          }
+        : {},
+    }),
   put: (url, data, token) =>
     apiClient.put(url, data, { authorized: true, token }),
   patch: (url, data, token, isMultipart = false) =>

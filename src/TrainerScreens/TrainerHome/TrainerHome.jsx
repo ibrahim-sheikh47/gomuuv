@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   FlatList,
   ScrollView,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  useWindowDimensions,
 } from "react-native";
 import Container from "../../components/Container";
 import images from "../../constants/images";
@@ -15,7 +16,7 @@ import icons from "../../constants/icons";
 import ProfileSection from "../../components/ProfileSection";
 import Header from "../../components/Header";
 import CustomButton from "../../components/CustomButton";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import SearchIcon from "../../assets/svgs/SearchIcon";
 import RevenueIcon from "../../assets/svgs/RevenueIcon";
 import StrengthIcon from "../../assets/svgs/StrengthIcon";
@@ -24,19 +25,30 @@ import ActiveClientsIcon from "../../assets/svgs/ActiveClientsIcon";
 import ProgramSoldIcon from "../../assets/svgs/ProgramSoldIcon";
 import { useSelector } from "react-redux";
 import { FontSize } from "../../utils/font";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
 
 const TrainerHome = () => {
   const navigation = useNavigation();
   const [stats, setStats] = useState({
-    revenue: "$5,010.65",
-    activeClients: 6,
-    programsSold: 25,
+    revenue: "$0",
+    activeClients: 0,
+    programsSold: 0,
   });
+  const [workouts, setWorkouts] = useState([]);
 
   // Combine all useSelector Hooks
-  const { userData } = useSelector((state) => ({
+  const { userData, token } = useSelector((state) => ({
     userData: state.Auth?.data,
+    token: state.Auth?.token,
   }));
+  const { width } = useWindowDimensions();
+
+  useFocusEffect(
+    useCallback(() => {
+      getWorkouts();
+    }, [])
+  );
 
   const trainerWorkoutData = [
     {
@@ -136,17 +148,19 @@ const TrainerHome = () => {
       onPress={() =>
         navigation.navigate("WorkoutProgramDetail", { program: item })
       }
-      style={styles.workoutCard}
+      style={[styles.workoutCard, { width: width * 0.9 }]}
     >
-      <Image source={item.image} style={styles.cardImage} />
+      <Image source={{ uri: item.image }} style={styles.cardImage} />
       <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>{item.title}</Text>
-        <Text style={styles.cardDescription}>{item.subtitle}</Text>
+        <Text style={styles.cardTitle}>{item.name}</Text>
+        <Text style={styles.cardDescription}>{item.description}</Text>
         <View style={styles.cardDetails}>
           <View>
             <View style={styles.sessionDetail}>
               <StrengthIcon />
-              <Text style={styles.detailText}>{item.category}</Text>
+              <Text style={styles.detailText}>
+                {item.equipments[0].replace("_", " ")}
+              </Text>
             </View>
             <View style={styles.sessionDetail}>
               <LevelIcon />
@@ -158,6 +172,18 @@ const TrainerHome = () => {
       </View>
     </TouchableOpacity>
   );
+
+  const getWorkouts = async () => {
+    try {
+      const res = await API.get(END_POINTS.TRAINER_WORKOUTS, null, token);
+      if (res.data.success) {
+        setWorkouts(res.data.data);
+        console.log(res.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching workouts:", error);
+    }
+  };
 
   return (
     <Container>
@@ -204,7 +230,7 @@ const TrainerHome = () => {
           <Text style={styles.workoutsTitle}>Your Workouts Program</Text>
           <TouchableOpacity
             onPress={() =>
-              navigation.navigate("WorkoutProgramsList", { trainerWorkoutData })
+              navigation.navigate("WorkoutProgramsList", { workouts })
             }
           >
             <Text style={styles.viewAllText}>View all</Text>
@@ -213,11 +239,21 @@ const TrainerHome = () => {
 
         <FlatList
           horizontal
-          data={trainerWorkoutData}
+          data={workouts.length > 0 ? [workouts[0]] : []}
           renderItem={renderWorkoutCard}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           style={styles.workoutList}
           showsHorizontalScrollIndicator={false}
+          contentContainerStyle={
+            workouts.length > 0
+              ? {}
+              : { alignItems: "center", justifyContent: "center", flexGrow: 1 }
+          }
+          ListEmptyComponent={
+            <Text style={{ fontSize: FontSize.small, color: "white" }}>
+              No workout program
+            </Text>
+          }
         />
       </ScrollView>
       <CustomButton
@@ -298,6 +334,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 170,
     borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
   cardContent: {
     padding: 14,

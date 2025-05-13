@@ -1,5 +1,5 @@
 // export const SERVER_URL = "https://gomuuv-446812.de.r.appspot.com/api";
-export const SERVER_URL = "http://192.168.100.15:4200/api";
+export const SERVER_URL = "http://192.168.137.1:4200/api";
 export const END_POINTS = {
   SIGNUP: `/users`,
   LOGIN: `/users/login`,
@@ -23,6 +23,7 @@ export const END_POINTS = {
   FASTING_CHART_DATA: "/fasting-history/chart-data",
   END_FASTING_SESSION: "/fasting-history/end-fasting",
   WORKOUTS: "/workouts",
+  TRAINER_WORKOUTS: "/workouts/trainer/list",
   EQUIPMENTS_WORKOUTS: "/equipment-workouts",
   UPDATE_EQUIPMENTS_WORKOUTS: "/equipment-workouts/update-day-stats",
   WORKOUT_SESSIONS: "/workout-sessions",
@@ -38,4 +39,5 @@ export const END_POINTS = {
   UPDATE_DAY_STATS: "/challenges/update-day-stats",
   WORKOUTS_UPDATE_DAY_STATS: "/workout-sessions/update-day-stats",
   COMPLETE_CHALLENGE_EXERCISE: "/challenges/complete-exercise",
+  ATTACHMENT: "/attachment",
 };
