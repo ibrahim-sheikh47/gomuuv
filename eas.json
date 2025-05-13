@@ -70,7 +70,7 @@
         "track": "internal"
       },
       "ios": {
-        "appleId": "com.gomuuv.ios"
+        "appleId": "ahmadmuzaffar6228@gmail.com"
       }
     },
     "production": {
@@ -78,7 +78,7 @@
         "track": "production"
       },
       "ios": {
-        "appleId": "com.gomuuv.ios"
+        "appleId": "ahmadmuzaffar6228@gmail.com"
       }
     }
   }

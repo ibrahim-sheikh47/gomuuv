@@ -113,6 +113,7 @@ const Login = () => {
         }
       }
     } catch (error) {
+      console.log(error)
       // Handle error response
       Toast.show({
         type: "error",

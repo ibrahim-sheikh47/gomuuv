@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import React, { useRef, useState, useEffect } from "react";
 import Geocoder from "react-native-geocoding";
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from "react-native-maps";
@@ -181,7 +181,7 @@ const Map = (props) => {
       <MapView
         onMapReady={() => setMapReady(true)}
         customMapStyle={MapStyle}
-        provider={PROVIDER_GOOGLE}
+        provider={Platform.OS == "ios" ? null : PROVIDER_GOOGLE}
         style={{ flex: 1 }} // Ensure the map takes up the full container
         ref={map}
         showsUserLocation={true}

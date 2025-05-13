@@ -50,7 +50,7 @@ const Splash = () => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000" />
       <View style={styles.statusBar} />
       <View style={styles.content}>
@@ -98,7 +98,7 @@ const Splash = () => {
           </View>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

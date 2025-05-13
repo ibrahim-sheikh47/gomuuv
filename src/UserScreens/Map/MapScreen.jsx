@@ -10,7 +10,7 @@ const MapScreen = ({ route }) => {
   const navigation = useNavigation();
   const params = route?.params;
   const STATUS_BAR_HEIGHT =
-    Platform.OS === "ios" ? 20 : StatusBar.currentHeight;
+    Platform.OS === "ios" ? 60 : StatusBar.currentHeight;
 
   const [location, setLocation] = useState(null); // To store the address
   const [totalDistance, setTotalDistance] = useState(0); // To store total distance

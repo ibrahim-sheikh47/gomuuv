@@ -49,11 +49,6 @@ const HomeScreen = () => {
     }, [])
   );
 
-  const handleInteraction = () => {
-    if (isFirstTime) {
-      setIsFirstTime(false);
-    }
-  };
   const activityIcons = {
     Walking: WalkingIcon,
     Running: RunningIcon,
@@ -105,7 +100,7 @@ const HomeScreen = () => {
 
   return (
     <Container>
-      <ScrollView onScroll={handleInteraction}>
+      <ScrollView>
         <View style={styles.header}>
           <ProfileSection
             userName={
@@ -134,7 +129,6 @@ const HomeScreen = () => {
               icon={activityIcons[activity]}
               label={activity}
               onPress={() => {
-                handleInteraction();
                 const goal = goals?.find((g) => g.type === activity);
 
                 if (goal) {
@@ -190,7 +184,6 @@ const HomeScreen = () => {
             goal="Goal: 8 hours of sleep daily"
             value="0h 0m"
             onPress={() => {
-              handleInteraction();
               navigation.navigate("SleepScreen");
             }}
           />
@@ -208,7 +201,6 @@ const HomeScreen = () => {
             goal="Goal: burn 1,457 kcal this week"
             value="123"
             onPress={() => {
-              handleInteraction();
               navigation.navigate("Nutrition");
             }}
           />
@@ -223,7 +215,6 @@ const HomeScreen = () => {
             goal="Goal: 4 workouts per week"
             value="3"
             onPress={() => {
-              handleInteraction();
               navigation.navigate("Workout");
             }}
           />
@@ -241,7 +232,6 @@ const HomeScreen = () => {
             goal="Goal: 84kg"
             value="63kg"
             onPress={() => {
-              handleInteraction();
               navigation.navigate("Challenges");
             }}
           />
@@ -256,7 +246,6 @@ const HomeScreen = () => {
             goal="items in cart"
             value="02"
             onPress={() => {
-              handleInteraction();
               navigation.navigate("Shop");
             }}
           />
