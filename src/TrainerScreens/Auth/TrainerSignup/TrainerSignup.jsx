@@ -18,9 +18,15 @@ import InputField from "../../../components/InputField";
 import { SocialButton } from "../../../components/SocialButton";
 import { colors } from "../../../constants/colors";
 import { FontSize } from "../../../utils/font";
+import { API } from "../../../config/apiClient";
+import { END_POINTS } from "../../../config/routes";
+import { setAuthData } from "../../../redux/reducers/AuthSlice";
+import Toast from "react-native-toast-message";
+import { useDispatch } from "react-redux";
 
 const TrainerSignup = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   // Single state for all form fields
   const [form, setForm] = useState({
@@ -37,12 +43,98 @@ const TrainerSignup = () => {
     }));
   };
 
-  const handleSignup = () => {
-    // Add your signup logic here
-    console.log("Name:", form.name);
-    console.log("Email:", form.email);
-    console.log("Password:", form.password);
-    navigation.navigate("TrainerHome");
+  const validateForm = () => {
+    // Check if all fields are filled
+    if (!form.name || !form.email || !form.password || !form.confirmPassword) {
+      Toast.show({
+        type: "error",
+        text1: "All fields are required",
+        text2: "Please fill in all fields.",
+      });
+      return false;
+    }
+
+    // Check if email is valid
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      Toast.show({
+        type: "error",
+        text1: "Invalid Email",
+        text2: "Please enter a valid email address.",
+      });
+      return false;
+    }
+
+    // Check if passwords match
+    if (form.password !== form.confirmPassword) {
+      Toast.show({
+        type: "error",
+        text1: "Password Mismatch",
+        text2: "Passwords do not match.",
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSignup = async () => {
+    if (!validateForm()) return;
+    let body = {
+      ...form,
+      firstName: form.name,
+      role: "trainer",
+    };
+
+    try {
+      const response = await API.post(END_POINTS.SIGNUP, body);
+      if (response?.data?.success) {
+        dispatch(
+          setAuthData({
+            token: response?.data?.token,
+            data: response?.data?.data,
+          })
+        );
+
+        setForm({
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+
+        Toast.show({
+          type: "success",
+          text1: "Signup Successful",
+          text2: "Welcome! Redirecting to dashboard.",
+        });
+        navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: "TrainerHome",
+            },
+          ],
+        });
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Signup Failed",
+          text2:
+            response.data?.message || "Something went wrong. Please try again.",
+        });
+      }
+    } catch (error) {
+      setLoading(false);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2:
+          error.response?.data?.message ||
+          error ||
+          "Failed to complete signup. Please try again.",
+      });
+    }
   };
 
   return (
@@ -55,6 +147,7 @@ const TrainerSignup = () => {
       <ScrollView>
         <View style={styles.inputContainer}>
           <InputField
+            type={"first_name"}
             label="First Name"
             value={form.name}
             onChangeText={(value) => handleInputChange("name", value)}

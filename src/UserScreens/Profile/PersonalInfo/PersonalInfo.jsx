@@ -73,8 +73,6 @@ const PersonalInfoScreen = () => {
   }, []);
 
   const handleInputChange = (field, value) => {
-    console.log(field, value);
-
     setPersonalInfo((prevInfo) => ({
       ...prevInfo,
       [field]: value,

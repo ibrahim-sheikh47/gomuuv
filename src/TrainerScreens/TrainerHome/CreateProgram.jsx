@@ -296,11 +296,7 @@ const CreateProgram = () => {
 
   return (
     <Container>
-      <Header
-        title={"Create New Program"}
-        showBackButton={true}
-        rightIcon1={<SearchIcon />}
-      />
+      <Header title={"Create New Program"} showBackButton={true} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <InputField
           label={"Title"}

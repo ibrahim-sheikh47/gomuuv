@@ -12,15 +12,21 @@ import PersonalInfoScreen from "../../UserScreens/Profile/PersonalInfo/PersonalI
 import ChangePassScreen from "../../UserScreens/Profile/ChangePass/ChangePass";
 import TrainerInfo from "../../TrainerScreens/TrainerHome/TrainerInfo";
 import TrainerChangePass from "../../TrainerScreens/TrainerHome/TrainerChangePass";
+import { useSelector } from "react-redux";
 const Stack = createNativeStackNavigator();
 
 export default function TrainerNavigator() {
+  const { isLoggedIn } = useSelector((state) => ({
+    isLoggedIn: state.Auth?.isLoggedIn,
+  }));
+
   return (
     <Stack.Navigator
       screenOptions={{
         animation: "slide_from_right",
         headerShown: false,
       }}
+      initialRouteName={isLoggedIn && "TrainerHome"}
     >
       <Stack.Screen name="TrainerSignup" component={TrainerSignup} />
       <Stack.Screen name="TrainerHome" component={TrainerHome} />

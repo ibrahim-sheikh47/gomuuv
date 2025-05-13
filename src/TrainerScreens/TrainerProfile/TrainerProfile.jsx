@@ -1,21 +1,42 @@
-import { Image, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useState } from "react";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
 import images from "../../constants/images";
-import { colors } from "../../constants/colors";
 import SettingItem from "../../components/SettingItem";
-import { settings } from "../../utils/data";
-import icons from "../../constants/icons";
 import { useNavigation } from "@react-navigation/native";
-import KetoIcon from "../../assets/svgs/KetoIcon";
 import { FontSize } from "../../utils/font";
 import PersonalInfoIcon from "../../assets/svgs/PersonalInfoIcon";
 import ChangePassIcon from "../../assets/svgs/ChangePassIcon";
 import SyncSecureIcon from "../../assets/svgs/SyncSecureIcon";
+import { useDispatch, useSelector } from "react-redux";
+import EditIcon from "../../assets/svgs/EditIcon";
+import * as ImagePicker from "expo-image-picker";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import { setUserData } from "../../redux/reducers/AuthSlice";
+import Toast from "react-native-toast-message";
 
 const TrainerProfile = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  // Combine all useSelector Hooks
+  const { userData, token } = useSelector((state) => ({
+    userData: state.Auth?.data,
+    token: state.Auth?.token,
+  }));
+  const [profileImage, setProfileImage] = useState(
+    userData.image !== "" ? { uri: userData.image } : images.dp
+  );
+
   const trainerSettings = [
     {
       icon: <PersonalInfoIcon />,
@@ -33,30 +54,85 @@ const TrainerProfile = () => {
       route: "SyncSecureDataScreen",
     },
   ];
+
+  // Handle photo change button press
+  const handleChangePhoto = async () => {
+    try {
+      // Request permission - minimal implementation
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission needed",
+          "Please allow access to your photo library to change profile picture"
+        );
+        return;
+      }
+
+      // Launch image picker
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets && result.assets[0]) {
+        // Just update local state - no backend changes
+        setProfileImage({ uri: result.assets[0].uri });
+        updateProfileImage(result.assets[0]);
+      }
+    } catch (error) {
+      console.log("Error selecting image:", error);
+      Alert.alert("Error", "Failed to change profile photo");
+    }
+  };
+
+  const updateProfileImage = async (image) => {
+    const formData = new FormData();
+
+    formData.append("image", {
+      uri: image.uri,
+      name: image.fileName || "photo.jpg",
+      type: image.mimeType || "image/jpeg",
+    });
+
+    try {
+      const response = await API.patch(
+        END_POINTS.UPDATE_PROFILE_PICTURE,
+        formData,
+        token,
+        true
+      );
+
+      if (response?.data?.success) {
+        dispatch(setUserData(response?.data?.data));
+        Toast.show({
+          type: "success",
+          text1: "Profile picture updated",
+        });
+      } else {
+        throw new Error("Failed to update information.");
+      }
+    } catch (error) {
+      console.error("Upload failed", error);
+    }
+  };
+
   return (
     <Container>
       <Header title={"Profile"} showBackButton={true} />
       <View style={styles.profileImageContainer}>
-        <Image source={images.dp} style={styles.profileImage} />
-        <Text
-          style={{
-            fontSize: FontSize.regular,
-            fontFamily: "Poppins-SemiBold",
-            color: "#F8F8F8",
-            marginTop: 10,
-          }}
+        <Image source={profileImage} style={styles.profileImage} />
+
+        <TouchableOpacity
+          style={styles.cameraIconContainer}
+          onPress={handleChangePhoto}
+          activeOpacity={0.7}
         >
-          Maxwell
-        </Text>
-        <Text
-          style={{
-            fontSize: FontSize.medium,
-            fontFamily: "Poppins-Regular",
-            color: colors.green,
-          }}
-        >
-          Nutritionist
-        </Text>
+          <EditIcon color="white" />
+        </TouchableOpacity>
       </View>
       <View style={{ marginHorizontal: 10 }}>
         <Text style={styles.accountSettingsHeader}>Account Settings:</Text>
@@ -80,11 +156,32 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 20,
+    position: "relative",
   },
   profileImage: {
     width: 135,
     height: 135,
     borderRadius: 100,
+  },
+  cameraIconContainer: {
+    backgroundColor: "#242425",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    bottom: 10,
+    right: 110,
+  },
+  cameraIcon: {
+    fontSize: 16,
+  },
+  changePhotoText: {
+    color: "white",
+    fontFamily: "Poppins-Regular",
+    fontSize: FontSize.small,
+    marginTop: 5,
   },
   accountSettingsHeader: {
     color: "white",

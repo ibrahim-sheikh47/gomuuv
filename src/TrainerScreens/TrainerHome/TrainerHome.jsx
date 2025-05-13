@@ -161,7 +161,7 @@ const TrainerHome = () => {
 
   return (
     <Container>
-      <Header title="Home" rightIcon1={<SearchIcon />} />
+      <Header title="Home" />
       <ScrollView>
         <TouchableOpacity style={styles.profileHeader}>
           <ProfileSection
