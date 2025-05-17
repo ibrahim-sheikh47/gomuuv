@@ -33,10 +33,7 @@ const CategoryList = () => {
   const [selectedTitle, setSelectedTitle] = useState("");
   const [filteredChallenges, setFilteredChallenges] = useState([]);
 
-  const { token, userData } = useSelector((state) => ({
-    token: state.Auth?.token,
-    userData: state.Auth?.data,
-  }));
+  const { token, data:userData } = useSelector((state) => state.Auth);
 
   useEffect(() => {
     getFilteredChallenges();

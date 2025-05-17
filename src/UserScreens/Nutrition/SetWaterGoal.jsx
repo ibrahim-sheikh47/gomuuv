@@ -24,9 +24,7 @@ const SetWaterGoal = ({ navigation, route }) => {
   const [glassQuantity, setGlassQuantity] = useState("");
   const [volumePerGlass, setVolumePerGlass] = useState(250);
 
-  const { token } = useSelector((state) => ({
-    token: state.Auth?.token,
-  }));
+  const { token } = useSelector((state) => state.Auth);
 
   const handleSaveGoal = () => {
     if (glassQuantity && volumePerGlass) {

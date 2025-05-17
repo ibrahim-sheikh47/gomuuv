@@ -6,7 +6,7 @@ const { width } = Dimensions.get("window");
 
 // Global function for responsive font sizes
 export const RF = (size) => {
-  return width > 600 ? RFValue(size * 1.2) : RFValue(size);
+  return width > 600 ? RFValue(size * 1.2, Dimensions.get("window").height) : RFValue(size, Dimensions.get("window").height);
 };
 
 // Predefined font sizes for consistency

@@ -32,12 +32,9 @@ const Profile = ({ navigation }) => {
   // Local state for profile image, initialized with default image
 
   // Combine all useSelector Hooks
-  const { userData, token } = useSelector((state) => ({
-    userData: state.Auth?.data,
-    token: state.Auth?.token,
-  }));
+  const { data: userData, token } = useSelector((state) => state.Auth);
   const [profileImage, setProfileImage] = useState(
-    userData.image !== "" ? { uri: userData.image } : images.dp
+    userData?.image !== "" ? { uri: userData.image } : images.dp
   );
 
   // Destructure height, weight, and age from userData

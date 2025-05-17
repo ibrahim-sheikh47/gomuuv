@@ -58,10 +58,7 @@ const WorkoutDetails = () => {
     workout?.days?.find((d) => d.date === date || d.weekDay === dayName)
       .stretchAfterWorkout || false
   );
-  const { token, userData } = useSelector((state) => ({
-    token: state.Auth?.token,
-    userData: state.Auth?.data,
-  }));
+  const { token, data: userData } = useSelector((state) => state.Auth);
   const getExercisesForDay = (day) => {
     const dayData = workout.days.find(
       (d) => d.shortName === day && (d.date === date || d.weekDay === dayName)
@@ -119,7 +116,7 @@ const WorkoutDetails = () => {
       );
       if (res?.data.success) {
       }
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const handleStartWorkout = async () => {
@@ -217,8 +214,8 @@ const WorkoutDetails = () => {
                       {label === "Exercises"
                         ? `${selectedExercises.length} Exercises`
                         : label === "Calories"
-                        ? workout.calories + " kcal"
-                        : workout.workoutTime + " mins"}
+                          ? workout.calories + " kcal"
+                          : workout.workoutTime + " mins"}
                     </Text>
                   </View>
                 ))}

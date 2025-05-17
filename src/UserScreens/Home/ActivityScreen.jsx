@@ -31,9 +31,7 @@ const ActivityScreen = () => {
     distanceUnit: "mi",
   });
   const [modalVisible, setModalVisible] = useState(false);
-  const { token } = useSelector((state) => ({
-    token: state.Auth?.token,
-  }));
+  const { token } = useSelector((state) => state.Auth);
 
   const distanceUnits = [
     { label: "Miles", value: "mi" },

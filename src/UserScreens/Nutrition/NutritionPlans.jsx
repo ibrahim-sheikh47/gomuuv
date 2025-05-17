@@ -20,9 +20,7 @@ const NutritionPlans = ({ route, navigation }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredPlans, setFilteredPlans] = useState([]);
 
-  const { token } = useSelector((state) => ({
-    token: state.Auth?.token,
-  }));
+  const { token } = useSelector((state) => state.Auth);
 
   const onChangeSearch = (query) => {
     setSearchQuery(query);

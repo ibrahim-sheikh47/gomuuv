@@ -30,15 +30,7 @@ const HomeScreen = () => {
   const [stats, setStats] = useState(null); // Track if it's the user's first time
   const [goals, setGoals] = useState(null); // Track if it's the user's first time
 
-  const { token } = useSelector((state) => ({
-    token: state.Auth?.token,
-  }));
-
-  // Combine all useSelector Hooks
-  const { userData } = useSelector((state) => ({
-    userData: state.Auth?.data,
-  }));
-
+  const { token, data:userData } = useSelector((state) => state.Auth);
   const profileImage =
     userData.image !== "" ? { uri: userData.image } : images.dp;
 
@@ -100,7 +92,7 @@ const HomeScreen = () => {
 
   return (
     <Container>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <ProfileSection
             userName={
@@ -164,22 +156,15 @@ const HomeScreen = () => {
           <CustomCard
             label="Activity"
             icon={RunningIcon}
-            message={
-              isFirstTime
-                ? `Please start Activity to see data`
-                : `${stats?.totalDistanceCovered || 0} mi`
+            message={`${stats?.totalDistanceCovered || 0} mi`
             }
             goal="Goal: Walk 2 miles daily"
           />
           <CustomCard
             label="Sleep"
             icon={SleepIcon}
-            message={
-              isFirstTime
-                ? `Please start Sleep to see data`
-                : `${stats?.totalSleepCovered || 0}h ${
-                    stats?.totalSleepCovered || 0
-                  }m`
+            message={`${stats?.totalSleepCovered || 0}h ${stats?.totalSleepCovered || 0
+              }m`
             }
             goal="Goal: 8 hours of sleep daily"
             value="0h 0m"
@@ -194,9 +179,7 @@ const HomeScreen = () => {
             label="Nutrition"
             icon={NutritionIcon}
             message={
-              isFirstTime
-                ? `Please start Nutrition to see data`
-                : `${stats?.totalCaloriesBurned || 0} kcal`
+              `${stats?.totalCaloriesBurned || 0} kcal`
             }
             goal="Goal: burn 1,457 kcal this week"
             value="123"
@@ -208,9 +191,7 @@ const HomeScreen = () => {
             label="Workouts"
             icon={WorkoutsIcon}
             message={
-              isFirstTime
-                ? `Please start Workouts to see data`
-                : `${stats?.workoutSessionsCount || 0}`
+              `${stats?.workoutSessionsCount || 0}`
             }
             goal="Goal: 4 workouts per week"
             value="3"
@@ -225,9 +206,7 @@ const HomeScreen = () => {
             label="Challenges"
             icon={ChallengesIcon}
             message={
-              isFirstTime
-                ? `Please start Challenges to see data`
-                : `${stats?.challengesCount || 0}`
+              `${stats?.challengesCount || 0}`
             }
             goal="Goal: 84kg"
             value="63kg"
@@ -239,9 +218,7 @@ const HomeScreen = () => {
             label="Shop"
             icon={ShopIcon}
             message={
-              isFirstTime
-                ? `Please start Shop to see data`
-                : `${stats?.ordersCount || 0}`
+              `${stats?.ordersCount || 0}`
             }
             goal="items in cart"
             value="02"

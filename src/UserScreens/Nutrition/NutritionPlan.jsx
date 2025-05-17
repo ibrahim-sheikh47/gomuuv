@@ -22,9 +22,7 @@ const NutritionPlan = ({ route }) => {
   const [modalText, setModalText] = useState(""); // State for modal text
   const [modalIcon, setModalIcon] = useState(null); // State for modal icon
 
-  const { token } = useSelector((state) => ({
-    token: state.Auth?.token,
-  }));
+  const { token } = useSelector((state) => state.Auth);
 
   const handleStartPlan = async () => {
     try {

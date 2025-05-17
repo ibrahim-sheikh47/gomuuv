@@ -20,7 +20,7 @@ import { FontSize } from "../utils/font";
 const Splash = () => {
   const navigation = useNavigation();
 
-  const { isLoggedIn } = useSelector((state) => state.Auth?.isLoggedIn);
+  const { isLoggedIn } = useSelector((state) => state.Auth);
 
   useLayoutEffect(() => {
     if (isLoggedIn) {
@@ -41,7 +41,7 @@ const Splash = () => {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000" />
-      <View style={styles.statusBar} />
+      {/* <View style={styles.statusBar} /> */}
       <View style={styles.content}>
         <Image source={images.splashBg} style={styles.image} />
 

@@ -32,9 +32,7 @@ const FinishActivity = () => {
   } = route.params;
 
   const navigation = useNavigation();
-  const { token } = useSelector((state) => ({
-    token: state.Auth?.token,
-  }));
+  const { token } = useSelector((state) => state.Auth);
 
   // Convert time from seconds (assuming time is given in seconds)
   const timeInSeconds = time; // time is in seconds from params

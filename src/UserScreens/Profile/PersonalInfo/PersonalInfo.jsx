@@ -25,10 +25,7 @@ import { FontSize } from "../../../utils/font";
 const PersonalInfoScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const { userData, token } = useSelector((state) => ({
-    userData: state.Auth?.data,
-    token: state.Auth?.token,
-  }));
+  const { data:userData, token } = useSelector((state) => state.Auth);
   const [personalInfo, setPersonalInfo] = useState({
     firstName: userData?.firstName || "",
     lastName: userData?.lastName || "",

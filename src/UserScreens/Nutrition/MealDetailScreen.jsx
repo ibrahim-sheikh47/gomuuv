@@ -35,9 +35,7 @@ const MealDetailScreen = ({ route }) => {
     total: 30,
   });
   const [fats, setFats] = useState({ current: meal?.fats || 0, total: 30 });
-  const { token } = useSelector((state) => ({
-    token: state.Auth?.token,
-  }));
+  const { token } = useSelector((state) => state.Auth);
 
   // Combine meal details and ingredients into one array
   const renderData = [

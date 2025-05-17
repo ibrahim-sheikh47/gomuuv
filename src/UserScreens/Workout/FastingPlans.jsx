@@ -14,9 +14,7 @@ const FastingPlans = (props) => {
   const { currentPlan } = route.params;
 
   const [fastingPlans, setFastingPlans] = useState([]);
-  const { token } = useSelector((state) => ({
-    token: state.Auth?.token,
-  }));
+  const { token } = useSelector((state) => state.Auth);
 
   useEffect(() => {
     getAllFastingPlans();

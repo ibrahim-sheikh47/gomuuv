@@ -22,10 +22,7 @@ const FastingPlanDetail = () => {
   const [startTime, setStartTime] = useState(null);
   const [showPicker, setShowPicker] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const { token, userData } = useSelector((state) => ({
-    token: state.Auth?.token,
-    userData: state.Auth?.data,
-  }));
+  const { token, data:userData } = useSelector((state) => state.Auth);
 
   const [filteredMeals, setFilteredMeals] = useState(
     selectedPlan?.mealsToBreakFast || []

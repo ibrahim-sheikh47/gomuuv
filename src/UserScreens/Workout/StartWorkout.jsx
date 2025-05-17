@@ -40,9 +40,7 @@ const StartWorkout = () => {
   const [isRunning, setIsRunning] = useState(true);
   const [isWorkoutComplete, setIsWorkoutComplete] = useState(false);
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
-  const { token } = useSelector((state) => ({
-    token: state.Auth?.token,
-  }));
+  const { token } = useSelector((state) => state.Auth);
 
   const [secondsRemaining, setSecondsRemaining] = useState(time);
   const secondsRemainingValue = useRef(time);

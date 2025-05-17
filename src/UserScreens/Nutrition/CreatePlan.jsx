@@ -81,9 +81,7 @@ const CreatePlan = () => {
   const navigation = useNavigation();
   const [isModalVisible, setModalVisible] = useState(false);
   const [is2ndModalVisible, set2ndModalVisible] = useState(false);
-  const { userData } = useSelector((state) => ({
-    userData: state.Auth?.data,
-  }));
+  const { data: userData } = useSelector((state) => state.Auth);
 
   // Modal visibility states
   const [heightUnitModalVisible, setHeightUnitModalVisible] = useState(false);

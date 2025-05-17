@@ -34,9 +34,7 @@ const TrainerHome = () => {
   });
 
   // Combine all useSelector Hooks
-  const { userData } = useSelector((state) => ({
-    userData: state.Auth?.data,
-  }));
+  const { data:userData } = useSelector((state) => state.Auth);
 
   const trainerWorkoutData = [
     {

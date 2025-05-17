@@ -30,10 +30,7 @@ const FastingScreen = () => {
   const route = useRoute(); // Use route to access navigation parameters
   const [activeTab, setActiveTab] = useState("Current Fast");
   const tabs = ["Current Fast", "Stats and History"];
-  const { token, userData } = useSelector((state) => ({
-    token: state.Auth?.token,
-    userData: state.Auth?.data,
-  }));
+  const { token, data:userData } = useSelector((state) => state.Auth);
   const [selectedFilter, setSelectedFilter] = useState("weekly");
 
   const [modalVisible, setModalVisible] = useState(false); // Modal visibility state

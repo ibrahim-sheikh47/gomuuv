@@ -46,10 +46,7 @@ const ChallengesScreen = () => {
   const [enrolledChallenges, setEnrolledChallenges] = useState([]);
   const [upcomingChallenges, setUpcomingChallenges] = useState([]);
 
-  const { token, userData } = useSelector((state) => ({
-    token: state.Auth?.token,
-    userData: state.Auth?.data,
-  }));
+  const { token, data: userData } = useSelector((state) => state.Auth);
 
   const [currentWeight, setCurrentWeight] = useState(
     userData?.weight.replace("kg", "").replace("lbs", "") || 0
@@ -357,7 +354,7 @@ const ChallengesScreen = () => {
           </Text>
         </View>
 
-        <TouchableOpacity style={{borderWidth: 1, borderColor: "#c2c2c2", borderRadius: 8}} onPress={() => setRangeModalVisible(true)}>
+        <TouchableOpacity style={{ borderWidth: 1, borderColor: "#c2c2c2", borderRadius: 8 }} onPress={() => setRangeModalVisible(true)}>
           <Text style={styles.rangeSelectText}>{selectedRange} ▼</Text>
         </TouchableOpacity>
       </View>
@@ -411,6 +408,7 @@ const ChallengesScreen = () => {
           flexDirection: "row",
           justifyContent: "space-between",
           marginTop: 20,
+          gap: 10
         }}
       >
         <CustomButton
@@ -568,7 +566,7 @@ const ChallengesScreen = () => {
         ListFooterComponent={activeTab === "Challenges" && renderFooter}
         ListEmptyComponent={
           activeTab === "Challenges" &&
-          (upcomingChallenges.length > 0 || enrolledChallenges.length > 0) ? (
+            (upcomingChallenges.length > 0 || enrolledChallenges.length > 0) ? (
             <Text style={{ color: "white" }}>No Challenge</Text>
           ) : null
         }

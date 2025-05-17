@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import { colors } from "../constants/colors";
 import { FontSize } from "../utils/font";
 import { ProgressBar } from "./ProgressBar";
@@ -18,6 +18,7 @@ export const CustomCard = ({
   onPress,
 }) => {
   const [showGoal, setShowGoal] = useState(hideGoal);
+  const {height} = useWindowDimensions();
 
   // useEffect(() => {
   //   // Check if the message does not start with "Please start" to determine if the goal should be shown
@@ -25,7 +26,7 @@ export const CustomCard = ({
   // }, [message]);
 
   return (
-    <TouchableOpacity style={styles.activityCard} onPress={onPress}>
+    <TouchableOpacity style={[styles.activityCard, {height: height * 0.16}]} onPress={onPress}>
       <View style={styles.activityCardContent}>
         <Text
           style={{

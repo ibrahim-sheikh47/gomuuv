@@ -49,9 +49,7 @@ const ActivityDetailScreen = () => {
     coordinates: [],
   });
 
-  const { token } = useSelector((state) => ({
-    token: state.Auth?.token,
-  }));
+  const { token } = useSelector((state) => state.Auth);
   // Button dimensions
   const buttonWidth = 300; // Adjust this to match your button width
   const maxDragDistance = buttonWidth; // Icon width is 48, padding is 24

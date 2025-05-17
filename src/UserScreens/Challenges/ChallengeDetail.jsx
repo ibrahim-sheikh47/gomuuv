@@ -22,10 +22,7 @@ const ChallengeDetail = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { challenge: item } = route.params; // Access challenge data from params
-  const { token, userData } = useSelector((state) => ({
-    token: state.Auth?.token,
-    userData: state.Auth?.data,
-  }));
+  const { token, data:userData } = useSelector((state) => state.Auth);
   const [challenge, setChallenge] = useState(item);
   const date = moment().format("DD/MM/yyyy");
 

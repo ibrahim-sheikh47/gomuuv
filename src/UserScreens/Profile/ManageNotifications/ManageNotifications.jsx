@@ -16,10 +16,7 @@ const ManageNotifications = () => {
   const navigation = useNavigation();
   // State to manage toggle switches for each notification category
 
-  const { userData, token } = useSelector((state) => ({
-    userData: state.Auth?.data,
-    token: state.Auth?.token,
-  }));
+  const { data:userData, token } = useSelector((state) => state.Auth);
 
   const [toggles, setToggles] = useState({
     physicalActivity: userData.notificationSettings.physicalActivity,

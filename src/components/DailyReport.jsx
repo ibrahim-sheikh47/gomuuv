@@ -51,9 +51,8 @@ const styles = StyleSheet.create({
   },
   reportCompletion: {
     color: "#fff",
-    fontSize: FontSize.small,
+    fontSize: FontSize.medium,
     fontFamily: "Poppins-SemiBold",
-    width: 105,
   },
   reportPercentageContainer: {
     justifyContent: "center",
@@ -62,7 +61,7 @@ const styles = StyleSheet.create({
   reportPercentage: {
     color: colors.green,
     fontFamily: "Poppins-SemiBold",
-    fontSize: FontSize.xxlarge,
+    fontSize: FontSize.large,
   },
 });
 

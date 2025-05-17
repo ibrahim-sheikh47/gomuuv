@@ -208,7 +208,7 @@ const NutritionScreen = () => {
   return (
     <Container>
       <Header title={"Nutrition"} />
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.rowContainer}>
           {/* Eaten Section */}
           <View style={styles.columnContainer}>
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
   },
   remainingText: {
     fontFamily: "Poppins-Bold",
-    fontSize: FontSize.large,
+    fontSize: FontSize.medium,
     color: "white",
   },
   remainingLabel: {
@@ -443,13 +443,12 @@ const styles = StyleSheet.create({
   },
   nutrientContainer: {
     backgroundColor: "#242425",
-    height: 85,
+    paddingVertical: 15,
     borderRadius: 15,
     marginTop: 20,
+    gap: 15,
     flexDirection: "row",
     width: "100%",
-    alignItems: "center",
-    justifyContent: "space-between",
     paddingHorizontal: 20,
   },
   intakeHeader: {

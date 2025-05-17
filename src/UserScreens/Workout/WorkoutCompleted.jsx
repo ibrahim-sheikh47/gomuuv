@@ -18,9 +18,7 @@ import { FontSize } from "../../utils/font";
 const WorkoutCompleted = ({ route }) => {
   const navigation = useNavigation();
   const { title, duration, image, level, calories, isChallenge } = route.params;
-  const { token } = useSelector((state) => ({
-    token: state.Auth?.token,
-  }));
+  const { token } = useSelector((state) => state.Auth);
 
   // Navigate back to home or workouts list
   const handleNavigate = () => {

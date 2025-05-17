@@ -22,10 +22,7 @@ const AddMealDetails = ({ route }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredData, setFilteredData] = useState([]);
 
-  const { token, nutritionMeals } = useSelector((state) => ({
-    token: state.Auth?.token,
-    nutritionMeals: state.Nutrition.data,
-  }));
+  const { nutritionMeals } = useSelector((state) => state.Nutrition);
 
   // Combine dailyPlanData and popularRecipesData
   const mealData = [...nutritionMeals];

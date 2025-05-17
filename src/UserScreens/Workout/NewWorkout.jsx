@@ -30,9 +30,7 @@ const NewWorkout = () => {
   const [selectedPeriod, setSelectedPeriod] = useState(workout?.mode || null);
   const [modalVisible, setModalVisible] = useState(false); // State to control modal visibility
 
-  const { token } = useSelector((state) => ({
-    token: state.Auth?.token,
-  }));
+  const { token } = useSelector((state) => state.Auth);
 
   const saveEquipmentWorkout = async () => {
     try {

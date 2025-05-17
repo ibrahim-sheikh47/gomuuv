@@ -15,9 +15,7 @@ const ChangePassScreen = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const { token } = useSelector((state) => ({
-    token: state.Auth?.token,
-  }));
+  const { token } = useSelector((state) => state.Auth);
 
   // Single state object to manage inputs
   const [formData, setFormData] = useState({

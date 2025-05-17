@@ -78,8 +78,6 @@ const Login = () => {
         email: formData.email,
         password: formData.password,
       });
-      console.log("response", response?.status);
-      console.log("response", response?.data);
       if (response?.data?.success) {
         dispatch(
           setAuthData({
