@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   FlatList,
   ScrollView,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  useWindowDimensions,
 } from "react-native";
 import Container from "../../components/Container";
 import images from "../../constants/images";
@@ -15,7 +16,7 @@ import icons from "../../constants/icons";
 import ProfileSection from "../../components/ProfileSection";
 import Header from "../../components/Header";
 import CustomButton from "../../components/CustomButton";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import SearchIcon from "../../assets/svgs/SearchIcon";
 import RevenueIcon from "../../assets/svgs/RevenueIcon";
 import StrengthIcon from "../../assets/svgs/StrengthIcon";
@@ -24,127 +25,46 @@ import ActiveClientsIcon from "../../assets/svgs/ActiveClientsIcon";
 import ProgramSoldIcon from "../../assets/svgs/ProgramSoldIcon";
 import { useSelector } from "react-redux";
 import { FontSize } from "../../utils/font";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
 
 const TrainerHome = () => {
   const navigation = useNavigation();
   const [stats, setStats] = useState({
-    revenue: "$5,010.65",
-    activeClients: 6,
-    programsSold: 25,
+    revenue: "$0",
+    activeClients: 0,
+    programsSold: 0,
   });
+  const [workouts, setWorkouts] = useState([]);
 
   // Combine all useSelector Hooks
-  const { data:userData } = useSelector((state) => state.Auth);
+  const { data:userData, token } = useSelector((state) => state.Auth);
+  const { width } = useWindowDimensions();
 
-  const trainerWorkoutData = [
-    {
-      id: "1",
-      title: "Full body burn",
-      subtitle: "Burn Fat and Boost Metabolism ",
-      price: "$790.99",
-      image: images.chestWorkout,
-      category: "Quadriceps",
-      level: "Intermediate",
-      exercises: 5,
-      calories: "190",
-      time: "25",
-      equipment: "Dumbbells",
-      description:
-        "A dynamic program designed to torch calories and melt away fat through intense full-body workouts. Boost your metabolism and achieve your fitness goals efficiently.",
-      days: {
-        day1: [
-          { title: "Bench Press", reps: "x10", image: images.chestWorkout },
-          { title: "Push Ups", reps: "x15", image: images.chestWorkout },
-        ],
-        day2: [
-          {
-            title: "Incline Bench Press",
-            reps: "x12",
-            image: images.chestWorkout,
-          },
-          { title: "Dumbbell Flyes", reps: "x10", image: images.chestWorkout },
-        ],
-        day3: [
-          {
-            title: "Decline Bench Press",
-            reps: "x10",
-            image: images.chestWorkout,
-          },
-          { title: "Chest Dips", reps: "x8", image: images.chestWorkout },
-        ],
-        day4: [
-          {
-            title: "Cable Crossovers",
-            reps: "x12",
-            image: images.chestWorkout,
-          },
-          { title: "Dumbbell Press", reps: "x10", image: images.chestWorkout },
-        ],
-      },
-    },
-    {
-      id: "2",
-      title: "30-Day Squat Challenge",
-      subtitle: "Strengthen your core with daily planks.",
-      price: "$790.99",
-      image: images.chestWorkout,
-      category: "Quadriceps",
-      level: "Intermediate",
-      exercises: 5,
-      calories: "190",
-      time: "25",
-      equipment: "Dumbbells",
-      description:
-        "A dynamic program designed to torch calories and melt away fat through intense full-body workouts. Boost your metabolism and achieve your fitness goals efficiently.",
-      days: {
-        day1: [
-          { title: "Bench Press", reps: "x10", image: images.chestWorkout },
-          { title: "Push Ups", reps: "x15", image: images.chestWorkout },
-        ],
-        day2: [
-          {
-            title: "Incline Bench Press",
-            reps: "x12",
-            image: images.chestWorkout,
-          },
-          { title: "Dumbbell Flyes", reps: "x10", image: images.chestWorkout },
-        ],
-        day3: [
-          {
-            title: "Decline Bench Press",
-            reps: "x10",
-            image: images.chestWorkout,
-          },
-          { title: "Chest Dips", reps: "x8", image: images.chestWorkout },
-        ],
-        day4: [
-          {
-            title: "Cable Crossovers",
-            reps: "x12",
-            image: images.chestWorkout,
-          },
-          { title: "Dumbbell Press", reps: "x10", image: images.chestWorkout },
-        ],
-      },
-    },
-  ];
+  useFocusEffect(
+    useCallback(() => {
+      getWorkouts();
+    }, [])
+  );
 
   const renderWorkoutCard = ({ item }) => (
     <TouchableOpacity
       onPress={() =>
         navigation.navigate("WorkoutProgramDetail", { program: item })
       }
-      style={styles.workoutCard}
+      style={[styles.workoutCard, { width: width * 0.9 }]}
     >
-      <Image source={item.image} style={styles.cardImage} />
+      <Image source={{ uri: item.image }} style={styles.cardImage} />
       <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>{item.title}</Text>
-        <Text style={styles.cardDescription}>{item.subtitle}</Text>
+        <Text style={styles.cardTitle}>{item.name}</Text>
+        <Text style={styles.cardDescription}>{item.description}</Text>
         <View style={styles.cardDetails}>
           <View>
             <View style={styles.sessionDetail}>
               <StrengthIcon />
-              <Text style={styles.detailText}>{item.category}</Text>
+              <Text style={styles.detailText}>
+                {item.equipments[0].replace("_", " ")}
+              </Text>
             </View>
             <View style={styles.sessionDetail}>
               <LevelIcon />
@@ -157,9 +77,21 @@ const TrainerHome = () => {
     </TouchableOpacity>
   );
 
+  const getWorkouts = async () => {
+    try {
+      const res = await API.get(END_POINTS.TRAINER_WORKOUTS, null, token);
+      if (res.data.success) {
+        setWorkouts(res.data.data);
+        console.log(res.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching workouts:", error);
+    }
+  };
+
   return (
     <Container>
-      <Header title="Home" rightIcon1={<SearchIcon />} />
+      <Header title="Home" />
       <ScrollView>
         <TouchableOpacity style={styles.profileHeader}>
           <ProfileSection
@@ -202,7 +134,7 @@ const TrainerHome = () => {
           <Text style={styles.workoutsTitle}>Your Workouts Program</Text>
           <TouchableOpacity
             onPress={() =>
-              navigation.navigate("WorkoutProgramsList", { trainerWorkoutData })
+              navigation.navigate("WorkoutProgramsList", { workouts })
             }
           >
             <Text style={styles.viewAllText}>View all</Text>
@@ -211,11 +143,21 @@ const TrainerHome = () => {
 
         <FlatList
           horizontal
-          data={trainerWorkoutData}
+          data={workouts.length > 0 ? [workouts[0]] : []}
           renderItem={renderWorkoutCard}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           style={styles.workoutList}
           showsHorizontalScrollIndicator={false}
+          contentContainerStyle={
+            workouts.length > 0
+              ? {}
+              : { alignItems: "center", justifyContent: "center", flexGrow: 1 }
+          }
+          ListEmptyComponent={
+            <Text style={{ fontSize: FontSize.small, color: "white" }}>
+              No workout program
+            </Text>
+          }
         />
       </ScrollView>
       <CustomButton
@@ -296,6 +238,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 170,
     borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
   cardContent: {
     padding: 14,

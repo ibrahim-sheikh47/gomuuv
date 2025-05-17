@@ -92,17 +92,25 @@ const Login = () => {
           text2: "Welcome back 👋",
         });
 
-        navigation.reset({
-          index: 0, // Ensures TabNavigator is at the top
-          routes: [
-            {
-              name: "UserApp", // Parent navigator (UserApp)
-              state: {
-                routes: [{ name: "TabNavigator" }], // Navigate to TabNavigator within UserApp
+        if (response.data.data.role === "user") {
+          navigation.reset({
+            index: 0, // Ensures TabNavigator is at the top
+            routes: [
+              {
+                name: "UserApp",
               },
-            },
-          ],
-        });
+            ],
+          });
+        } else {
+          navigation.reset({
+            index: 0, // Ensures TabNavigator is at the top
+            routes: [
+              {
+                name: "TrainerApp",
+              },
+            ],
+          });
+        }
       }
     } catch (error) {
       console.log(error)

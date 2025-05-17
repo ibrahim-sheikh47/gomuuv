@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  Switch,
+} from "react-native";
 import { colors } from "../../constants/colors";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
@@ -7,168 +15,227 @@ import icons from "../../constants/icons";
 import Selectable from "../../components/Selectable";
 import EditIcon from "../../assets/svgs/EditIcon";
 import { FontSize } from "../../utils/font";
+import moment from "moment";
+import images from "../../constants/images";
+import BackIcon from "../../assets/svgs/BackIcon";
+import CustomButton from "../../components/CustomButton";
+
+const SwitchItem = ({ label, isSwitchOn, onToggleSwitch }) => (
+  <View style={styles.switchContainer}>
+    <Text style={styles.switchLabel}>{label}</Text>
+    <Switch
+      value={isSwitchOn}
+      onValueChange={onToggleSwitch}
+      color={colors.green}
+    />
+  </View>
+);
 
 const WorkoutProgramDetail = ({ route }) => {
   const { program } = route.params;
-  const [selectedPeriod, setSelectedPeriod] = useState("Day 1");
+  const date = moment().format("DD/MM/yyyy");
+  const dayName = moment().format("dddd");
+
+  const [selectedPeriod, setSelectedPeriod] = useState(
+    program?.days[
+      program?.days?.indexOf(
+        program?.days?.find((d) => d.date === date || d.weekDay === dayName)
+      )
+    ]?.shortName || ""
+  );
+  const [isWarmUpVisible, setIsWarmUpVisible] = useState(
+    program?.days?.find((d) => d.date === date || d.weekDay === dayName)
+      ?.startWithWarmup || false
+  );
+  const [isStretchVisible, setIsStretchVisible] = useState(
+    program?.days?.find((d) => d.date === date || d.weekDay === dayName)
+      ?.stretchAfterWorkout || false
+  );
+  const getExercisesForDay = (day) => {
+    const dayData = program.days.find(
+      (d) => d.shortName === day && (d.date === date || d.weekDay === dayName)
+    );
+    return {
+      exercises: dayData ? dayData.exercises : [],
+      warmupExercises:
+        dayData && dayData.startWithWarmup ? dayData.warmupExercises : [],
+      stretchExercises:
+        dayData && dayData.stretchAfterWorkout ? dayData.stretchExercises : [],
+    };
+  };
+
+  const selectedDayData = getExercisesForDay(selectedPeriod);
+  const {
+    exercises: selectedExercises,
+    warmupExercises,
+    stretchExercises,
+  } = selectedDayData;
+
+  const getExerciseParam = (e) => {
+    return e.exercise ? e.exercise : e;
+  };
+
+  const renderExercise = (heading, exercises) => {
+    return (
+      <>
+        <Text style={styles.exerciseHeading}>{heading}</Text>
+        {exercises.map((e) => (
+          <View key={getExerciseParam(e)._id} style={styles.exerciseContainer}>
+            <Image source={images.chestWorkout} style={styles.exerciseImage} />
+            <Text style={styles.exerciseTitle}>{getExerciseParam(e).name}</Text>
+            <Text style={styles.exerciseReps}>{getExerciseParam(e).reps}</Text>
+          </View>
+        ))}
+      </>
+    );
+  };
+
   const renderDayExercise = (dayExercises) => {
-    return dayExercises.map((exercise, index) => (
-      <View key={index} style={styles.exerciseContainer}>
-        <Image source={exercise.image} style={styles.exerciseImage} />
-        <Text style={styles.exerciseTitle}>{exercise.title}</Text>
-        <Text style={styles.exerciseReps}>{exercise.reps}</Text>
+    return dayExercises.map((e) => (
+      <View key={getExerciseParam(e)._id} style={styles.exerciseContainer}>
+        <Image source={images.chestWorkout} style={styles.exerciseImage} />
+        <Text style={styles.exerciseTitle}>{getExerciseParam(e).name}</Text>
+        <Text style={styles.exerciseReps}>{getExerciseParam(e).reps}</Text>
       </View>
     ));
   };
-  const getExercisesForDay = (day) => {
-    switch (day) {
-      case "Day 1":
-        return program.days.day1 || [];
-      case "Day 2":
-        return program.days.day2 || [];
-      case "Day 3":
-        return program.days.day3 || [];
-      case "Day 4":
-        return program.days.day4 || [];
-      default:
-        return []; // Return an empty array if the day is not found
-    }
-  };
-
-  const selectedExercises = getExercisesForDay(selectedPeriod);
 
   return (
-    <Container>
+    <Container cusStyles={{ marginTop: 0, paddingHorizontal: 0 }}>
       <Header
         title={"Workout Program"}
         showBackButton={true}
-        rightIcon1={
-          <View
-            style={{
-              backgroundColor: colors.green,
-              padding: 10,
-              borderRadius: 10,
-            }}
-          >
-            <Text>Edit</Text>
-          </View>
-        }
+        // rightIcon1={
+        //   <TouchableOpacity
+        //     style={{
+        //       backgroundColor: colors.green,
+        //       padding: 10,
+        //       borderRadius: 10,
+        //     }}
+        //   >
+        //     <Text>Edit</Text>
+        //   </TouchableOpacity>
+        // }
         cusStyle={{ width: 58, height: 32 }}
       />
-      <ScrollView style={{ marginTop: 20 }}>
-        <Image source={program.image} style={styles.image} />
-        <View style={styles.content}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text style={styles.title}>{program.title}</Text>
-            <Text style={styles.price}>{program.price}</Text>
+      <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+        <View style={{ position: "relative" }}>
+
+          <View>
+            <Image
+              source={{ uri: program.image }}
+              style={styles.workoutImage}
+            />
+            <Text style={styles.absoluteTitle}>{program.name}</Text>
+
+            <View
+              style={{
+                backgroundColor: colors.bgColor,
+                borderRadius: 10,
+                width: 50,
+                padding: 5,
+                position: "absolute",
+                bottom: -25,
+                left: 20,
+              }}
+            >
+              <Text style={styles.dayTitle}>{selectedPeriod}</Text>
+            </View>
           </View>
 
-          <Text style={styles.description}>{program.subtitle}</Text>
+          <Text style={[styles.sectionTitle, { padding: 20 }]}>
+            Description
+          </Text>
+          <Text style={[styles.description, { paddingHorizontal: 20 }]}>
+            {program.description}
+          </Text>
 
-          <Text style={styles.sectionTitle}>Description</Text>
-
-          <Text style={styles.cardDescription}>{program.description}</Text>
-        </View>
-
-        <View style={styles.infoBox}>
-          <View style={styles.row}>
-            {["Exercises", "Calories", "Time"].map((label, index) => (
-              <View style={styles.detailItem} key={index}>
-                <Text style={styles.label}>{label}</Text>
-                <Text style={styles.value}>
-                  {label === "Exercises"
-                    ? program.exercises + " Exercises"
-                    : label === "Calories"
-                    ? program.calories + " kcal"
-                    : program.time + " mins"}
-                </Text>
+          <View style={{ padding: 16 }}>
+            <View style={styles.infoBox}>
+              <View style={styles.row}>
+                {["Exercises", "Calories", "Time"].map((label, index) => (
+                  <View style={styles.detailItem} key={index}>
+                    <Text style={styles.label}>{label}</Text>
+                    <Text style={styles.value}>
+                      {label === "Exercises"
+                        ? `${selectedExercises.length} Exercises`
+                        : label === "Calories"
+                        ? program.calories + " kcal"
+                        : program.workoutTime + " mins"}
+                    </Text>
+                  </View>
+                ))}
               </View>
-            ))}
-          </View>
 
-          <View style={styles.row}>
-            {["Equipment", "Level"].map((label, index) => (
-              <View style={styles.detailItem} key={index}>
-                <Text style={styles.label}>{label}</Text>
-                <Text style={styles.value}>
-                  {label === "Equipment" ? program.equipment : program.level}
-                </Text>
+              <View style={styles.row}>
+                {["Equipment", "Level"].map((label, index) => (
+                  <View style={styles.detailItem} key={index}>
+                    <Text style={styles.label}>{label}</Text>
+                    <Text style={styles.value}>
+                      {label === "Equipment"
+                        ? program.equipments.join(", ")
+                        : program.level}
+                    </Text>
+                  </View>
+                ))}
+                <View style={styles.detailItem}></View>
               </View>
-            ))}
-            <View style={styles.detailItem}></View>
+            </View>
+            <Text style={styles.sectionTitle}>Description</Text>
+            <Text style={styles.description}>{program.description}</Text>
+            <SwitchItem
+              label="Start With Warm-Up"
+              isSwitchOn={isWarmUpVisible}
+              onToggleSwitch={() => setIsWarmUpVisible(!isWarmUpVisible)}
+            />
+            <SwitchItem
+              label="Stretch After Workout"
+              isSwitchOn={isStretchVisible}
+              onToggleSwitch={() => setIsStretchVisible(!isStretchVisible)}
+            />
+            {isWarmUpVisible &&
+              warmupExercises.length > 0 &&
+              renderExercise("Warm Up", warmupExercises)}
+            <Text style={styles.sectionTitle}>Exercises</Text>
+            <Selectable
+              items={["Day 1", "Day 2", "Day 3", "Day 4"]}
+              selectedItem={selectedPeriod}
+              setSelectedItem={setSelectedPeriod}
+            />
+            {selectedExercises.length > 0 &&
+              renderDayExercise(selectedExercises)}
+            {isStretchVisible &&
+              stretchExercises.length > 0 &&
+              renderExercise("Stretch", stretchExercises)}
           </View>
         </View>
-
-        <Text style={styles.sectionTitle}>Exercises</Text>
-        <Selectable
-          items={["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"]}
-          selectedItem={selectedPeriod}
-          setSelectedItem={setSelectedPeriod}
-        />
-        {selectedExercises.length > 0 && renderDayExercise(selectedExercises)}
       </ScrollView>
     </Container>
   );
 };
 
 const styles = StyleSheet.create({
-  image: {
-    width: "100%",
-    height: 250,
-    borderRadius: 10,
-    borderColor: colors.bgColor,
-    borderWidth: 2,
+  backButton: {
+    position: "absolute",
+    top: 60,
+    left: 20,
+    zIndex: 1,
   },
-  content: {
-    marginVertical: 20,
-  },
-  title: {
-    fontSize: FontSize.regular,
-    fontFamily: "Poppins-SemiBold",
-    color: colors.green,
-    width: 200,
-  },
-  description: {
-    fontSize: FontSize.small,
-    fontFamily: "Poppins-Regular",
-    color: "#F8F8F8",
-  },
-  sectionTitle: {
-    fontSize: FontSize.regular,
-    fontFamily: "Poppins-SemiBold",
-    color: "white",
-    marginTop: 20,
-  },
-  detailRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 5,
-  },
-  detailIcon: {
+  backIcon: {
     width: 20,
     height: 20,
-    marginRight: 10,
   },
-  detailText: {
-    fontSize: FontSize.medium,
-    fontFamily: "Poppins-Regular",
-    color: "#F8F8F8",
+  workoutImage: {
+    width: "100%",
+    height: 285,
   },
-  price: {
-    fontSize: FontSize.regular,
-    fontFamily: "Poppins-SemiBold",
+  absoluteTitle: {
+    position: "absolute",
+    bottom: 30,
+    left: 20,
+    fontSize: 28,
+    fontFamily: "Poppins-Bold",
     color: colors.green,
-  },
-  cardDescription: {
-    fontSize: FontSize.small,
-    fontFamily: "Poppins-Regular",
-    color: "#F8F8F8",
   },
   infoBox: {
     backgroundColor: colors.bgColor,
@@ -194,6 +261,33 @@ const styles = StyleSheet.create({
     fontSize: FontSize.small,
     color: colors.green,
   },
+  sectionTitle: {
+    fontSize: FontSize.regular,
+    fontFamily: "Poppins-SemiBold",
+    color: "white",
+    marginTop: 20,
+  },
+  description: {
+    color: "#AFAFAF",
+    marginTop: 10,
+    fontFamily: "Poppins-Regular",
+    fontSize: FontSize.small,
+  },
+  switchContainer: {
+    height: 38,
+    backgroundColor: colors.bgColor,
+    marginTop: 10,
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  switchLabel: {
+    color: "#F8F8F8",
+    fontSize: FontSize.medium,
+    fontFamily: "Poppins-Medium",
+  },
   exerciseHeading: {
     color: "white",
     fontSize: FontSize.regular,
@@ -216,15 +310,23 @@ const styles = StyleSheet.create({
   },
   exerciseTitle: {
     marginLeft: 16,
+    flex: 1,
     color: "#F8F8F8",
     fontFamily: "Poppins-Regular",
     fontSize: FontSize.regular,
+    maxWidth: "65%",
   },
   exerciseReps: {
     marginLeft: "auto",
     color: colors.green,
     fontFamily: "Poppins-Medium",
+    fontSize: FontSize.small,
+  },
+  dayTitle: {
     fontSize: FontSize.regular,
+    fontFamily: "Poppins-SemiBold",
+    color: colors.green,
+    textAlign: "center",
   },
 });
 

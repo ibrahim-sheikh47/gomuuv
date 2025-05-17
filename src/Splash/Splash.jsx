@@ -20,21 +20,29 @@ import { FontSize } from "../utils/font";
 const Splash = () => {
   const navigation = useNavigation();
 
-  const { isLoggedIn } = useSelector((state) => state.Auth);
+  const { isLoggedIn, data } = useSelector((state) => state.Auth);
 
   useLayoutEffect(() => {
     if (isLoggedIn) {
-      navigation.reset({
-        index: 0, // Ensures TabNavigator is at the top
-        routes: [
-          {
-            name: "UserApp", // Parent navigator (UserApp)
-            state: {
-              routes: [{ name: "TabNavigator" }], // Navigate to TabNavigator within UserApp
+      if (data.role === "user") {
+        navigation.reset({
+          index: 0, // Ensures TabNavigator is at the top
+          routes: [
+            {
+              name: "UserApp", // Parent navigator (UserApp)
             },
-          },
-        ],
-      });
+          ],
+        });
+      } else {
+        navigation.reset({
+          index: 0, // Ensures TabNavigator is at the top
+          routes: [
+            {
+              name: "TrainerApp", // Parent navigator (UserApp)
+            },
+          ],
+        });
+      }
     }
   }, []);
 
@@ -81,11 +89,7 @@ const Splash = () => {
             }}
           >
             <Text style={styles.signInText}>Already a member?</Text>
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate("UserApp", { screen: "Login" })
-              }
-            >
+            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
               <Text style={styles.signInLink}>Sign in</Text>
             </TouchableOpacity>
           </View>

@@ -30,12 +30,12 @@ const WorkoutProgramsList = ({ navigation, route }) => {
         navigation.navigate("WorkoutProgramDetail", { program: item })
       }
     >
-      <Image source={item.image} style={styles.cardImage} />
+      <Image source={{ uri: item.image }} style={styles.cardImage} />
       <View style={styles.cardContent}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <View style={{ width: "70%" }}>
-            <Text style={styles.cardTitle}>{item.title}</Text>
-            <Text style={styles.cardDescription}>{item.subtitle}</Text>
+            <Text style={styles.cardTitle}>{item.name}</Text>
+            <Text style={styles.cardDescription}>{item.description}</Text>
           </View>
 
           <Text style={styles.cardPrice}>{item.price}</Text>
@@ -44,7 +44,9 @@ const WorkoutProgramsList = ({ navigation, route }) => {
           <View>
             <View style={styles.sessionDetail}>
               <StrengthIcon />
-              <Text style={styles.detailText}>{item.category}</Text>
+              <Text style={styles.detailText}>
+                {item.equipments[0].replace("_", " ")}
+              </Text>
             </View>
             <View style={styles.sessionDetail}>
               <LevelIcon />
@@ -61,7 +63,7 @@ const WorkoutProgramsList = ({ navigation, route }) => {
       <Header
         title={"Your Program"}
         showBackButton={true}
-        rightIcon1={<SearchIcon />}
+        // rightIcon1={<SearchIcon />}
       />
       <Selectable
         items={["All", "Recent", "Popular", "Inactive", "Active"]}
@@ -72,7 +74,16 @@ const WorkoutProgramsList = ({ navigation, route }) => {
         data={trainerWorkoutData}
         renderItem={renderWorkoutCard}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={
+          trainerWorkoutData.length > 0
+            ? styles.listContent
+            : { alignItems: "center", justifyContent: "center", flexGrow: 1 }
+        }
+        ListEmptyComponent={
+          <Text style={{ fontSize: FontSize.small, color: "white" }}>
+            No workout programs
+          </Text>
+        }
       />
     </Container>
   );

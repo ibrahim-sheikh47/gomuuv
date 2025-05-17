@@ -25,41 +25,46 @@ import StrengthIcon from "../../assets/svgs/StrengthIcon";
 import { FontSize } from "../../utils/font";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
+import moment from "moment/moment";
+import Toast from "react-native-toast-message";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import { useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
 
 const CreateProgram = () => {
+  const navigation = useNavigation();
   const modes = ["Strength", "Cardio", "Hill Climb", "Fat Burn", "Flexibility"];
   const equipment = [
     "Dumbbell",
-    "Bench",
+    "Bench Press",
     "Pull Up Bar",
     "Barbell",
     "Treadmill",
     "Jump Rope",
   ];
 
-  const [selectedMode, setSelectedMode] = useState("Strength");
-  const [selectedSkillLevel, setSelectedSkillLevel] = useState("Beginner");
-  const [selectedEquipment, setSelectedEquipment] = useState(modes[0]);
+  const { data:userData, token } = useSelector((state) => state.Auth);
+
   const [modalVisible, setModalVisible] = useState(false);
   const [createdModalVisible, setCreatedModalVisible] = useState(false);
   const [titleImage, setTitleImage] = useState(null);
-  const [exerciseMedia, setExerciseMedia] = useState(null);
-  const [currentExerciseIndex, setCurrentExerciseIndex] = useState(null);
-
-  const [selectedDay, setSelectedDay] = useState(null);
-  const [exercises, setExercises] = useState([
-    { exercise: "", time: "", reps: "", media: null },
-  ]);
 
   const [savedExercises, setSavedExercises] = useState([]);
-  const openModal = () => setModalVisible(true);
+  const openModal = () => {
+    if (days.length > 0) {
+      setModalVisible(true);
+    } else {
+      Alert.alert("Kindly select start and end date before adding exercises");
+    }
+  };
   const closeModal = () => setModalVisible(false);
 
   const openCreatedModal = () => setCreatedModalVisible(true);
   const closeCreatedModal = () => {
     setCreatedModalVisible(false);
-    // Reset form after successful creation
     resetForm();
+    navigation.goBack();
   };
 
   const resetForm = () => {
@@ -78,31 +83,52 @@ const CreateProgram = () => {
     setTitleImage(null);
   };
 
-  const addExercise = () => {
-    setExercises([
-      ...exercises,
-      { exercise: "", time: "", reps: "", media: null },
-    ]);
-  };
-
   const updateExercise = (index, field, value) => {
-    const updatedExercises = [...exercises];
-    updatedExercises[index][field] = value;
-    setExercises(updatedExercises);
+    const updatedDays = [...days];
+    updatedDays[selectedDayIndex].exercises[index].exercise[field] = value;
+    setDays(updatedDays);
   };
 
   const handleSave = () => {
-    if (selectedDay) {
-      setSavedExercises((prev) => [
-        ...prev,
-        { day: selectedDay, exercises: [...exercises] },
-      ]);
-      setModalVisible(false);
-      setExercises([{ exercise: "", time: "", reps: "", media: null }]); // Reset exercises
-      setSelectedDay(null); // Reset selected day
-    } else {
-      Alert.alert("Error", "Please select a day before saving!");
+    let errorMessage = "";
+
+    for (let [day, dayIndex] in days.entries) {
+      if (day.exercises.length === 0) {
+        isValid = false;
+        errorMessage = `Day ${dayIndex + 1} has no exercises.`;
+        Toast.show({ text1: errorMessage, type: "error" });
+        return;
+      } else {
+        day.exercises.forEach((exercise, exerciseIndex) => {
+          // Replace these with your actual required fields
+          if (!exercise.name || exercise.name.trim() === "") {
+            errorMessage = `Exercise ${exerciseIndex + 1} on Day ${
+              dayIndex + 1
+            } is missing a name.`;
+            Toast.show({ text1: errorMessage, type: "error" });
+            return;
+          }
+          if (!exercise.sets || exercise.sets <= 0) {
+            errorMessage = `Exercise ${exerciseIndex + 1} on Day ${
+              dayIndex + 1
+            } has invalid sets.`;
+            Toast.show({ text1: errorMessage, type: "error" });
+            return;
+          }
+          if (!exercise.reps || exercise.reps <= 0) {
+            errorMessage = `Exercise ${exerciseIndex + 1} on Day ${
+              dayIndex + 1
+            } has invalid reps.`;
+            Toast.show({ text1: errorMessage, type: "error" });
+            return;
+          }
+        });
+      }
     }
+
+    setSavedDays([...days]);
+    setDays([]);
+    closeModal();
   };
 
   const showStartDatePicker = () => setStartDatePickerVisibility(true);
@@ -117,6 +143,16 @@ const CreateProgram = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
+  const [days, setDays] = useState([]); // Full days array from your schema
+  const [savedDays, setSavedDays] = useState([]); // Full days array from your schema
+  const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+
+  useEffect(() => {
+    if (startDate && endDate) {
+      generateDaysFromRange(startDate, endDate);
+    }
+  }, [startDate, endDate]);
+
   const handleStartDateConfirm = (date) => {
     const today = new Date();
     if (date < today) {
@@ -124,6 +160,7 @@ const CreateProgram = () => {
       return;
     }
 
+    setEndDate(null);
     setStartDate(date);
     hideStartDatePicker();
   };
@@ -146,9 +183,9 @@ const CreateProgram = () => {
     selectedMode: "Strength",
     selectedSkillLevel: "Beginner",
     selectedEquipment: equipment[0],
+    time: "",
     price: "",
     calories: "",
-    targetMuscle: "",
   });
 
   const handleInputChange = (field, value) => {
@@ -177,7 +214,7 @@ const CreateProgram = () => {
     });
 
     if (!result.canceled) {
-      setTitleImage(result.assets[0].uri);
+      setTitleImage(result.assets[0]);
     }
   };
 
@@ -195,16 +232,13 @@ const CreateProgram = () => {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All, // Allow both images and videos
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      allowsMultipleSelection: false,
     });
 
     if (!result.canceled) {
-      const updatedExercises = [...exercises];
-      updatedExercises[index].media = result.assets[0].uri;
-      setExercises(updatedExercises);
+      days[selectedDayIndex].exercises[index].exercise.media = result.assets[0];
+      setDays(days);
     }
   };
 
@@ -224,8 +258,8 @@ const CreateProgram = () => {
       return false;
     }
 
-    if (savedExercises.length === 0) {
-      Alert.alert("Error", "Please add at least one exercise");
+    if (savedDays.length === 0) {
+      Alert.alert("Error", "Please add at least one day");
       return false;
     }
 
@@ -234,7 +268,7 @@ const CreateProgram = () => {
       return false;
     }
 
-    if (!formData.targetMuscle.trim()) {
+    if (!formData.time.trim()) {
       Alert.alert("Error", "Please enter target muscle");
       return false;
     }
@@ -247,33 +281,132 @@ const CreateProgram = () => {
     return true;
   };
 
-  const handleCreateProgram = () => {
-    if (validateForm()) {
-      // Here you would typically send the data to your API
-      console.log("Creating program with data:", {
-        ...formData,
-        startDate,
-        endDate,
-        exercises: savedExercises,
-        titleImage,
-      });
+  function calculateDuration(startDate, endDate) {
+    const ms = new Date(endDate) - new Date(startDate); // difference in milliseconds
 
-      openCreatedModal();
+    const oneMinute = 60 * 1000;
+    const oneHour = 60 * oneMinute;
+    const oneDay = 24 * oneHour;
+    const oneWeek = 7 * oneDay;
+    const oneMonth = 30 * oneDay; // Approximate
+
+    let value, unit;
+
+    if (ms < oneHour) {
+      value = Math.round(ms / oneMinute);
+      unit = "minute";
+    } else if (ms < oneDay) {
+      value = Math.round(ms / oneHour);
+      unit = "hour";
+    } else if (ms < oneWeek) {
+      value = Math.round(ms / oneDay);
+      unit = "day";
+    } else if (ms < oneMonth) {
+      value = Math.round(ms / oneWeek);
+      unit = "week";
+    } else {
+      value = Math.round(ms / oneMonth);
+      unit = "month";
     }
+
+    return { value, unit };
+  }
+
+  const uploadAttachment = (file) => {
+    return new Promise(async (resolve, reject) => {
+      const formData = new FormData();
+
+      formData.append("media", {
+        uri: file.uri,
+        name: file.fileName,
+        type: file.mimeType,
+      });
+      console.log(file);
+
+      try {
+        const response = await API.post(
+          END_POINTS.ATTACHMENT,
+          formData,
+          token,
+          true
+        );
+
+        console.log(response.data);
+        if (response?.data?.success) {
+          resolve(response.data.url);
+        } else {
+          reject(null);
+        }
+      } catch (error) {
+        reject(null);
+        console.error("Upload failed", error);
+      }
+    });
   };
 
-  const formatDateRange = () => {
-    if (startDate && endDate) {
-      const formatDate = (date) => {
-        const day = date.getDate().toString().padStart(2, "0");
-        const month = (date.getMonth() + 1).toString().padStart(2, "0");
-        const year = date.getFullYear();
-        return `${day} ${getMonthName(date.getMonth())} ${year}`;
-      };
+  const handleCreateProgram = async () => {
+    if (validateForm()) {
+      try {
+        const programImage = await uploadAttachment(titleImage);
+        if (!programImage) {
+          Toast.show({ text1: "Failed to create program" });
+          return;
+        }
 
-      return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+        const body = {
+          creator: userData?._id,
+          image: programImage,
+          name: formData.title,
+          duration: calculateDuration(startDate, endDate),
+          level: formData.selectedSkillLevel.toLowerCase(),
+          calories: formData.calories,
+          equipments: [
+            formData.selectedEquipment.toLowerCase().replace(" ", "_"),
+          ],
+          timePerWorkout: formData.time,
+          workoutTime: parseInt(formData.time),
+        };
+
+        let daysToUpload = [];
+        for (let day of savedDays) {
+          let tempDay = { ...day };
+          tempDay.exercises = [];
+          for (let exercise of day.exercises) {
+            let tempExercise = { ...exercise };
+            let videoUrl;
+            if (exercise.media) {
+              videoUrl = await uploadAttachment(exercise.media);
+            }
+            tempExercise.videoUrl = videoUrl;
+            delete tempExercise.media;
+
+            const res = await API.post(
+              END_POINTS.EXERCISE,
+              tempExercise,
+              token
+            );
+
+            if (res.data.success) {
+              tempDay.exercises.push({
+                exercise: res.data.data._id,
+                isCompleted: false,
+              });
+            }
+          }
+          daysToUpload.push(tempDay);
+        }
+        body.days = daysToUpload;
+
+        const res = await API.post(END_POINTS.WORKOUTS, body, token);
+        if (res.data.success) {
+          openCreatedModal();
+        }
+      } catch (error) {
+        console.error("Error fetching workouts:", error);
+      }
+    } else {
+      console.log("not validated");
     }
-    return "";
   };
 
   const getMonthName = (monthIndex) => {
@@ -294,13 +427,77 @@ const CreateProgram = () => {
     return months[monthIndex];
   };
 
+  const generateDaysFromRange = (startDate, endDate) => {
+    const result = [];
+    const current = startDate;
+    const end = endDate;
+
+    while (current <= end) {
+      const formattedDate = moment(current).format("DD/MM/yyyy");
+      const weekDay = moment(current).format("dddd");
+      const shortName = moment(current).format("ddd");
+
+      result.push({
+        name: `Day ${result.length + 1}`,
+        shortName,
+        date: formattedDate,
+        weekDay,
+        activities: [],
+        exercises: [
+          {
+            exercise: {
+              name: "",
+              description: "",
+              sets: "",
+              reps: "",
+              restTime: "",
+              media: null,
+            },
+            isCompleted: false,
+          },
+        ],
+        startWithWarmup: false,
+        warmupExercises: [],
+        stretchAfterWorkout: false,
+        stretchExercises: [],
+        isDayCompleted: false,
+      });
+
+      current.setDate(current.getDate() + 1);
+    }
+
+    setDays(result);
+  };
+
+  const addExerciseToDay = (exercise) => {
+    setDays((prev) => {
+      const updated = [...prev];
+      updated[selectedDayIndex].exercises.push({
+        exercise: {
+          name: "",
+          description: "",
+          sets: "",
+          reps: "",
+          restTime: "",
+          media: null,
+        },
+        isCompleted: false,
+      });
+      return updated;
+    });
+  };
+
+  const removeExerciseFromDay = (exerciseIndex) => {
+    setDays((prev) => {
+      const updated = [...prev];
+      updated[selectedDayIndex].exercises.splice(exerciseIndex, 1);
+      return updated;
+    });
+  };
+
   return (
     <Container>
-      <Header
-        title={"Create New Program"}
-        showBackButton={true}
-        rightIcon1={<SearchIcon />}
-      />
+      <Header title={"Create New Program"} showBackButton={true} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <InputField
           label={"Title"}
@@ -309,13 +506,13 @@ const CreateProgram = () => {
           onChangeText={(text) => handleInputChange("title", text)}
         />
 
-        <Text style={styles.text}>Workout Mode</Text>
+        {/* <Text style={styles.text}>Workout Mode</Text>
         <Selectable
           items={modes}
           selectedItem={formData.selectedMode}
           setSelectedItem={(item) => handleInputChange("selectedMode", item)}
           wrapOnLineChange={true}
-        />
+        /> */}
 
         <View style={styles.planDurationContainer}>
           <Text style={styles.text}>Plan Duration</Text>
@@ -367,7 +564,7 @@ const CreateProgram = () => {
         </View>
         <Text style={styles.text}>Skill Level</Text>
         <Selectable
-          items={["Beginner", "Intermediate", "Advance"]}
+          items={["Beginner", "Intermediate", "Expert", "Pro"]}
           selectedItem={formData.selectedSkillLevel}
           setSelectedItem={(item) =>
             handleInputChange("selectedSkillLevel", item)
@@ -388,16 +585,16 @@ const CreateProgram = () => {
           </TouchableOpacity>
         </View>
 
-        {savedExercises.length > 0 ? (
-          savedExercises.map((entry, index) => (
+        {savedDays.length > 0 ? (
+          savedDays.map((day, index) => (
             <View key={index} style={styles.savedExerciseContainer}>
-              <Text style={styles.savedDayText}>{entry.day}</Text>
+              <Text style={styles.savedDayText}>{day.name}</Text>
               <View style={styles.exercisesWrapper}>
-                {entry.exercises.map((exercise, idx) => (
+                {day.exercises.map((exercise, idx) => (
                   <View key={idx} style={styles.exerciseDisplay}>
                     <Text style={styles.exerciseText}>
-                      {exercise.exercise} x {exercise.reps} Reps (
-                      {exercise.time} mins)
+                      {exercise.exercise.name} x {exercise.exercise.reps} Reps (
+                      {exercise.exercise.restTime} mins)
                     </Text>
                   </View>
                 ))}
@@ -416,82 +613,106 @@ const CreateProgram = () => {
           width={"90%"}
           height={"80%"}
         >
-          <ScrollView>
-            <Text style={styles.modalText}>Select Day</Text>
-            <View style={styles.dayContainer}>
-              {["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"].map((day) => (
-                <TouchableOpacity
-                  key={day}
-                  style={[
-                    styles.dayButton,
-                    selectedDay === day && styles.selectedDayButton,
-                  ]}
-                  onPress={() => setSelectedDay(day)}
-                >
-                  <Text style={styles.dayText}>{day}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            {exercises.map((exercise, index) => (
-              <View key={index}>
-                <View style={styles.exerciseView}>
-                  <View style={{ flex: 1 }}>
-                    <InputField
-                      label={"Exercise"}
-                      value={exercise.exercise}
-                      onChangeText={(text) =>
-                        updateExercise(index, "exercise", text)
-                      }
-                    />
-                  </View>
-                  <InputField
-                    label={"Time"}
-                    value={exercise.time}
-                    onChangeText={(text) => updateExercise(index, "time", text)}
-                    keyboardType="numeric"
-                  />
-                  <InputField
-                    label={"Reps"}
-                    value={exercise.reps}
-                    onChangeText={(text) => updateExercise(index, "reps", text)}
-                    keyboardType="numeric"
-                  />
-                </View>
-
-                <TouchableOpacity
-                  style={styles.uploadButton}
-                  onPress={() => pickExerciseMedia(index)}
-                >
-                  <MaterialIcons
-                    name="file-upload"
-                    size={20}
-                    color="#fff"
-                    style={styles.uploadIcon}
-                  />
-                  <Text style={styles.uploadButtonText}>
-                    {exercise.media ? "Change Media" : "Upload Media"}
-                  </Text>
-                </TouchableOpacity>
-
-                {exercise.media && (
-                  <View style={styles.mediaPreviewContainer}>
-                    <Image
-                      source={{ uri: exercise.media }}
-                      style={styles.mediaPreview}
-                      resizeMode="cover"
-                    />
-                  </View>
-                )}
+          <ScrollView
+            contentContainerStyle={{
+              width: "100%", // Let the content fill full width of ScrollView
+              alignItems: "center", // Center children horizontally
+              paddingBottom: 20,
+            }}
+          >
+            <View style={{ width: "90%" }}>
+              <Text style={styles.modalText}>Select Day</Text>
+              <View style={styles.dayContainer}>
+                {days.map((day, index) => (
+                  <TouchableOpacity
+                    key={`${index}`}
+                    style={[
+                      styles.dayButton,
+                      selectedDayIndex === index && styles.selectedDayButton,
+                    ]}
+                    onPress={() => setSelectedDayIndex(index)}
+                  >
+                    <Text style={styles.dayText}>{day.name}</Text>
+                  </TouchableOpacity>
+                ))}
               </View>
-            ))}
 
-            <TouchableOpacity
-              style={styles.addMoreButton}
-              onPress={addExercise}
-            >
-              <Text style={styles.addMoreButtonText}>Add More</Text>
-            </TouchableOpacity>
+              {(days[selectedDayIndex]?.exercises || []).map(
+                (exercise, index) => (
+                  <View key={index}>
+                    <View style={styles.exerciseView}>
+                      <View style={{ flex: 1 }}>
+                        <InputField
+                          label={"Name"}
+                          value={exercise.exercise.name}
+                          onChangeText={(text) =>
+                            updateExercise(index, "name", text)
+                          }
+                        />
+                      </View>
+                      <InputField
+                        label={"Sets"}
+                        value={exercise.exercise.sets}
+                        onChangeText={(text) =>
+                          updateExercise(index, "sets", text)
+                        }
+                        keyboardType="numeric"
+                      />
+                      <InputField
+                        label={"Reps"}
+                        value={exercise.exercise.reps}
+                        onChangeText={(text) =>
+                          updateExercise(index, "reps", text)
+                        }
+                        keyboardType="numeric"
+                      />
+                      <InputField
+                        label={"Rest Time (mins)"}
+                        value={exercise.exercise.restTime}
+                        onChangeText={(text) =>
+                          updateExercise(index, "restTime", text)
+                        }
+                        keyboardType="numeric"
+                      />
+                    </View>
+
+                    <TouchableOpacity
+                      style={styles.uploadButton}
+                      onPress={() => pickExerciseMedia(index)}
+                    >
+                      <MaterialIcons
+                        name="file-upload"
+                        size={20}
+                        color="#fff"
+                        style={styles.uploadIcon}
+                      />
+                      <Text style={styles.uploadButtonText}>
+                        {exercise.exercise.media
+                          ? "Change Media"
+                          : "Upload Media"}
+                      </Text>
+                    </TouchableOpacity>
+
+                    {/* {exercise.media && (
+                    <View style={styles.mediaPreviewContainer}>
+                      <Image
+                        source={{ uri: exercise.media }}
+                        style={styles.mediaPreview}
+                        resizeMode="cover"
+                      />
+                    </View>
+                  )} */}
+                  </View>
+                )
+              )}
+
+              <TouchableOpacity
+                style={styles.addMoreButton}
+                onPress={addExerciseToDay}
+              >
+                <Text style={styles.addMoreButtonText}>Add More</Text>
+              </TouchableOpacity>
+            </View>
           </ScrollView>
 
           <CustomButton
@@ -502,18 +723,19 @@ const CreateProgram = () => {
         </CustomModal>
 
         <InputField
+          label={"Workout Time"}
+          placeholder={"Enter time (mins)"}
+          value={formData.time}
+          onChangeText={(text) => handleInputChange("time", text)}
+          keyboardType="numeric"
+        />
+
+        <InputField
           label={"Calories"}
           placeholder={"Enter calories (e.g. 129kcal)"}
           value={formData.calories}
           onChangeText={(text) => handleInputChange("calories", text)}
           keyboardType="numeric"
-        />
-
-        <InputField
-          label={"Target Muscle"}
-          placeholder={"Enter target muscle group"}
-          value={formData.targetMuscle}
-          onChangeText={(text) => handleInputChange("targetMuscle", text)}
         />
 
         <Text style={[styles.text, { width: "100%" }]}>
@@ -536,7 +758,7 @@ const CreateProgram = () => {
         >
           {titleImage ? (
             <Image
-              source={{ uri: titleImage }}
+              source={{ uri: titleImage.uri }}
               style={styles.titleImagePreview}
               resizeMode="cover"
             />

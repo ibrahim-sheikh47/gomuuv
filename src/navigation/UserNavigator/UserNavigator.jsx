@@ -43,19 +43,22 @@ import VideoPlayerScreen from "../../UserScreens/Workout/VideoPlayerScreen";
 import MapScreen from "../../UserScreens/Map/MapScreen";
 import NutritionPlan from "../../UserScreens/Nutrition/NutritionPlan";
 import Orders from "../../UserScreens/Shop/Orders";
+import { useSelector } from "react-redux";
 
 const Stack = createNativeStackNavigator();
 
 export default function UserNavigator() {
+  const { isLoggedIn } = useSelector((state) => state.Auth);
+
   return (
     <Stack.Navigator
       screenOptions={{
         animation: "slide_from_right",
         headerShown: false,
       }}
+      initialRouteName={isLoggedIn && "TabNavigator"}
     >
       <Stack.Screen name="Signup" component={Signup} />
-      <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="ForgotPass" component={ForgotPass} />
       <Stack.Screen name="Verify" component={Verify} />
       <Stack.Screen name="NewPass" component={NewPass} />

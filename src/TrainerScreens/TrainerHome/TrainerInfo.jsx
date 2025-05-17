@@ -15,29 +15,82 @@ import { colors } from "../../constants/colors";
 import icons from "../../constants/icons";
 import EditIcon from "../../assets/svgs/EditIcon";
 import { FontSize } from "../../utils/font";
+import { useDispatch, useSelector } from "react-redux";
+import Toast from "react-native-toast-message";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import { setUserData } from "../../redux/reducers/AuthSlice";
+import { useNavigation } from "@react-navigation/native";
 
 const TrainerInfo = () => {
-  // State to hold dynamic values for each input field
-  const [firstName, setFirstName] = useState("fname");
-  const [lastName, setLastName] = useState("lname");
-  const [profession, setProfession] = useState("profession");
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
 
-  // State to toggle between edit and view mode
-  const [isEditing, setIsEditing] = useState({
-    firstName: false,
-    lastName: false,
-    profession: false,
+  const { data:userData, token } = useSelector((state) => state.Auth);
+
+  const [personalInfo, setPersonalInfo] = useState({
+    firstName: userData?.firstName || "",
+    lastName: userData?.lastName || "",
   });
+  const [email, setEmail] = useState(userData?.email || "");
 
-  // Handler for saving the changes
-  const handleSaveChanges = () => {
-    // You can implement saving functionality here, like sending the updated values to a backend.
-    alert("Changes Saved");
+  const handleInputChange = (field, value) => {
+    setPersonalInfo((prevInfo) => ({
+      ...prevInfo,
+      [field]: value,
+    }));
   };
 
-  // Handler for toggling the edit mode
-  const handleEdit = (field) => {
-    setIsEditing((prevState) => ({ ...prevState, [field]: !prevState[field] }));
+  const validateFields = () => {
+    // Ensure all fields are filled
+    if (!personalInfo.firstName || !personalInfo.lastName) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "All fields are required.",
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSaveChanges = async () => {
+    if (!validateFields()) return;
+
+    try {
+      const updatedData = {
+        firstName: personalInfo.firstName,
+        lastName: personalInfo.lastName,
+      };
+      const response = await API.patch(
+        END_POINTS.UPDATE_USER + `${userData?._id}`,
+        updatedData,
+        token
+      );
+
+      if (response?.data?.success) {
+        dispatch(setUserData(response?.data?.data));
+        Toast.show({
+          type: "success",
+          text1: "Success",
+          text2: "Personal information updated successfully.",
+        });
+        navigation.goBack();
+      } else {
+        throw new Error("Failed to update information.");
+      }
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2:
+          error.response?.data?.message ||
+          error ||
+          "An error occurred. Please try again.",
+      });
+    }
   };
 
   return (
@@ -46,45 +99,20 @@ const TrainerInfo = () => {
       <ScrollView>
         <View style={styles.fieldContainer}>
           <InputField
-            label={"First Name"}
-            value={isEditing.firstName ? firstName : firstName} // Display initial value or allow editing
-            onChangeText={(text) => setFirstName(text)}
-            editable={isEditing.firstName}
+            label={"Name"}
+            value={personalInfo.firstName} // Display initial value or allow editing
+            onChangeText={(text) => handleInputChange("firstName", text)}
           />
-          <TouchableOpacity
-            style={styles.editIcon}
-            onPress={() => handleEdit("firstName")}
-          >
-            <EditIcon />
-          </TouchableOpacity>
         </View>
         <View style={styles.fieldContainer}>
-          <InputField
-            label={"Last Name"}
-            value={isEditing.lastName ? lastName : lastName} // Display initial value or allow editing
-            onChangeText={(text) => setLastName(text)}
-            editable={isEditing.lastName}
-          />
-          <TouchableOpacity
-            style={styles.editIcon}
-            onPress={() => handleEdit("lastName")}
-          >
-            <EditIcon />
-          </TouchableOpacity>
+          <InputField label={"Email"} value={email} editable={false} />
         </View>
         <View style={styles.fieldContainer}>
           <InputField
             label={"Professional Title"}
-            value={isEditing.profession ? profession : profession} // Display initial value or allow editing
-            onChangeText={(text) => setProfession(text)}
-            editable={isEditing.profession}
+            value={personalInfo.lastName} // Display initial value or allow editing
+            onChangeText={(text) => handleInputChange("lastName", text)}
           />
-          <TouchableOpacity
-            style={styles.editIcon}
-            onPress={() => handleEdit("profession")}
-          >
-            <EditIcon />
-          </TouchableOpacity>
         </View>
       </ScrollView>
       <CustomButton title={"Save Changes"} onPress={handleSaveChanges} />
