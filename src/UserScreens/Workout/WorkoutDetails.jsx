@@ -48,15 +48,13 @@ const WorkoutDetails = () => {
       workout?.days?.indexOf(
         workout?.days?.find((d) => d.date === date || d.weekDay === dayName)
       )
-    ].shortName
+    ]?.shortName || `${workout?.days.length} Days`
   );
   const [isWarmUpVisible, setIsWarmUpVisible] = useState(
-    workout?.days?.find((d) => d.date === date || d.weekDay === dayName)
-      .startWithWarmup || false
+    workout?.days?.find((d) => d.date === date || d.weekDay === dayName)?.startWithWarmup || false
   );
   const [isStretchVisible, setIsStretchVisible] = useState(
-    workout?.days?.find((d) => d.date === date || d.weekDay === dayName)
-      .stretchAfterWorkout || false
+    workout?.days?.find((d) => d.date === date || d.weekDay === dayName)?.stretchAfterWorkout || false
   );
   const { token, data: userData } = useSelector((state) => state.Auth);
   const getExercisesForDay = (day) => {
@@ -186,8 +184,7 @@ const WorkoutDetails = () => {
               style={{
                 backgroundColor: colors.bgColor,
                 borderRadius: 10,
-                width: 50,
-                padding: 5,
+                padding: 10,
                 position: "absolute",
                 bottom: -25,
                 left: 20,

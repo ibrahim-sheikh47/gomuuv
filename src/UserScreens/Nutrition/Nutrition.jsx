@@ -71,24 +71,26 @@ const NutritionScreen = () => {
   useFocusEffect(
     useCallback(() => {
       fetchActiveGoal();
-    }, [])
-  );
-
-  useFocusEffect(
-    useCallback(() => {
       getNutritionMeals();
       getDailyPlans();
     }, [])
   );
 
+  useEffect(() => {
+    if (goal) {
+      setTotalGlasses(parseInt(goal?.targetDistance?.value || 0));
+      setConsumedGlasses(
+        parseInt(
+          goal?.activities?.find((a) => a.date === date)?.distance?.value || 0
+        )
+      );
+    }
+  }, [goal])
+
   const getNutritionMeals = async () => {
     try {
       const res = await API.get(END_POINTS.NUTRITION_MEALS, null, token);
       if (res.data.success) {
-        console.log(
-          "res?.data?.data",
-          JSON.stringify(res?.data?.data, null, 2)
-        );
         dispatch(setNutritionMeals(res?.data?.data || []));
       }
     } catch (error) {
@@ -174,7 +176,6 @@ const NutritionScreen = () => {
 
       if (response?.data?.success) {
         setConsumedGlasses((prev) => prev + 1);
-        // fetchActiveGoal();
       }
     } catch (error) {
       console.log(error);
@@ -190,13 +191,7 @@ const NutritionScreen = () => {
       );
 
       if (response?.data?.success) {
-        setGoal(response?.data?.data);
-        setTotalGlasses(parseInt(goal?.targetDistance?.value || 0));
-        setConsumedGlasses(
-          parseInt(
-            goal?.activities?.find((a) => a.date === date)?.distance?.value || 0
-          )
-        );
+        setGoal(response?.data?.data.goal);
       }
     } catch (error) {
       console.log(error);

@@ -43,12 +43,12 @@ const MealDetailScreen = ({ route }) => {
     {
       type: "ingredients",
       id: "ingredients",
-      ingredients: meal.ingredients,
+      ingredients: meal?.ingredients,
     },
     {
       type: "steps",
       id: "steps",
-      steps: meal.steps,
+      steps: meal?.recipe,
     },
   ];
 
@@ -107,7 +107,7 @@ const MealDetailScreen = ({ route }) => {
           </TouchableOpacity>
           <Image source={imageSource} style={styles.image} />
           <View style={{ padding: 20 }}>
-            <Text style={styles.mealName}>{item.meal?.mealName}</Text>
+            <Text style={styles.mealName}>{item.meal?.name}</Text>
             <Text style={styles.title}>{item.meal?.title}</Text>
 
             {/* Meal Stats Container */}
@@ -178,8 +178,7 @@ const MealDetailScreen = ({ route }) => {
             keyExtractor={(ingredient) => ingredient.id}
             renderItem={({ item }) => (
               <View style={styles.ingredientContainer}>
-                <Text style={styles.ingredientText}>{item.name}</Text>
-                <Text style={styles.ingredientQuantity}>{item.quantity}</Text>
+                <Text style={styles.ingredientText}>{item}</Text>
               </View>
             )}
           />
@@ -206,7 +205,7 @@ const MealDetailScreen = ({ route }) => {
               <View style={styles.stepContainer}>
                 {/* Displaying the step number dynamically */}
                 <Text style={styles.stepNum}>{`Step ${index + 1}`}</Text>
-                <Text style={styles.stepText}>{item.step}</Text>
+                <Text style={styles.stepText}>{item}</Text>
               </View>
             )}
           />

@@ -92,7 +92,6 @@ const WorkoutScreen = () => {
     try {
       const res = await API.get(END_POINTS.WORKOUT_SESSIONS, null, token);
       if (res.data.success) {
-        console.log(res?.data?.data);
         dispatch(setTodaySessions(res?.data?.data ? [res.data.data] : []));
       }
     } catch (error) {
@@ -252,7 +251,7 @@ const WorkoutScreen = () => {
                 unit="mins"
               />
             </View>
-            {todaySessions?.length > 0 ? (
+            {todaySessions?.length > 0 && todaySessions[0]?.workout?.days?.some((d) => date === d.date || d.weekDay === dayName) ? (
               <View>
                 <Text style={styles.sessionTitle}>Today's Session</Text>
                 <WorkoutCard
@@ -266,6 +265,7 @@ const WorkoutScreen = () => {
                       const day = todaySessions[0]?.workout?.days?.find(
                         (d) => date === d.date || d.weekDay === dayName
                       );
+                      console.log(todaySessions[0]?.workout?.days)
                       const incompleteExercises = day.exercises.filter(
                         (e) => !e.isCompleted
                       );

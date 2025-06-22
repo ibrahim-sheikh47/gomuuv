@@ -16,7 +16,7 @@ import images from "../../constants/images";
 const ViewAllWorkouts = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const { category } = useRoute().params;
+  const { category } = useRoute()?.params || {};
 
   const { token, trendingData } = useSelector((state) => ({
     token: state.Auth?.token,
@@ -70,7 +70,7 @@ const ViewAllWorkouts = () => {
       <Header
         title={category ? category.label : "Trending Workouts"}
         showBackButton={true}
-        rightIcon1={<SearchIcon />}
+        // rightIcon1={<SearchIcon />}
       />
       <FlatList
         style={{ marginTop: 30 }}
