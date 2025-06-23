@@ -52,7 +52,6 @@ const ActivityScreen = () => {
 
   const createGoal = async () => {
     try {
-      console.log(activityType);
       const response = await API.post(
         `${END_POINTS.GOALS}`,
         {

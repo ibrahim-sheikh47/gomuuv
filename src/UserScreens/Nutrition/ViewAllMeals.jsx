@@ -139,46 +139,43 @@ const ViewAllMeals = ({ route, navigation }) => {
       <SearchBar searchQuery={searchQuery} onChangeSearch={onChangeSearch} />
 
       {title.toLowerCase() === "recipes" && (
-        <>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={{ paddingBottom: 50 }}
-          >
-            <MealCategorySelector
-              categories={mealCategories}
-              selectedCategory={selectedCategory}
-              onSelect={(index) =>
-                setSelectedCategory(mealCategories[index].value)
-              }
-            />
-          </ScrollView>
+        <View>
+          <MealCategorySelector
+            categories={mealCategories}
+            selectedCategory={selectedCategory}
+            onSelect={(index) =>
+              setSelectedCategory(mealCategories[index].value)
+            }
+          />
           <Text style={styles.title}>Popular Recipes</Text>
-        </>
+        </View>
       )}
 
-      <FlatList
-        data={filteredData}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <MealItem
-            style={styles.ViewAll}
-            mealId={item?._id}
-            mealName={item?.name}
-            mealImage={item?.image}
-            calories={item?.calories}
-            time={item?.preparationTime}
-            iconType={title.toLowerCase() === "recipes" ? "next" : "delete"}
-            onPress={() =>
-              navigation.navigate("MealDetailScreen", { meal: item })
-            }
-            onDelete={(mealId) => removeMealFromPlan(mealId)}
-          />
-        )}
-        numColumns={1}
-        showsVerticalScrollIndicator={false}
-        ListFooterComponent={<View style={{ marginBottom: 25 }} />}
-      />
+      <View style={{ flex: 1 }}>
+        <FlatList
+          data={filteredData}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <MealItem
+              style={styles.ViewAll}
+              mealId={item?._id}
+              mealName={item?.name}
+              mealImage={item?.image}
+              calories={item?.calories}
+              time={item?.preparationTime}
+              iconType={title.toLowerCase() === "recipes" ? "next" : "delete"}
+              onPress={() =>
+                navigation.navigate("MealDetailScreen", { meal: item })
+              }
+              onDelete={(mealId) => removeMealFromPlan(mealId)}
+            />
+          )}
+          numColumns={1}
+          showsVerticalScrollIndicator={false}
+          ListFooterComponent={<View style={{ marginBottom: 25 }} />}
+        />
+
+      </View>
 
       {title.toLowerCase() !== "recipes" && (
         <CustomButton
@@ -205,6 +202,6 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Bold",
     fontSize: FontSize.regular,
     marginBottom: 5,
-    marginTop: 20,
+    marginTop: 20
   },
 });

@@ -88,7 +88,7 @@ const MealDetailScreen = ({ route }) => {
   const renderItem = ({ item }) => {
     if (item.type === "mealInfo") {
       // Check if the mealImage is a valid URL or an object with a URI
-      const imageSource = item.meal.image
+      const imageSource = item.meal?.image
         ? { uri: item.meal.image }
         : images.lunch;
       return (

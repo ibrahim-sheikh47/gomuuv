@@ -22,7 +22,7 @@ const ChallengeDetail = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { challenge: item } = route.params; // Access challenge data from params
-  const { token, data:userData } = useSelector((state) => state.Auth);
+  const { token, data: userData } = useSelector((state) => state.Auth);
   const [challenge, setChallenge] = useState(item);
   const date = moment().format("DD/MM/yyyy");
 
@@ -33,7 +33,7 @@ const ChallengeDetail = () => {
       challenge?.workout?.days?.indexOf(
         challenge?.workout?.days?.find((d) => d.date === date)
       )
-    ].shortName
+    ]?.shortName || `${challenge?.workout?.days.length} Days`
   );
 
   const openModal = (title) => {
@@ -131,8 +131,8 @@ const ChallengeDetail = () => {
         {/* <Image source={challenge.image} style={styles.challengeImage} /> */}
         <View>
           <Image
-            source={{ uri: challenge.workout.image }}
-            style={styles.workoutImage}
+            source={{ uri: challenge?.workout?.image }}
+            style={styles.challengeImage}
           />
           <Text style={styles.absoluteTitle}>{challenge.workout.name}</Text>
 
@@ -140,8 +140,7 @@ const ChallengeDetail = () => {
             style={{
               backgroundColor: colors.bgColor,
               borderRadius: 10,
-              width: 50,
-              padding: 5,
+              padding: 10,
               position: "absolute",
               bottom: -25,
               left: 20,
@@ -151,7 +150,7 @@ const ChallengeDetail = () => {
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>Description</Text>
+        <Text style={[styles.sectionTitle, { marginTop: 40 }]}>Description</Text>
         <Text style={styles.description}>{challenge.workout.description}</Text>
 
         <View style={styles.infoBox}>
@@ -162,11 +161,11 @@ const ChallengeDetail = () => {
                 <Text style={styles.value}>
                   {label === "Exercises"
                     ? challenge.workout.days.reduce((sum, day) => {
-                        return sum + day.exercises.length;
-                      }, 0) + " Exercises"
+                      return sum + day.exercises.length;
+                    }, 0) + " Exercises"
                     : label === "Calories"
-                    ? challenge.workout.calories + " kcal"
-                    : challenge.workout.timePerWorkout + ""}
+                      ? challenge.workout.calories + " kcal"
+                      : challenge.workout.timePerWorkout + ""}
                 </Text>
               </View>
             ))}
@@ -208,9 +207,9 @@ const ChallengeDetail = () => {
             challenge?.workout?.days
               .find((d) => d.shortName === selectedPeriod && date === d.date)
               ?.exercises.some((ex) => !ex.isCompleted) === undefined ||
-            challenge?.workout?.days
-              .find((d) => d.shortName === selectedPeriod && date === d.date)
-              ?.exercises.some((ex) => !ex.isCompleted)
+              challenge?.workout?.days
+                .find((d) => d.shortName === selectedPeriod && date === d.date)
+                ?.exercises.some((ex) => !ex.isCompleted)
               ? "Continue Challenge"
               : "Day Completed"
           }
@@ -258,6 +257,25 @@ const styles = StyleSheet.create({
     height: 175,
     borderRadius: 10,
     marginTop: 20,
+  },
+  workoutImage: {
+    width: "100%",
+    height: 285,
+  },
+  absoluteTitle: {
+    position: "absolute",
+    bottom: 30,
+    left: 20,
+    right:20,
+    fontSize: 28,
+    fontFamily: "Poppins-Bold",
+    color: colors.green,
+  },
+  dayTitle: {
+    fontSize: FontSize.regular,
+    fontFamily: "Poppins-SemiBold",
+    color: colors.green,
+    textAlign: "center",
   },
   title: {
     fontSize: FontSize.regular,

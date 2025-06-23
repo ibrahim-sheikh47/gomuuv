@@ -140,6 +140,7 @@ const ActivityDetailScreen = () => {
         {},
         token
       );
+      console.log(response?.data?.success)
 
       if (response?.data?.success) {
         setGoal(response?.data?.data?.goal);
