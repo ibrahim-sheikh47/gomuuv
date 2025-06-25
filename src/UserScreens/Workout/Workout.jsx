@@ -55,6 +55,7 @@ const WorkoutScreen = () => {
     useCallback(() => {
       getTrendingWorkouts();
       getTodaySessions();
+      getStats();
     }, [])
   );
 
@@ -247,11 +248,14 @@ const WorkoutScreen = () => {
               <MetricBox
                 label="Time"
                 icon={TimeIcon}
-                value={Math.floor((stats?.totalDuration || 0) / 60)}
+                value={((stats?.totalDuration || 0) / 60).toFixed(2)}
                 unit="mins"
               />
             </View>
-            {todaySessions?.length > 0 && todaySessions[0]?.workout?.days?.some((d) => date === d.date || d.weekDay === dayName) ? (
+            {todaySessions?.length > 0 &&
+            todaySessions[0]?.workout?.days?.some(
+              (d) => date === d.date || d.weekDay === dayName
+            ) ? (
               <View>
                 <Text style={styles.sessionTitle}>Today's Session</Text>
                 <WorkoutCard
@@ -265,7 +269,7 @@ const WorkoutScreen = () => {
                       const day = todaySessions[0]?.workout?.days?.find(
                         (d) => date === d.date || d.weekDay === dayName
                       );
-                      console.log(todaySessions[0]?.workout?.days)
+                      console.log(todaySessions[0]?.workout?.days);
                       const incompleteExercises = day.exercises.filter(
                         (e) => !e.isCompleted
                       );
