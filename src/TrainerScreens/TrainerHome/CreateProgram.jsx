@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Image,
   ScrollView,
@@ -9,6 +9,7 @@ import {
   TextInput,
   Alert,
   Platform,
+  useWindowDimensions,
 } from "react-native";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
@@ -31,12 +32,16 @@ import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
 import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
+import Loader from "../../components/Loader";
 
 const CreateProgram = () => {
   const navigation = useNavigation();
+  const { width } = useWindowDimensions();
+  const startDatePicker = useRef();
+  const endDatePicker = useRef();
   const modes = ["Strength", "Cardio", "Hill Climb", "Fat Burn", "Flexibility"];
   const equipment = [
-    "Dumbbell",
+    "Dumbells",
     "Bench Press",
     "Pull Up Bar",
     "Barbell",
@@ -44,13 +49,25 @@ const CreateProgram = () => {
     "Jump Rope",
   ];
 
-  const { data:userData, token } = useSelector((state) => state.Auth);
+  const { data: userData, token } = useSelector((state) => state.Auth);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [createdModalVisible, setCreatedModalVisible] = useState(false);
   const [titleImage, setTitleImage] = useState(null);
 
   const [savedExercises, setSavedExercises] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const [isStartDatePickerVisible, setStartDatePickerVisibility] =
+    useState(false);
+  const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
+  const [days, setDays] = useState([]); // Full days array from your schema
+  const [savedDays, setSavedDays] = useState([]); // Full days array from your schema
+  const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+
   const openModal = () => {
     if (days.length > 0) {
       setModalVisible(true);
@@ -102,23 +119,20 @@ const CreateProgram = () => {
         day.exercises.forEach((exercise, exerciseIndex) => {
           // Replace these with your actual required fields
           if (!exercise.name || exercise.name.trim() === "") {
-            errorMessage = `Exercise ${exerciseIndex + 1} on Day ${
-              dayIndex + 1
-            } is missing a name.`;
+            errorMessage = `Exercise ${exerciseIndex + 1} on Day ${dayIndex + 1
+              } is missing a name.`;
             Toast.show({ text1: errorMessage, type: "error" });
             return;
           }
           if (!exercise.sets || exercise.sets <= 0) {
-            errorMessage = `Exercise ${exerciseIndex + 1} on Day ${
-              dayIndex + 1
-            } has invalid sets.`;
+            errorMessage = `Exercise ${exerciseIndex + 1} on Day ${dayIndex + 1
+              } has invalid sets.`;
             Toast.show({ text1: errorMessage, type: "error" });
             return;
           }
           if (!exercise.reps || exercise.reps <= 0) {
-            errorMessage = `Exercise ${exerciseIndex + 1} on Day ${
-              dayIndex + 1
-            } has invalid reps.`;
+            errorMessage = `Exercise ${exerciseIndex + 1} on Day ${dayIndex + 1
+              } has invalid reps.`;
             Toast.show({ text1: errorMessage, type: "error" });
             return;
           }
@@ -137,16 +151,6 @@ const CreateProgram = () => {
   const showEndDatePicker = () => setEndDatePickerVisibility(true);
   const hideEndDatePicker = () => setEndDatePickerVisibility(false);
 
-  const [isStartDatePickerVisible, setStartDatePickerVisibility] =
-    useState(false);
-  const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-
-  const [days, setDays] = useState([]); // Full days array from your schema
-  const [savedDays, setSavedDays] = useState([]); // Full days array from your schema
-  const [selectedDayIndex, setSelectedDayIndex] = useState(0);
-
   useEffect(() => {
     if (startDate && endDate) {
       generateDaysFromRange(startDate, endDate);
@@ -155,13 +159,15 @@ const CreateProgram = () => {
 
   const handleStartDateConfirm = (date) => {
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     if (date < today) {
       Alert.alert("Error", "Start date cannot be earlier than today's date.");
       return;
     }
 
-    setEndDate(null);
-    setStartDate(date);
+    setStartDate(date.toISOString());
+    setEndDate(null); // Reset end date when start date changes
     hideStartDatePicker();
   };
 
@@ -170,11 +176,18 @@ const CreateProgram = () => {
       Alert.alert("Error", "Please select the start date first.");
       return;
     }
-    if (date <= startDate) {
+
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(date);
+    end.setHours(0, 0, 0, 0);
+
+    if (end <= start) {
       Alert.alert("Error", "End date must be after the start date.");
       return;
     }
-    setEndDate(date);
+
+    setEndDate(date.toISOString());
     hideEndDatePicker();
   };
 
@@ -210,7 +223,7 @@ const CreateProgram = () => {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [16, 9],
-      quality: 1,
+      quality: 0.5,
     });
 
     if (!result.canceled) {
@@ -219,7 +232,6 @@ const CreateProgram = () => {
   };
 
   const pickExerciseMedia = async (index) => {
-    setCurrentExerciseIndex(index);
 
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -231,14 +243,19 @@ const CreateProgram = () => {
       return;
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-      allowsMultipleSelection: false,
-    });
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+        allowsMultipleSelection: false,
+        videoQuality: 3
+      });
 
-    if (!result.canceled) {
-      days[selectedDayIndex].exercises[index].exercise.media = result.assets[0];
-      setDays(days);
+      if (!result.canceled) {
+        days[selectedDayIndex].exercises[index].exercise.media = result.assets[0];
+        setDays(days);
+      }
+    } catch (err) {
+      console.log(err)
     }
   };
 
@@ -312,16 +329,19 @@ const CreateProgram = () => {
     return { value, unit };
   }
 
+  const getCleanUri = (uri) => {
+    return Platform.OS === 'android' ? uri : uri.replace('file://', '');
+  };
+
   const uploadAttachment = (file) => {
     return new Promise(async (resolve, reject) => {
       const formData = new FormData();
 
       formData.append("media", {
-        uri: file.uri,
+        uri: getCleanUri(file.uri),
         name: file.fileName,
         type: file.mimeType,
       });
-      console.log(file);
 
       try {
         const response = await API.post(
@@ -331,15 +351,13 @@ const CreateProgram = () => {
           true
         );
 
-        console.log(response.data);
         if (response?.data?.success) {
           resolve(response.data.url);
         } else {
-          reject(null);
+          reject(response.data?.message);
         }
       } catch (error) {
-        reject(null);
-        console.error("Upload failed", error);
+        reject(error);
       }
     });
   };
@@ -347,6 +365,8 @@ const CreateProgram = () => {
   const handleCreateProgram = async () => {
     if (validateForm()) {
       try {
+        setLoading(true);
+
         const programImage = await uploadAttachment(titleImage);
         if (!programImage) {
           Toast.show({ text1: "Failed to create program" });
@@ -402,7 +422,17 @@ const CreateProgram = () => {
           openCreatedModal();
         }
       } catch (error) {
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2:
+            error.response?.data?.message ||
+            error ||
+            "Failed to complete signup. Please try again.",
+        });
         console.error("Error fetching workouts:", error);
+      } finally {
+        setLoading(false);
       }
     } else {
       console.log("not validated");
@@ -429,8 +459,9 @@ const CreateProgram = () => {
 
   const generateDaysFromRange = (startDate, endDate) => {
     const result = [];
-    const current = startDate;
-    const end = endDate;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const current = new Date(start);
 
     while (current <= end) {
       const formattedDate = moment(current).format("DD/MM/yyyy");
@@ -469,7 +500,7 @@ const CreateProgram = () => {
     setDays(result);
   };
 
-  const addExerciseToDay = (exercise) => {
+  const addExerciseToDay = () => {
     setDays((prev) => {
       const updated = [...prev];
       updated[selectedDayIndex].exercises.push({
@@ -520,8 +551,10 @@ const CreateProgram = () => {
 
         <View style={{ flex: 1 }}>
           <InputField
+            key={"startDate"}
             placeholder={"Select Start Date"}
-            value={startDate ? startDate.toLocaleDateString() : ""}
+            value={startDate ? moment(startDate).format("DD/MM/yyyy") : ""}
+            onChangeText={null}
             editable={false}
           />
           <TouchableOpacity>
@@ -534,6 +567,7 @@ const CreateProgram = () => {
             />
           </TouchableOpacity>
           <DateTimePickerModal
+            ref={startDatePicker}
             isVisible={isStartDatePickerVisible}
             mode="date"
             onConfirm={handleStartDateConfirm}
@@ -542,8 +576,10 @@ const CreateProgram = () => {
         </View>
         <View style={{ flex: 1 }}>
           <InputField
+            key={"endDate"}
             placeholder={"Select End Date"}
-            value={endDate ? endDate.toLocaleDateString() : ""}
+            value={endDate ? moment(endDate).format("DD/MM/yyyy") : ""}
+            onChangeText={null}
             editable={false}
           />
           <TouchableOpacity onPress={showEndDatePicker}>
@@ -556,6 +592,7 @@ const CreateProgram = () => {
             />
           </TouchableOpacity>
           <DateTimePickerModal
+            ref={endDatePicker}
             isVisible={isEndDatePickerVisible}
             mode="date"
             onConfirm={handleEndDateConfirm}
@@ -615,7 +652,7 @@ const CreateProgram = () => {
         >
           <ScrollView
             contentContainerStyle={{
-              width: "100%", // Let the content fill full width of ScrollView
+              width: width * 0.88,
               alignItems: "center", // Center children horizontally
               paddingBottom: 20,
             }}
@@ -787,6 +824,8 @@ const CreateProgram = () => {
         modalText={"Program Created !"}
         modalIcon={<StrengthIcon width={50} height={50} />}
       />
+
+      <Loader isLoading={loading} message="Processing your request..." />
     </Container>
   );
 };

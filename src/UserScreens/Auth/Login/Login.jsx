@@ -199,7 +199,16 @@ const Login = () => {
           }}
         >
           <Text style={styles.signInText}>Don’t have an account?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
+          <TouchableOpacity onPress={() => {
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: "Splash",
+                },
+              ],
+            });
+          }}>
             <Text style={styles.signInLink}> Sign up</Text>
           </TouchableOpacity>
         </View>

@@ -19,7 +19,7 @@ import LevelIcon from "../../assets/svgs/LevelIcon";
 import { FontSize } from "../../utils/font";
 
 const WorkoutProgramsList = ({ navigation, route }) => {
-  const trainerWorkoutData = route.params?.trainerWorkoutData || [];
+  const trainerWorkoutData = route.params?.workouts || [];
 
   const [selectedPeriod, setSelectedPeriod] = useState("All");
 

@@ -82,7 +82,6 @@ const TrainerHome = () => {
       const res = await API.get(END_POINTS.TRAINER_WORKOUTS, null, token);
       if (res.data.success) {
         setWorkouts(res.data.data);
-        console.log(res.data.data);
       }
     } catch (error) {
       console.error("Error fetching workouts:", error);

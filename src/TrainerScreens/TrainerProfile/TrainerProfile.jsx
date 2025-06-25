@@ -21,8 +21,9 @@ import EditIcon from "../../assets/svgs/EditIcon";
 import * as ImagePicker from "expo-image-picker";
 import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
-import { setUserData } from "../../redux/reducers/AuthSlice";
+import { clearUserData, setUserData } from "../../redux/reducers/AuthSlice";
 import Toast from "react-native-toast-message";
+import CustomButton from "../../components/CustomButton";
 
 const TrainerProfile = () => {
   const navigation = useNavigation();
@@ -145,6 +146,23 @@ const TrainerProfile = () => {
           />
         ))}
       </View>
+
+      <View style={{ flex: 1 }} />
+
+      <CustomButton
+        title="Log Out"
+        onPress={async () => {
+          dispatch(clearUserData());
+          navigation.reset({
+            index: 0,
+            routes: [
+              {
+                name: "Splash",
+              },
+            ],
+          });
+        }}
+      />
     </Container>
   );
 };

@@ -118,7 +118,6 @@ const ChallengeDetail = () => {
   const getExercisesForDay = (day) => {
     const dayData = challenge.workout.days.find((d) => d.shortName === day);
     let exercises = dayData ? dayData.exercises : [];
-    // console.log(exercises);
     return exercises;
   };
 
@@ -192,7 +191,7 @@ const ChallengeDetail = () => {
         <Selectable
           items={Array.from(
             { length: challenge.workout.days.length },
-            (_, i) => `Day ${i + 1}`
+            (_, i) => challenge.workout.days[i]?.shortName || `Day ${i + 1}`
           )}
           selectedItem={selectedPeriod}
           setSelectedItem={setSelectedPeriod}

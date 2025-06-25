@@ -59,7 +59,8 @@ const WorkoutDetails = () => {
   const { token, data: userData } = useSelector((state) => state.Auth);
   const getExercisesForDay = (day) => {
     const dayData = workout.days.find(
-      (d) => d.shortName === day && (d.date === date || d.weekDay === dayName)
+      (d) => d.shortName === day
+      //  || (d.date === date || d.weekDay === dayName)
     );
     return {
       exercises: dayData ? dayData.exercises : [],
@@ -249,7 +250,10 @@ const WorkoutDetails = () => {
               renderExercise("Warm Up", warmupExercises)}
             <Text style={styles.sectionTitle}>Exercises</Text>
             <Selectable
-              items={["Day 1", "Day 2", "Day 3", "Day 4"]}
+              items={Array.from(
+                { length: workout.days.length },
+                (_, i) => workout.days[i]?.shortName || `Day ${i + 1}`
+              )}
               selectedItem={selectedPeriod}
               setSelectedItem={setSelectedPeriod}
             />

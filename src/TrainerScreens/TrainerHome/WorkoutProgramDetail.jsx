@@ -1,24 +1,26 @@
-import React, { useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   Image,
   ScrollView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
-  Switch,
+  View,
 } from "react-native";
-import { colors } from "../../constants/colors";
+import React, { useState } from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import images from "../../constants/images";
 import Container from "../../components/Container";
-import Header from "../../components/Header";
-import icons from "../../constants/icons";
+import { colors } from "../../constants/colors";
 import Selectable from "../../components/Selectable";
-import EditIcon from "../../assets/svgs/EditIcon";
+import CustomButton from "../../components/CustomButton";
+import { Switch } from "react-native-paper";
+import BackIcon from "../../assets/svgs/BackIcon";
+import { API } from "../../config/apiClient";
+import { END_POINTS } from "../../config/routes";
+import { useDispatch, useSelector } from "react-redux";
+import { setTodaySessions } from "../../redux/reducers/WorkoutSlice";
 import { FontSize } from "../../utils/font";
 import moment from "moment";
-import images from "../../constants/images";
-import BackIcon from "../../assets/svgs/BackIcon";
-import CustomButton from "../../components/CustomButton";
 
 const SwitchItem = ({ label, isSwitchOn, onToggleSwitch }) => (
   <View style={styles.switchContainer}>
@@ -31,29 +33,35 @@ const SwitchItem = ({ label, isSwitchOn, onToggleSwitch }) => (
   </View>
 );
 
-const WorkoutProgramDetail = ({ route }) => {
-  const { program } = route.params;
+const WorkoutProgramDetails = () => {
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const { program: item } = useRoute().params;
+
   const date = moment().format("DD/MM/yyyy");
   const dayName = moment().format("dddd");
+  console.log(dayName)
+
+  const [workout, setWorkout] = useState(item);
 
   const [selectedPeriod, setSelectedPeriod] = useState(
-    program?.days[
-      program?.days?.indexOf(
-        program?.days?.find((d) => d.date === date || d.weekDay === dayName)
+    workout?.days[
+      workout?.days?.indexOf(
+        workout?.days?.find((d) => d.date === date || d.weekDay === dayName)
       )
-    ]?.shortName || ""
+    ]?.shortName || `${workout?.days.length} Days`
   );
   const [isWarmUpVisible, setIsWarmUpVisible] = useState(
-    program?.days?.find((d) => d.date === date || d.weekDay === dayName)
-      ?.startWithWarmup || false
+    workout?.days?.find((d) => d.date === date || d.weekDay === dayName)?.startWithWarmup || false
   );
   const [isStretchVisible, setIsStretchVisible] = useState(
-    program?.days?.find((d) => d.date === date || d.weekDay === dayName)
-      ?.stretchAfterWorkout || false
+    workout?.days?.find((d) => d.date === date || d.weekDay === dayName)?.stretchAfterWorkout || false
   );
+  const { token, data: userData } = useSelector((state) => state.Auth);
   const getExercisesForDay = (day) => {
-    const dayData = program.days.find(
-      (d) => d.shortName === day && (d.date === date || d.weekDay === dayName)
+    const dayData = workout.days.find(
+      (d) => d.shortName === day
+      //  && (d.date === date || d.weekDay === dayName)
     );
     return {
       exercises: dayData ? dayData.exercises : [],
@@ -100,40 +108,85 @@ const WorkoutProgramDetail = ({ route }) => {
     ));
   };
 
+  const deleteWorkoutSession = async (id) => {
+    try {
+      const res = await API.delete(
+        END_POINTS.WORKOUT_SESSIONS + `/${id}`,
+        token
+      );
+      if (res?.data.success) {
+      }
+    } catch (error) { }
+  };
+
+  const handleStartWorkout = async () => {
+    try {
+      // deleteWorkoutSession();
+      let payload = { user: userData?._id, workout: workout?._id };
+      const res = await API.post(END_POINTS.WORKOUT_SESSIONS, payload, token);
+      if (res.data.success) {
+        dispatch(setTodaySessions([res?.data?.data]));
+
+        const day = workout?.days?.find(
+          (d) => date === d.date || d.weekDay === dayName
+        );
+
+        navigation.navigate("StartWorkout", {
+          title: workout.name,
+          image: workout.image,
+          time: workout.workoutTime * 60,
+          exercises: selectedExercises.filter((e) => !e.isCompleted),
+          level: workout.level,
+          calories: workout.calories,
+          workoutSessionId: res?.data?.data?._id,
+          refresh: () => {
+            fetchWorkout();
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Error starting session:", error);
+    }
+  };
+
+  const fetchWorkout = async () => {
+    try {
+      const res = await API.get(
+        `${END_POINTS.WORKOUTS}/${workout._id}`,
+        null,
+        token
+      );
+      if (res.data.success) {
+        setWorkout(res.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching challenge:", error);
+    }
+  };
+
   return (
     <Container cusStyles={{ marginTop: 0, paddingHorizontal: 0 }}>
-      <Header
-        title={"Workout Program"}
-        showBackButton={true}
-        // rightIcon1={
-        //   <TouchableOpacity
-        //     style={{
-        //       backgroundColor: colors.green,
-        //       padding: 10,
-        //       borderRadius: 10,
-        //     }}
-        //   >
-        //     <Text>Edit</Text>
-        //   </TouchableOpacity>
-        // }
-        cusStyle={{ width: 58, height: 32 }}
-      />
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
         <View style={{ position: "relative" }}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <BackIcon />
+          </TouchableOpacity>
 
           <View>
             <Image
-              source={{ uri: program.image }}
+              source={{ uri: workout.image }}
               style={styles.workoutImage}
             />
-            <Text style={styles.absoluteTitle}>{program.name}</Text>
+            <Text style={styles.absoluteTitle}>{workout.name}</Text>
 
             <View
               style={{
                 backgroundColor: colors.bgColor,
                 borderRadius: 10,
-                width: 50,
-                padding: 5,
+                padding: 10,
                 position: "absolute",
                 bottom: -25,
                 left: 20,
@@ -147,7 +200,7 @@ const WorkoutProgramDetail = ({ route }) => {
             Description
           </Text>
           <Text style={[styles.description, { paddingHorizontal: 20 }]}>
-            {program.description}
+            {workout.description}
           </Text>
 
           <View style={{ padding: 16 }}>
@@ -160,8 +213,8 @@ const WorkoutProgramDetail = ({ route }) => {
                       {label === "Exercises"
                         ? `${selectedExercises.length} Exercises`
                         : label === "Calories"
-                        ? program.calories + " kcal"
-                        : program.workoutTime + " mins"}
+                          ? workout.calories + " kcal"
+                          : workout.workoutTime + " mins"}
                     </Text>
                   </View>
                 ))}
@@ -173,8 +226,8 @@ const WorkoutProgramDetail = ({ route }) => {
                     <Text style={styles.label}>{label}</Text>
                     <Text style={styles.value}>
                       {label === "Equipment"
-                        ? program.equipments.join(", ")
-                        : program.level}
+                        ? workout.equipments.join(", ")
+                        : workout.level}
                     </Text>
                   </View>
                 ))}
@@ -182,7 +235,7 @@ const WorkoutProgramDetail = ({ route }) => {
               </View>
             </View>
             <Text style={styles.sectionTitle}>Description</Text>
-            <Text style={styles.description}>{program.description}</Text>
+            <Text style={styles.description}>{workout.description}</Text>
             <SwitchItem
               label="Start With Warm-Up"
               isSwitchOn={isWarmUpVisible}
@@ -198,7 +251,10 @@ const WorkoutProgramDetail = ({ route }) => {
               renderExercise("Warm Up", warmupExercises)}
             <Text style={styles.sectionTitle}>Exercises</Text>
             <Selectable
-              items={["Day 1", "Day 2", "Day 3", "Day 4"]}
+              items={Array.from(
+                { length: workout.days.length },
+                (_, i) => workout.days[i]?.shortName || `Day ${i + 1}`
+              )}
               selectedItem={selectedPeriod}
               setSelectedItem={setSelectedPeriod}
             />
@@ -210,6 +266,10 @@ const WorkoutProgramDetail = ({ route }) => {
           </View>
         </View>
       </ScrollView>
+
+      <View style={{ padding: 16 }}>
+        <CustomButton title={"Start Workout"} onPress={handleStartWorkout} />
+      </View>
     </Container>
   );
 };
@@ -330,4 +390,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WorkoutProgramDetail;
+export default WorkoutProgramDetails;
