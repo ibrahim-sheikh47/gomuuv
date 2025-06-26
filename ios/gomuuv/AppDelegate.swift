@@ -3,6 +3,7 @@ import FirebaseCore
 import React
 import ReactAppDependencyProvider
 import Firebase
+import GoogleMaps
 
 @UIApplicationMain
 public class AppDelegate: ExpoAppDelegate {
@@ -23,6 +24,7 @@ public class AppDelegate: ExpoAppDelegate {
     reactNativeFactory = factory
     bindReactNativeFactory(factory)
     FirebaseApp.configure()
+    GMSServices.provideAPIKey("AIzaSyCSz-v30_BxTuT6a23e78UUy0ANbRd0gC4")
 
 #if os(iOS) || os(tvOS)
     window = UIWindow(frame: UIScreen.main.bounds)

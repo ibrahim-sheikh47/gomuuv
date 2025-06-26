@@ -61,9 +61,7 @@ const MapScreen = ({ route }) => {
   return (
     <View style={{ flex: 1 }}>
       <Map
-        onLocationUpdate={onLocationUpdate} // Pass the callback to Map.js
-        address={location}
-        pathCoordinates={[]}
+        onLocationUpdate={onLocationUpdate} 
         tracking={tracking} // Pass the tracking state to Map.js
       />
 

@@ -192,7 +192,7 @@ const Map = (props) => {
       <MapView
         onMapReady={() => setMapReady(true)}
         customMapStyle={MapStyle}
-        provider={Platform.OS == "ios" ? null : PROVIDER_GOOGLE}
+        provider={PROVIDER_GOOGLE}
         style={{ flex: 1 }} // Ensure the map takes up the full container
         ref={map}
         showsUserLocation={true}
