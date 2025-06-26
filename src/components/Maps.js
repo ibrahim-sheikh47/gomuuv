@@ -42,33 +42,30 @@ const Map = (props) => {
   }, [tracking]);
 
   useEffect(() => {
-    if (locationHistory.length > 0 && startLocation.current) {
-      const lastLocation = locationHistory[locationHistory.length - 1];
-      const distance = haversine(
-        lastLocation,
-        {
-          latitude: startLocation.current.latitude,
-          longitude: startLocation.current.longitude,
-        },
-        { unit: "meter" }
-      );
+    if (locationHistory.length > 1) {
+      const prevLocation = locationHistory[locationHistory.length - 2];
+      const currentLocation = locationHistory[locationHistory.length - 1];
 
-      // Update total distance
-      setTotalDistance((prevTotal) => prevTotal + distance);
+      const distance = haversine(prevLocation, currentLocation, {
+        unit: "meter",
+      });
+
+      // Only count significant movement
+      if (distance >= 1.5) {
+        setTotalDistance((prev) => prev + distance);
+      }
     }
   }, [locationHistory.length]);
 
   useEffect(() => {
     const updateLocationWithSnapshot = async () => {
       if (onLocationUpdate && mapReady) {
-        const snapshotUri = await takeMapSnapshot(); // <-- WAIT for snapshot first!
-
         onLocationUpdate({
           address,
           distance: totalDistance,
           time: elapsedTime,
           pathCoordinates: locationHistory,
-          snapshot: snapshotUri, // <-- Now snapshot will not be null
+          snapshot: null, // <-- Now snapshot will not be null
         });
       }
     };
@@ -166,11 +163,25 @@ const Map = (props) => {
   };
 
   // Stop location tracking
-  const stopLocationTracking = () => {
+  const stopLocationTracking = async () => {
     clearInterval(intervalRef.current);
     clearInterval(timerRef.current);
     intervalRef.current = null;
     timerRef.current = null;
+
+    if (onLocationUpdate && mapReady) {
+      const snapshotUri = await takeMapSnapshot();
+
+      onLocationUpdate({
+        address,
+        distance: totalDistance,
+        time: elapsedTime,
+        pathCoordinates: locationHistory,
+        snapshot: snapshotUri,
+      });
+    }
+
+    // Reset state
     setElapsedTime(0);
     setTotalDistance(0);
     setLocationHistory([]);

@@ -67,6 +67,7 @@ const FinishActivity = () => {
         token
       );
 
+      console.log(response.data.data);
       if (response?.data?.success) {
         navigation.reset({
           routes: [

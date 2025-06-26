@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
     flex: 1, // This ensures the progress bar takes the available space
     height: 6,
     width: 65,
+    overflow: 'hidden',
     backgroundColor: "#BDBDBD",
     borderRadius: 10,
     marginRight: 8, // Add space between the bar and the text
@@ -33,7 +34,6 @@ const styles = StyleSheet.create({
   progressBar: {
     height: "100%",
     backgroundColor: colors.green,
-    borderRadius: 10,
   },
   progressText: {
     fontSize: FontSize.small,

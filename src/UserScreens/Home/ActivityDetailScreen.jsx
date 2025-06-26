@@ -65,12 +65,18 @@ const ActivityDetailScreen = () => {
         duration: 0,
         useNativeDriver: false,
       }).start();
+
+      fetchActiveGoal();
     }, [])
   );
 
-  useEffect(() => {
-    fetchActiveGoal();
-  }, [selectedPeriod]);
+  const resetPan = () => {
+    Animated.spring(pan, {
+      toValue: { x: 0, y: 0 },
+      friction: 5,
+      useNativeDriver: false,
+    }).start();
+  };
 
   const panResponder = useRef(
     PanResponder.create({
@@ -96,7 +102,7 @@ const ActivityDetailScreen = () => {
         pan.flattenOffset();
 
         if (pan.x._value > dragThreshold) {
-          if (goal) {
+          if (goal !== null && goal !== undefined) {
             navigation.navigate("Map", {
               goal,
               activityName,
@@ -119,13 +125,9 @@ const ActivityDetailScreen = () => {
           //   heartRate: heartRate,
           //   calories: calories,
           // });
-        } else {
-          Animated.spring(pan, {
-            toValue: { x: 0, y: 0 },
-            friction: 5,
-            useNativeDriver: false,
-          }).start();
         }
+
+        resetPan();
       },
     })
   ).current;
@@ -140,7 +142,7 @@ const ActivityDetailScreen = () => {
         {},
         token
       );
-      console.log(response?.data?.success)
+      console.log(response?.data?.success);
 
       if (response?.data?.success) {
         setGoal(response?.data?.data?.goal);
@@ -189,15 +191,23 @@ const ActivityDetailScreen = () => {
             current={stats?.distance || 0}
             target={goal?.targetDistance?.value || 0}
             hideGoal={goal?.distance == null || false}
-            goal={`Goal: ${goal?.targetDistance?.value || 0} ${goal?.targetDistance?.unit || "mi"}`}
-            message={`${Math.floor(stats?.distance) || 0} ${goal?.targetDistance?.unit || "mi"}`}
+            goal={`Goal: ${goal?.targetDistance?.value || 0} ${
+              goal?.targetDistance?.unit || "mi"
+            }`}
+            message={`${Math.floor(stats?.distance) || 0} ${
+              goal?.targetDistance?.unit || "mi"
+            }`}
           />
           <CustomCard
             label="Time"
             icon={TimeIcon}
             hideGoal={goal?.duration == null || false}
-            goal={`Goal: ${goal?.targetDuration?.value || 0} ${goal?.targetDuration?.unit || "mins"}`}
-            message={`${Math.floor(stats?.duration) || 0} ${goal?.targetDuration?.unit || "mins"}`}
+            goal={`Goal: ${goal?.targetDuration?.value || 0} ${
+              goal?.targetDuration?.unit || "mins"
+            }`}
+            message={`${Math.floor(stats?.duration) || 0} ${
+              goal?.targetDuration?.unit || "mins"
+            }`}
           />
         </View>
 

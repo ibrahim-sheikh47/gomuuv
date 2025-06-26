@@ -50,6 +50,7 @@ const NutritionPlan = ({ route }) => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <MealItem
+            style={{ width: "100%" }}
             mealName={item?.name}
             mealImage={item?.image}
             calories={item?.calories}

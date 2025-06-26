@@ -196,7 +196,7 @@ const Signup = (props) => {
             placeholder="Enter your last name"
           />
 
-          <View style={styles.row}>
+          <View style={[styles.row, { marginVertical: 0 }]}>
             <View style={{ flex: 1 }}>
               <InputField
                 type="height"
@@ -234,7 +234,7 @@ const Signup = (props) => {
             </View>
           </View>
 
-          <View style={styles.row}>
+          <View style={[styles.row, { marginVertical: 0 }]}>
             <View style={{ flex: 1 }}>
               <InputField
                 type="weight"

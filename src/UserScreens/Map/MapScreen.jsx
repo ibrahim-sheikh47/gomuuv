@@ -1,5 +1,5 @@
 import { View, Text, Alert } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Map from "../../components/Maps";
 import CustomButton from "../../components/CustomButton";
 import { FontSize } from "../../utils/font";
@@ -18,6 +18,22 @@ const MapScreen = ({ route }) => {
   const [coordinates, setCoordinates] = useState([]);
   const [snapshot, setSnapshot] = useState(null);
   const [tracking, setTracking] = useState(false);
+
+  useEffect(() => {
+    if (snapshot) {
+      navigation.navigate("FinishActivity", {
+        goal: params.goal,
+        activityName: params.activityName,
+        activityType: params.activityType,
+        distance: (totalDistance / 1609.34).toFixed(2),
+        time: elapsedTime,
+        distanceUnit: "mi",
+        heartRate: params.heartRate,
+        calories: params.calories,
+        snapshot: snapshot,
+      });
+    }
+  }, [snapshot]);
 
   const onLocationUpdate = ({
     address,
@@ -40,17 +56,6 @@ const MapScreen = ({ route }) => {
 
   const stopTracking = () => {
     setTracking(false);
-    navigation.navigate("FinishActivity", {
-      goal: params.goal,
-      activityName: params.activityName,
-      activityType: params.activityType,
-      distance: (totalDistance / 1609.34).toFixed(2),
-      time: elapsedTime,
-      distanceUnit: "mi",
-      heartRate: params.heartRate,
-      calories: params.calories,
-      snapshot: snapshot,
-    });
   };
 
   return (

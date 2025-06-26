@@ -119,20 +119,23 @@ const CreateProgram = () => {
         day.exercises.forEach((exercise, exerciseIndex) => {
           // Replace these with your actual required fields
           if (!exercise.name || exercise.name.trim() === "") {
-            errorMessage = `Exercise ${exerciseIndex + 1} on Day ${dayIndex + 1
-              } is missing a name.`;
+            errorMessage = `Exercise ${exerciseIndex + 1} on Day ${
+              dayIndex + 1
+            } is missing a name.`;
             Toast.show({ text1: errorMessage, type: "error" });
             return;
           }
           if (!exercise.sets || exercise.sets <= 0) {
-            errorMessage = `Exercise ${exerciseIndex + 1} on Day ${dayIndex + 1
-              } has invalid sets.`;
+            errorMessage = `Exercise ${exerciseIndex + 1} on Day ${
+              dayIndex + 1
+            } has invalid sets.`;
             Toast.show({ text1: errorMessage, type: "error" });
             return;
           }
           if (!exercise.reps || exercise.reps <= 0) {
-            errorMessage = `Exercise ${exerciseIndex + 1} on Day ${dayIndex + 1
-              } has invalid reps.`;
+            errorMessage = `Exercise ${exerciseIndex + 1} on Day ${
+              dayIndex + 1
+            } has invalid reps.`;
             Toast.show({ text1: errorMessage, type: "error" });
             return;
           }
@@ -193,6 +196,7 @@ const CreateProgram = () => {
 
   const [formData, setFormData] = useState({
     title: "",
+    description: "",
     selectedMode: "Strength",
     selectedSkillLevel: "Beginner",
     selectedEquipment: equipment[0],
@@ -232,7 +236,6 @@ const CreateProgram = () => {
   };
 
   const pickExerciseMedia = async (index) => {
-
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (status !== "granted") {
@@ -247,21 +250,28 @@ const CreateProgram = () => {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Videos,
         allowsMultipleSelection: false,
-        videoQuality: 3
+        videoQuality: 3,
       });
 
       if (!result.canceled) {
-        days[selectedDayIndex].exercises[index].exercise.media = result.assets[0];
-        setDays(days);
+        let tempDays = [...days];
+        tempDays[selectedDayIndex].exercises[index].exercise.media =
+          result.assets[0];
+        setDays([...tempDays]);
       }
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
   };
 
   const validateForm = () => {
     if (!formData.title.trim()) {
       Alert.alert("Error", "Please enter a program title");
+      return false;
+    }
+
+    if (!formData.description.trim()) {
+      Alert.alert("Error", "Please enter a program description");
       return false;
     }
 
@@ -330,7 +340,7 @@ const CreateProgram = () => {
   }
 
   const getCleanUri = (uri) => {
-    return Platform.OS === 'android' ? uri : uri.replace('file://', '');
+    return Platform.OS === "android" ? uri : uri.replace("file://", "");
   };
 
   const uploadAttachment = (file) => {
@@ -375,16 +385,18 @@ const CreateProgram = () => {
 
         const body = {
           creator: userData?._id,
+          description: formData.description,
           image: programImage,
           name: formData.title,
           duration: calculateDuration(startDate, endDate),
           level: formData.selectedSkillLevel.toLowerCase(),
           calories: formData.calories,
           equipments: [
-            formData.selectedEquipment.toLowerCase().replace(" ", "_"),
+            formData.selectedEquipment.toLowerCase().replaceAll(" ", "_"),
           ],
           timePerWorkout: formData.time,
           workoutTime: parseInt(formData.time),
+          price: formData.price,
         };
 
         let daysToUpload = [];
@@ -392,7 +404,7 @@ const CreateProgram = () => {
           let tempDay = { ...day };
           tempDay.exercises = [];
           for (let exercise of day.exercises) {
-            let tempExercise = { ...exercise };
+            let tempExercise = { ...exercise.exercise };
             let videoUrl;
             if (exercise.media) {
               videoUrl = await uploadAttachment(exercise.media);
@@ -537,6 +549,14 @@ const CreateProgram = () => {
           onChangeText={(text) => handleInputChange("title", text)}
         />
 
+        <InputField
+          isRichText
+          label={"Description"}
+          placeholder={"Add Your Program Description"}
+          value={formData.description}
+          onChangeText={(text) => handleInputChange("description", text)}
+        />
+
         {/* <Text style={styles.text}>Workout Mode</Text>
         <Selectable
           items={modes}
@@ -679,6 +699,45 @@ const CreateProgram = () => {
                   <View key={index}>
                     <View style={styles.exerciseView}>
                       <View style={{ flex: 1 }}>
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          <Text
+                            style={{
+                              flex: 1,
+                              fontSize: FontSize.large,
+                              fontFamily: "Poppins-Bold",
+                              color: "#fff",
+                              marginVertical: 5,
+                            }}
+                          >
+                            Exercise {index + 1}
+                          </Text>
+
+                          {index > 0 && (
+                            <TouchableOpacity
+                              onPress={() => {
+                                let tempDays = [...days];
+                                tempDays[selectedDayIndex].exercises = days[
+                                  selectedDayIndex
+                                ]?.exercises.filter((e, ind) => index !== ind);
+                                setDays([...tempDays]);
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  fontSize: FontSize.medium,
+                                  fontFamily: "Poppins-Medium",
+                                  color: "red",
+                                  marginBottom: 5,
+                                }}
+                              >
+                                Remove
+                              </Text>
+                            </TouchableOpacity>
+                          )}
+                        </View>
+
                         <InputField
                           label={"Name"}
                           value={exercise.exercise.name}
@@ -725,7 +784,7 @@ const CreateProgram = () => {
                       />
                       <Text style={styles.uploadButtonText}>
                         {exercise.exercise.media
-                          ? "Change Media"
+                          ? exercise.exercise.media.fileName
                           : "Upload Media"}
                       </Text>
                     </TouchableOpacity>

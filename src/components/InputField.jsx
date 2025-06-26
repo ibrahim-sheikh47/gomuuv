@@ -14,6 +14,7 @@ import { colors } from "../constants/colors";
 import { FontSize } from "../utils/font";
 
 const InputField = ({
+  isRichText = false,
   type,
   label,
   value,
@@ -27,8 +28,8 @@ const InputField = ({
   unitValue, // e.g., "cm", "ft-in"
   onUnitChange, // function to update unit
   compositeFields = [], // [{ key, value, onChangeText, placeholder }]
+  editable = true,
 }) => {
-
   const [isFocused, setIsFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -118,7 +119,7 @@ const InputField = ({
       ) : compositeFields.length > 0 && type === "height" ? (
         renderCompositeInputs()
       ) : (
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 10}}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
           <View style={[styles.inputContainer, { flex: 1 }]}>
             <TextInput
               ref={inputRef}
@@ -126,6 +127,7 @@ const InputField = ({
                 styles.input,
                 isFocused && { borderColor: colors.green },
                 cusStyles,
+                isRichText && { height: 140, textAlignVertical: "top" },
               ]}
               value={value?.toString()}
               onChangeText={onChangeText}
@@ -135,6 +137,7 @@ const InputField = ({
               keyboardType={keyboardType}
               placeholder={placeholder}
               placeholderTextColor="#AFAFAF"
+              editable={editable}
             />
             {secureTextEntry && (
               <TouchableOpacity
@@ -339,7 +342,7 @@ const styles = StyleSheet.create({
   modalCloseButtonText: {
     fontSize: 16,
     fontFamily: "Poppins-Medium",
-    color: "#fff",
+    color: "#000",
   },
 
   unitSelector: {

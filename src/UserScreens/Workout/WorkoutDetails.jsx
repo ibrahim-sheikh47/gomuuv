@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setTodaySessions } from "../../redux/reducers/WorkoutSlice";
 import { FontSize } from "../../utils/font";
 import moment from "moment";
+import { capitalize } from "lodash";
 
 const SwitchItem = ({ label, isSwitchOn, onToggleSwitch }) => (
   <View style={styles.switchContainer}>
@@ -51,10 +52,12 @@ const WorkoutDetails = () => {
     ]?.shortName || `${workout?.days.length} Days`
   );
   const [isWarmUpVisible, setIsWarmUpVisible] = useState(
-    workout?.days?.find((d) => d.date === date || d.weekDay === dayName)?.startWithWarmup || false
+    workout?.days?.find((d) => d.date === date || d.weekDay === dayName)
+      ?.startWithWarmup || false
   );
   const [isStretchVisible, setIsStretchVisible] = useState(
-    workout?.days?.find((d) => d.date === date || d.weekDay === dayName)?.stretchAfterWorkout || false
+    workout?.days?.find((d) => d.date === date || d.weekDay === dayName)
+      ?.stretchAfterWorkout || false
   );
   const { token, data: userData } = useSelector((state) => state.Auth);
   const getExercisesForDay = (day) => {
@@ -115,7 +118,7 @@ const WorkoutDetails = () => {
       );
       if (res?.data.success) {
       }
-    } catch (error) { }
+    } catch (error) {}
   };
 
   const handleStartWorkout = async () => {
@@ -212,8 +215,8 @@ const WorkoutDetails = () => {
                       {label === "Exercises"
                         ? `${selectedExercises.length} Exercises`
                         : label === "Calories"
-                          ? workout.calories + " kcal"
-                          : workout.workoutTime + " mins"}
+                        ? workout.calories + " kcal"
+                        : workout.workoutTime + " mins"}
                     </Text>
                   </View>
                 ))}
@@ -225,7 +228,9 @@ const WorkoutDetails = () => {
                     <Text style={styles.label}>{label}</Text>
                     <Text style={styles.value}>
                       {label === "Equipment"
-                        ? workout.equipments.join(", ")
+                        ? capitalize(
+                            workout.equipments.join(", ").replaceAll("_", " ")
+                          )
                         : workout.level}
                     </Text>
                   </View>
@@ -233,8 +238,6 @@ const WorkoutDetails = () => {
                 <View style={styles.detailItem}></View>
               </View>
             </View>
-            <Text style={styles.sectionTitle}>Description</Text>
-            <Text style={styles.description}>{workout.description}</Text>
             <SwitchItem
               label="Start With Warm-Up"
               isSwitchOn={isWarmUpVisible}

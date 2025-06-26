@@ -135,6 +135,29 @@ const TrainerProfile = () => {
           <EditIcon color="white" />
         </TouchableOpacity>
       </View>
+
+      <Text
+        style={{
+          color: "white",
+          fontFamily: "Poppins-SemiBold",
+          marginTop: 20,
+          alignSelf: "center",
+          fontSize: FontSize.regular,
+        }}
+      >
+        {userData.firstName}
+      </Text>
+      <Text
+        style={{
+          color: "white",
+          fontFamily: "Poppins-SemiBold",
+          alignSelf: "center",
+          fontSize: FontSize.regular,
+        }}
+      >
+        {userData.lastName}
+      </Text>
+
       <View style={{ marginHorizontal: 10 }}>
         <Text style={styles.accountSettingsHeader}>Account Settings:</Text>
         {trainerSettings.map((item, index) => (
@@ -204,7 +227,7 @@ const styles = StyleSheet.create({
   accountSettingsHeader: {
     color: "white",
     fontFamily: "Poppins-SemiBold",
-    marginTop: 50,
+    marginTop: 30,
     fontSize: FontSize.regular,
   },
 });
