@@ -58,6 +58,7 @@ const ChallengesScreen = () => {
   const [rangeModalVisible, setRangeModalVisible] = useState(false);
   const [selectedRange, setSelectedRange] = useState("Weekly");
   const [graphData, setGraphData] = useState([]);
+  const [parentWidth, setParentWidth] = useState(0);
 
   useFocusEffect(
     useCallback(() => {
@@ -285,41 +286,70 @@ const ChallengesScreen = () => {
   ];
 
   const BarGraph = ({ data }) => {
-    const maxHeight = 150;
+    const maxHeight = 160;
+    const maxValue = Math.max(...data.map((item) => item.value));
+    const steps = Array.from({ length: 5 }, (_, i) =>
+      Math.round((i / 4) * maxValue)
+    );
 
     return (
-      <View style={styles.barOuterContainer}>
-        {data.map((item, index) => {
-          const barHeight = (item.value / 100) * maxHeight;
+      <View style={{ flexDirection: "row", gap: 5 }}>
+        <View style={{ justifyContent: "space-between", height: maxHeight }}>
+          {steps.reverse().map((val, idx) => (
+            <Text key={idx} style={styles.label}>
+              {val}
+            </Text>
+          ))}
+        </View>
 
-          return (
-            <View key={index} style={styles.barContainer}>
+        <View
+          onLayout={(e) => {
+            setParentWidth(e.nativeEvent.layout.width);
+          }}
+          style={[styles.barOuterContainer, { flex: 1, }]}
+        >
+          {data.map((item, index) => {
+            const barHeight = (item.value / maxValue) * maxHeight;
+
+            return (
               <View
+                key={index}
                 style={[
-                  styles.bar,
+                  styles.barContainer,
                   {
-                    height: barHeight,
-                    backgroundColor: "#C2FF59",
-                    justifyContent: "center",
-                    alignItems: "center",
+                    width: parentWidth / data.length,
                   },
                 ]}
               >
-                <Text
+                <View
                   style={[
-                    styles.label,
+                    styles.bar,
                     {
-                      color: "#000",
+                      height: barHeight,
+                      width: "90%",
+                      maxWidth: 30,
+                      backgroundColor: "#C2FF59",
+                      justifyContent: "center",
+                      alignItems: "center",
                     },
                   ]}
                 >
-                  {item.value}
-                </Text>
+                  <Text
+                    style={[
+                      styles.label,
+                      {
+                        color: "#000",
+                      },
+                    ]}
+                  >
+                    {item.value}
+                  </Text>
+                </View>
+                <Text style={styles.label}>{item.day}</Text>
               </View>
-              <Text style={styles.label}>{item.day}</Text>
-            </View>
-          );
-        })}
+            );
+          })}
+        </View>
       </View>
     );
   };
@@ -354,11 +384,14 @@ const ChallengesScreen = () => {
           </Text>
         </View>
 
-        <TouchableOpacity style={{ borderWidth: 1, borderColor: "#c2c2c2", borderRadius: 8 }} onPress={() => setRangeModalVisible(true)}>
+        <TouchableOpacity
+          style={{ borderWidth: 1, borderColor: "#c2c2c2", borderRadius: 8 }}
+          onPress={() => setRangeModalVisible(true)}
+        >
           <Text style={styles.rangeSelectText}>{selectedRange} ▼</Text>
         </TouchableOpacity>
       </View>
-      <View style={{ flex: 1 }}>
+      <View style={[styles.progressContainer, { flex: 1 }]}>
         <BarGraph data={graphData} />
       </View>
 
@@ -408,7 +441,7 @@ const ChallengesScreen = () => {
           flexDirection: "row",
           justifyContent: "space-between",
           marginTop: 20,
-          gap: 10
+          gap: 10,
         }}
       >
         <CustomButton
@@ -490,7 +523,7 @@ const ChallengesScreen = () => {
           "Strength",
           "Flexibility",
           "Health & Wellness",
-          "Lifestyle And Habit",
+          "Lifestyle & Habit",
           "Skills Based",
         ].map((text) => (
           <TouchableOpacity
@@ -566,7 +599,7 @@ const ChallengesScreen = () => {
         ListFooterComponent={activeTab === "Challenges" && renderFooter}
         ListEmptyComponent={
           activeTab === "Challenges" &&
-            (upcomingChallenges.length > 0 || enrolledChallenges.length > 0) ? (
+          (upcomingChallenges.length > 0 || enrolledChallenges.length > 0) ? (
             <Text style={{ color: "white" }}>No Challenge</Text>
           ) : null
         }
@@ -808,7 +841,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
-    padding: 20, // optional dark background
+    // padding: 20, // optional dark background
     maxHeight: 200,
   },
   barContainer: {

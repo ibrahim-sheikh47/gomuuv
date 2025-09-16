@@ -1,5 +1,5 @@
-export const SERVER_URL = "https://gomuuv-446812.de.r.appspot.com/api";
-// export const SERVER_URL = "http://192.168.137.1:4200/api";
+// export const SERVER_URL = "https://gomuuv-446812.de.r.appspot.com/api";
+export const SERVER_URL = "http://192.168.100.18:4200/api";
 export const END_POINTS = {
   SIGNUP: `/users`,
   LOGIN: `/users/login`,

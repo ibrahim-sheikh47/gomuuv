@@ -19,6 +19,7 @@ const ProfileSection = ({ userName, imageSource, onPress }) => {
           borderRadius: 20,
           borderWidth: 2,
         }}
+        onError={(e) => console.log(e.nativeEvent.error)}
       />
       <View>
         <Text
