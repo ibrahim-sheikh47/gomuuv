@@ -7,7 +7,7 @@ import Commons from "../utils/Commons";
 import haversine from "haversine"; // Install via `npm install haversine`
 
 const Map = (props) => {
-  const { tracking, onLocationUpdate } = props;
+  const { tracking, onLocationUpdate, goal } = props;
   const map = useRef(null); // Reference to MapView
   const [locationHistory, setLocationHistory] = useState([]); // Track location history
   const [location, setLocation] = useState(null); // Store the location
@@ -20,7 +20,7 @@ const Map = (props) => {
   const timerRef = useRef(null); // For tracking elapsed time
 
   const [mapReady, setMapReady] = useState(false);
-  Geocoder.init("AIzaSyCSz-v30_BxTuT6a23e78UUy0ANbRd0gC4");
+  Geocoder.init(process.env.EXPO_PUBLIC_MAPS_API_KEY);
 
   useEffect(() => {
     // Initial fetch location on component mount
@@ -46,12 +46,13 @@ const Map = (props) => {
       const prevLocation = locationHistory[locationHistory.length - 2];
       const currentLocation = locationHistory[locationHistory.length - 1];
 
+      const unit = goal?.targetDistance.unit === "mi" ? "mile" : "km" || "km";
       const distance = haversine(prevLocation, currentLocation, {
-        unit: "meter",
+        unit,
       });
+      const threshold = convertThreshold(unit);
 
-      // Only count significant movement
-      if (distance >= 1.5) {
+      if (distance >= threshold) {
         setTotalDistance((prev) => prev + distance);
       }
     }
@@ -63,15 +64,32 @@ const Map = (props) => {
         onLocationUpdate({
           address,
           distance: totalDistance,
-          time: elapsedTime,
+          time: formatElapsedTime(elapsedTime),
           pathCoordinates: locationHistory,
-          snapshot: null, // <-- Now snapshot will not be null
+          snapshot: null,
         });
       }
     };
 
     updateLocationWithSnapshot(); // call async function
   }, [address, totalDistance, elapsedTime]);
+
+  const formatElapsedTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return { hours, minutes, seconds: seconds % 60 };
+  };
+
+  const convertThreshold = (unit, thresholdInMeters = 1.5) => {
+    switch (unit) {
+      case "km":
+        return thresholdInMeters / 1000;
+      case "mile":
+        return thresholdInMeters / 1609.34;
+      default:
+        return thresholdInMeters;
+    }
+  };
 
   const takeMapSnapshot = async () => {
     if (!map.current || !mapReady) {
@@ -175,7 +193,7 @@ const Map = (props) => {
       onLocationUpdate({
         address,
         distance: totalDistance,
-        time: elapsedTime,
+        time: formatElapsedTime(elapsedTime),
         pathCoordinates: locationHistory,
         snapshot: snapshotUri,
       });

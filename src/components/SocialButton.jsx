@@ -4,8 +4,8 @@ import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import React from "react";
 import GoogleLogo from "../assets/svgs/GoogleLogo";
 
-export const SocialButton = ({ icon: IconComponent }) => (
-  <TouchableOpacity style={styles.socialButton}>
+export const SocialButton = ({ icon: IconComponent, onPress }) => (
+  <TouchableOpacity style={styles.socialButton} onPress={onPress}>
     <IconComponent />
   </TouchableOpacity>
 );

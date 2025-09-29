@@ -26,6 +26,7 @@ import EditIcon from "../../assets/svgs/EditIcon";
 import Toast from "react-native-toast-message";
 import { END_POINTS } from "../../config/routes";
 import { API } from "../../config/apiClient";
+import { isSignedIn, signOutUser } from "../../services/authService";
 
 const Profile = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -159,6 +160,9 @@ const Profile = ({ navigation }) => {
         title="Log Out"
         onPress={async () => {
           dispatch(clearUserData());
+          if (isSignedIn()) {
+            signOutUser();
+          }
           navigation.reset({
             index: 0,
             routes: [

@@ -1,19 +1,14 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { View, Text, FlatList, StyleSheet, Image } from "react-native";
+import React, { useState, useCallback } from "react";
+import { Text, FlatList, StyleSheet } from "react-native";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
 import SearchBar from "../../components/SearchBar";
 import { MealItem } from "../../components/MealItem";
-import CustomButton from "../../components/CustomButton";
-import CustomModal from "../../components/CustomModal"; // Import your CustomModal
-import { nutritionPlansData } from "../../utils/data";
-import icons from "../../constants/icons";
 import { FontSize } from "../../utils/font";
 import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
 import { useSelector } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
-import moment from "moment";
 
 const NutritionPlans = ({ route, navigation }) => {
   const { title, type } = route.params;
@@ -36,7 +31,6 @@ const NutritionPlans = ({ route, navigation }) => {
     try {
       const res = await API.get(`${END_POINTS.DIET_PLANS}`, null, token);
       if (res.data.success) {
-        console.log(res.data.data);
         setFilteredPlans(res?.data?.data.filter((p) => p.type === type));
       }
     } catch (error) {

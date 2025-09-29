@@ -43,49 +43,43 @@ const NutritionScreen = () => {
   const date = moment().format("DD/MM/yyyy");
 
   const [consumedGlasses, setConsumedGlasses] = useState(
-    goal?.activities?.find((a) => a.date === date)?.distance?.value || 0
+    goal?.activities?.find((a) => a.date === date)?.duration?.hours || 0
   );
   const [totalGlasses, setTotalGlasses] = useState(
-    goal?.targetDistance?.value || 0
-  ); // Default to 8 glasses
-  const [totalIntakeGoal, setTotalIntakeGoal] = useState(0);
-  const { token, dailyPlans, nutritionMeals } = useSelector((state) => ({
-    token: state.Auth?.token,
-    dailyPlans: state.Nutrition.dailyPlans,
-    nutritionMeals: state.Nutrition.data,
-  }));
+    goal?.targetDuration?.hours || 0
+  );
+  const { token } = useSelector((state) => state.Auth);
+  const { dailyPlans, data: nutritionMeals } = useSelector(
+    (state) => state.Nutrition
+  );
+  const [customisedPlan, setCustomisedPlans] = useState([]);
 
-  // State for nutrients (carbs, proteins, fats)
   const [carbs, setCarbs] = useState({ current: 0, total: 30 });
   const [proteins, setProteins] = useState({ current: 0, total: 30 });
   const [fats, setFats] = useState({ current: 0, total: 30 });
 
-  // Calculate remaining calories
   const remainingCalories = totalCalories - eatenCalories;
-
-  // Calculate the fill percentage for the circular progress
   const fillPercentage = (remainingCalories / totalCalories) * 100;
-
-  const waterProgress = (consumedGlasses / totalGlasses) * 100;
 
   useFocusEffect(
     useCallback(() => {
       fetchActiveGoal();
       getNutritionMeals();
       getDailyPlans();
+      fetchCustomisedPlans();
     }, [])
   );
 
   useEffect(() => {
     if (goal) {
-      setTotalGlasses(parseInt(goal?.targetDistance?.value || 0));
+      setTotalGlasses(parseInt(goal?.targetDuration?.hours || 0));
       setConsumedGlasses(
         parseInt(
-          goal?.activities?.find((a) => a.date === date)?.distance?.value || 0
+          goal?.activities?.find((a) => a.date === date)?.duration?.hours || 0
         )
       );
     }
-  }, [goal])
+  }, [goal]);
 
   const getNutritionMeals = async () => {
     try {
@@ -104,28 +98,30 @@ const NutritionScreen = () => {
       if (res.data.success) {
         dispatch(setDailyPlans(res?.data?.data?.meals || []));
 
-        let totalCalories = 0,
-          totalCarbs = 0,
-          totalProteins = 0,
-          totalSugar = 0,
-          totalFats = 0,
-          totalVitamins = 0;
-        for (meal of res?.data?.data?.meals) {
-          totalCalories += meal.calories;
-          totalCarbs += meal.carbs;
-          totalFats += meal.fats;
-          totalProteins += meal.protein;
-          totalSugar += meal.sugar;
-          totalVitamins += meal.vitamins;
-        }
+        if (res.data.data) {
+          let totalCalories = 0,
+            totalCarbs = 0,
+            totalProteins = 0,
+            totalSugar = 0,
+            totalFats = 0,
+            totalVitamins = 0;
+          for (meal of res?.data?.data?.meals) {
+            totalCalories += meal.calories;
+            totalCarbs += meal.carbs;
+            totalFats += meal.fats;
+            totalProteins += meal.protein;
+            totalSugar += meal.sugar;
+            totalVitamins += meal.vitamins;
+          }
 
-        setTotalCalories(totalCalories);
-        setProteins({ current: 0, total: totalProteins });
-        setCarbs({ current: 0, total: totalCarbs });
-        setFats({ current: 0, total: totalFats });
+          setTotalCalories(totalCalories);
+          setProteins({ current: 0, total: totalProteins });
+          setCarbs({ current: 0, total: totalCarbs });
+          setFats({ current: 0, total: totalFats });
+        }
       }
     } catch (error) {
-      console.error("Error fetching meals:", error);
+      console.error("Error fetching plans:", error);
     }
   };
 
@@ -153,9 +149,10 @@ const NutritionScreen = () => {
     }
   };
 
-  // The rest of the component remains the same
   const handleSetGoal = () => {
-    navigation.navigate("SetWaterGoal");
+    navigation.navigate("SetWaterGoal", {
+      goal: goal,
+    });
   };
 
   const updateWaterIntake = async () => {
@@ -165,10 +162,12 @@ const NutritionScreen = () => {
         {
           type: "Drinking",
           distance: {
-            value: consumedGlasses + 1,
+            value: goal?.targetDistance?.value || 0,
           },
           duration: {
-            value: (consumedGlasses + 1) * goal?.targetDuration?.value,
+            hours: consumedGlasses + 1,
+            minutes: 0,
+            totalSeconds: (consumedGlasses + 1) * goal?.targetDistance?.value,
           },
         },
         token
@@ -198,7 +197,21 @@ const NutritionScreen = () => {
     }
   };
 
-  // Data for daily meal plan
+  const fetchCustomisedPlans = async () => {
+    try {
+      const response = await API.get(
+        `${END_POINTS.DIET_PLANS}?type=customized_plan`,
+        null,
+        token
+      );
+
+      if (response?.data?.success) {
+        setCustomisedPlans(response?.data?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <Container>
@@ -270,7 +283,11 @@ const NutritionScreen = () => {
         <WaterIntake
           consumedGlasses={consumedGlasses}
           totalGlasses={totalGlasses}
-          totalVolume={goal?.targetDuration?.value}
+          consumedVolume={
+            goal?.activities?.find((a) => a.date === date)?.duration
+              ?.totalSeconds
+          }
+          totalVolume={goal?.targetDuration?.totalSeconds}
           onAddWater={handleAddWater}
         />
 
@@ -365,6 +382,20 @@ const NutritionScreen = () => {
             >
               {plan.icon}
               <Text style={styles.nutritionPlanText}>{plan.title}</Text>
+            </TouchableOpacity>
+          ))}
+          {customisedPlan.map((plan) => (
+            <TouchableOpacity
+              key={plan._id}
+              style={styles.nutritionPlanCard}
+              onPress={() =>
+                navigation.navigate("NutritionPlans", {
+                  title: plan.title,
+                  type: plan.type,
+                })
+              }
+            >
+              <Text style={styles.nutritionPlanText}>{plan.name}</Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity

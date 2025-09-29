@@ -5,9 +5,7 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  Image,
   ScrollView,
-  Alert,
 } from "react-native";
 import InputField from "../../components/InputField";
 import Container from "../../components/Container";
@@ -19,10 +17,16 @@ import { FontSize } from "../../utils/font";
 import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
 import { useSelector } from "react-redux";
+import { useRoute } from "@react-navigation/native";
 
 const SetWaterGoal = ({ navigation, route }) => {
-  const [glassQuantity, setGlassQuantity] = useState("");
-  const [volumePerGlass, setVolumePerGlass] = useState(250);
+  const { goal } = useRoute().params || {};
+  const [glassQuantity, setGlassQuantity] = useState(
+    goal?.targetDuration?.hours || ""
+  );
+  const [volumePerGlass, setVolumePerGlass] = useState(
+    goal?.targetDistance?.value || "250"
+  );
 
   const { token } = useSelector((state) => state.Auth);
 
@@ -39,10 +43,13 @@ const SetWaterGoal = ({ navigation, route }) => {
         {
           type: "Drinking",
           targetDistance: {
-            value: glassQuantity,
+            value: volumePerGlass,
+            // unit: "ml",
           },
           targetDuration: {
-            value: glassQuantity * volumePerGlass,
+            hours: glassQuantity,
+            minutes: 0,
+            totalSeconds: glassQuantity * volumePerGlass,
           },
         },
         token
@@ -80,7 +87,7 @@ const SetWaterGoal = ({ navigation, route }) => {
           value={volumePerGlass}
           onChangeText={setVolumePerGlass}
           keyboardType="numeric"
-          placeholder="250 ml"
+          placeholder="ml per glass"
         />
 
         <CustomButton

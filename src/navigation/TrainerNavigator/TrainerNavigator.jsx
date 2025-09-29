@@ -16,9 +16,7 @@ import { useSelector } from "react-redux";
 const Stack = createNativeStackNavigator();
 
 export default function TrainerNavigator() {
-  const { isLoggedIn } = useSelector((state) => ({
-    isLoggedIn: state.Auth?.isLoggedIn,
-  }));
+  const { isLoggedIn } = useSelector((state) => state.Auth);
 
   return (
     <Stack.Navigator

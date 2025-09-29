@@ -45,11 +45,8 @@ const WorkoutScreen = () => {
   const date = moment().format("DD/MM/yyyy");
   const dayName = moment().format("dddd");
   const [selectedPeriod, setSelectedPeriod] = useState("Today");
-  const { token, trendingData, todaySessions } = useSelector((state) => ({
-    token: state.Auth?.token,
-    trendingData: state.Workout.trendingData,
-    todaySessions: state.Workout.todaySessions,
-  }));
+  const { token } = useSelector((state) => state.Auth);
+  const { trendingData, todaySessions } = useSelector((state) => state.Workout);
 
   useFocusEffect(
     useCallback(() => {
@@ -117,8 +114,8 @@ const WorkoutScreen = () => {
     { label: "Treadmill", value: "treadmill", icon: <TreadMillIcon /> },
     { label: "Dumbbells", value: "dumbells", icon: <DumbbellIcon /> },
     { label: "Jump Rope", value: "jump_rope", icon: <JumpRopeIcon /> },
-    { label: "Pull-Up Bar", value: "pull_up_assist", icon: <PullupBarIcon /> },
-    { label: "Kettle Bells", value: "pull_up_assist", icon: <PullupBarIcon /> },
+    { label: "Pull-Up Bar", value: "pull_up_bar", icon: <PullupBarIcon /> },
+    { label: "Kettle Bells", value: "kettlebells", icon: <PullupBarIcon /> },
   ];
 
   const activityData = [
@@ -269,17 +266,18 @@ const WorkoutScreen = () => {
                       const day = todaySessions[0]?.workout?.days?.find(
                         (d) => date === d.date || d.weekDay === dayName
                       );
-                      console.log(todaySessions[0]?.workout?.days);
                       const incompleteExercises = day.exercises.filter(
                         (e) => !e.isCompleted
                       );
+                      const activity =
+                        day.activities?.find((a) => date === a.date) || null;
 
                       navigation.navigate("StartWorkout", {
                         title: todaySessions[0]?.workout?.name,
                         image: todaySessions[0]?.workout?.image,
                         time:
                           todaySessions[0]?.workout?.workoutTime * 60 -
-                          day.durationCompleted,
+                          (activity?.durationCompleted || 0),
                         workoutTime: todaySessions[0]?.workout?.workoutTime,
                         exercises: incompleteExercises,
                         level: todaySessions[0]?.workout?.level,

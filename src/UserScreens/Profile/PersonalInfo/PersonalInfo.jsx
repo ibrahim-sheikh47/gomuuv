@@ -18,14 +18,13 @@ import Toast from "react-native-toast-message";
 import { API } from "../../../config/apiClient";
 import { END_POINTS } from "../../../config/routes";
 import { setUserData } from "../../../redux/reducers/AuthSlice";
-import Loader from "../../../components/Loader";
 import { useNavigation } from "@react-navigation/native";
 import { FontSize } from "../../../utils/font";
 
 const PersonalInfoScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const { data:userData, token } = useSelector((state) => state.Auth);
+  const { data: userData, token } = useSelector((state) => state.Auth);
   const [personalInfo, setPersonalInfo] = useState({
     firstName: userData?.firstName || "",
     lastName: userData?.lastName || "",
@@ -36,7 +35,6 @@ const PersonalInfoScreen = () => {
     weightUnit: "kg",
     date: userData?.dob || "",
   });
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (userData?.height?.includes("ft")) {
@@ -121,7 +119,6 @@ const PersonalInfoScreen = () => {
 
   const handleSave = async () => {
     if (!validateFields()) return;
-    setIsLoading(true);
 
     let heightFormatted =
       personalInfo.heightUnit === "cm"
@@ -163,8 +160,6 @@ const PersonalInfoScreen = () => {
           error ||
           "An error occurred. Please try again.",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -280,7 +275,6 @@ const PersonalInfoScreen = () => {
         contentContainerStyle={styles.scrollContainer}
       />
       <CustomButton title={"Save Changes"} onPress={handleSave} />
-      <Loader isLoading={isLoading} message="Processing your request..." />
     </Container>
   );
 };

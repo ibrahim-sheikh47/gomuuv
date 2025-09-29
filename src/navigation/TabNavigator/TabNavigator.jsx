@@ -74,7 +74,8 @@ export default function TabNavigator() {
   return (
     <View style={{ flex: 1, backgroundColor: "#121212" }}>
       <Tab.Navigator
-        initialRouteName="Home" // Set the Home screen as the initial active tab
+        backBehavior={"initialRoute"}
+        initialRouteName={"Home"}
         screenOptions={({ route }) => ({
           headerShown: false,
           tabBarStyle: {

@@ -1,9 +1,6 @@
 // NAVIGATION
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Signup from "../../UserScreens/Auth/Signup/Signup";
-import ForgotPass from "../../UserScreens/Auth/ForgotPass/ForgotPass";
-import Verify from "../../UserScreens/Auth/ForgotPass/Verify";
-import NewPass from "../../UserScreens/Auth/ForgotPass/NewPass";
 import Profile from "../../UserScreens/Profile/Profile";
 import PersonalInfoScreen from "../../UserScreens/Profile/PersonalInfo/PersonalInfo";
 import ChangePassScreen from "../../UserScreens/Profile/ChangePass/ChangePass";
@@ -37,7 +34,6 @@ import StartWorkout from "../../UserScreens/Workout/StartWorkout";
 import WorkoutCompleted from "../../UserScreens/Workout/WorkoutCompleted";
 import AddDevice from "../../UserScreens/Profile/Device/AddDevice";
 import Device from "../../UserScreens/Profile/Device/Device";
-import Login from "../../UserScreens/Auth/Login/Login";
 import FinalizePlan from "../../UserScreens/Nutrition/FinalizePlan";
 import VideoPlayerScreen from "../../UserScreens/Workout/VideoPlayerScreen";
 import MapScreen from "../../UserScreens/Map/MapScreen";
@@ -59,9 +55,6 @@ export default function UserNavigator() {
       initialRouteName={isLoggedIn && "TabNavigator"}
     >
       <Stack.Screen name="Signup" component={Signup} />
-      <Stack.Screen name="ForgotPass" component={ForgotPass} />
-      <Stack.Screen name="Verify" component={Verify} />
-      <Stack.Screen name="NewPass" component={NewPass} />
 
       <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="PersonalInfoScreen" component={PersonalInfoScreen} />

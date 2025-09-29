@@ -1,26 +1,44 @@
 {
   "project_info": {
-    "project_number": "997260022562",
-    "project_id": "gomuuv-446812",
-    "storage_bucket": "gomuuv-446812.firebasestorage.app"
+    "project_number": "927173641477",
+    "project_id": "gomuuvpremiumb",
+    "storage_bucket": "gomuuvpremiumb.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:997260022562:android:f0d0e1e7e3ba8987fb4b7b",
+        "mobilesdk_app_id": "1:927173641477:android:2da5d6e09198ef224f236c",
         "android_client_info": {
           "package_name": "com.gomuuv.android"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "927173641477-ku49ms32gs4vhh9j35t9ccl4ojujpbnf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gomuuv.android",
+            "certificate_hash": "8abc0c78cad40cb55fa55a23746532a6abec6cbf"
+          }
+        },
+        {
+          "client_id": "927173641477-irrkglah24ke9olvq38nr4r7uuq70rlt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyChX0bZVvvKXz6ytme1qizBAS3741yoVm0"
+          "current_key": "AIzaSyA4OhrQS48rLfLzUYeajrXwQfqFbhlCotg"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "927173641477-irrkglah24ke9olvq38nr4r7uuq70rlt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

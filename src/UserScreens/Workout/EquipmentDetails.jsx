@@ -98,10 +98,7 @@ const EquipmentDetails = () => {
   const getEquipmentWorkouts = async () => {
     try {
       const res = await API.get(
-        `${END_POINTS.EQUIPMENTS_WORKOUTS}?type=${category.label
-          .replace(" ", "_")
-          .replace("-", "")
-          .toLowerCase()}`,
+        `${END_POINTS.EQUIPMENTS_WORKOUTS}?type=${category.value}`,
         null,
         token
       );

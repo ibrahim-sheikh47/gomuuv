@@ -12,12 +12,10 @@ import {
 import Container from "../../components/Container";
 import images from "../../constants/images";
 import { colors } from "../../constants/colors";
-import icons from "../../constants/icons";
 import ProfileSection from "../../components/ProfileSection";
 import Header from "../../components/Header";
 import CustomButton from "../../components/CustomButton";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import SearchIcon from "../../assets/svgs/SearchIcon";
 import RevenueIcon from "../../assets/svgs/RevenueIcon";
 import StrengthIcon from "../../assets/svgs/StrengthIcon";
 import LevelIcon from "../../assets/svgs/LevelIcon";
@@ -38,8 +36,10 @@ const TrainerHome = () => {
   const [workouts, setWorkouts] = useState([]);
 
   // Combine all useSelector Hooks
-  const { data:userData, token } = useSelector((state) => state.Auth);
+  const { data: userData, token } = useSelector((state) => state.Auth);
   const { width } = useWindowDimensions();
+  const profileImage =
+    userData.image !== "" ? { uri: userData.image } : images.dp;
 
   useFocusEffect(
     useCallback(() => {
@@ -97,7 +97,7 @@ const TrainerHome = () => {
             userName={
               (userData?.firstName || "") + " " + (userData?.lastName || "")
             }
-            imageSource={images.dp}
+            imageSource={profileImage}
             onPress={() => navigation.navigate("TrainerProfile")}
           />
         </TouchableOpacity>

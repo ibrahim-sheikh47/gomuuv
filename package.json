@@ -2,13 +2,17 @@
   "name": "gomuuv",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start --dev-client",
-    "clean:android": "cd android && ./gradlew clean && cd ..",
-    "debug-build": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && cd android && gradlew assembleDebug && cd ..",
-    "release:build": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/ && cd android && ./gradlew assembleRelease && cd ..",
+    "reinstall-modules": "rm package-lock.json && rm node_modules && npm install",
+    "clean-run": "cd android && gradlew clean && cd.. && react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && npx react-native run-android",
+    "relink-assets": "react-native bundle --platform android --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --dev false --reset-cache --assets-dest android/app/src/main/res/",
+    "android:clean": "cd android && gradlew clean && cd..",
+    "debug-build": "cd android && gradlew clean && cd.. && react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && cd android && gradlew assembleDebug",
+    "release-build": "cd android && gradlew clean && cd.. && react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && cd android && gradlew assembleRelease",
+    "start": "expo start",
     "android": "expo run:android",
-    "ios": "NODE_ENV=development expo run:ios",
-    "web": "NODE_ENV=development expo start --web"
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "submit-ios": "eas build -p ios --profile production --auto-submit"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.1.2",
@@ -39,6 +43,7 @@
     "expo-location": "~18.1.4",
     "expo-splash-screen": "~0.30.8",
     "expo-status-bar": "~2.2.3",
+    "expo-updates": "~0.28.15",
     "expo-video": "~2.1.8",
     "expo-video-player": "^2.2.0",
     "expo-web-browser": "~14.1.6",
@@ -51,7 +56,6 @@
     "react-native-chart-kit": "^6.12.0",
     "react-native-circular-progress": "^1.4.0",
     "react-native-date-picker": "^5.0.7",
-    "react-native-dotenv": "^3.4.11",
     "react-native-geocoding": "^0.5.0",
     "react-native-geolocation-service": "^5.3.1",
     "react-native-gesture-handler": "~2.24.0",
@@ -72,12 +76,12 @@
     "react-redux": "^9.2.0",
     "reactotron-react-native": "^5.1.12",
     "redux": "^5.0.1",
-    "redux-persist": "^6.0.0",
-    "expo-updates": "~0.28.15"
+    "redux-persist": "^6.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@react-native-community/cli": "latest"
+    "@react-native-community/cli": "latest",
+    "@types/react": "~19.0.10"
   },
   "private": true
 }

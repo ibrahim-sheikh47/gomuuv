@@ -122,7 +122,7 @@ const SleepGraph = () => {
           },
         }}
         bezier
-        style={{ marginVertical: 8 }}
+        style={{ marginVertical: 8, marginLeft: -40 }}
       />
     </View>
   );

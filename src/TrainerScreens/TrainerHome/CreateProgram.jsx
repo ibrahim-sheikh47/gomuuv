@@ -6,21 +6,18 @@ import {
   Text,
   TouchableOpacity,
   View,
-  TextInput,
   Alert,
   Platform,
   useWindowDimensions,
 } from "react-native";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
-import icons from "../../constants/icons";
 import InputField from "../../components/InputField";
 import CustomButton from "../../components/CustomButton";
 import Selectable from "../../components/Selectable";
 import { colors } from "../../constants/colors";
 import CustomModal from "../../components/CustomModal";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import SearchIcon from "../../assets/svgs/SearchIcon";
 import { IconButton } from "react-native-paper";
 import StrengthIcon from "../../assets/svgs/StrengthIcon";
 import { FontSize } from "../../utils/font";
@@ -32,7 +29,6 @@ import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
 import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-import Loader from "../../components/Loader";
 
 const CreateProgram = () => {
   const navigation = useNavigation();
@@ -56,7 +52,6 @@ const CreateProgram = () => {
   const [titleImage, setTitleImage] = useState(null);
 
   const [savedExercises, setSavedExercises] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   const [isStartDatePickerVisible, setStartDatePickerVisibility] =
     useState(false);
@@ -375,8 +370,6 @@ const CreateProgram = () => {
   const handleCreateProgram = async () => {
     if (validateForm()) {
       try {
-        setLoading(true);
-
         const programImage = await uploadAttachment(titleImage);
         if (!programImage) {
           Toast.show({ text1: "Failed to create program" });
@@ -443,8 +436,6 @@ const CreateProgram = () => {
             "Failed to complete signup. Please try again.",
         });
         console.error("Error fetching workouts:", error);
-      } finally {
-        setLoading(false);
       }
     } else {
       console.log("not validated");
@@ -883,8 +874,6 @@ const CreateProgram = () => {
         modalText={"Program Created !"}
         modalIcon={<StrengthIcon width={50} height={50} />}
       />
-
-      <Loader isLoading={loading} message="Processing your request..." />
     </Container>
   );
 };

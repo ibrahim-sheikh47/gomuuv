@@ -33,10 +33,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 const Checkout = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const { cartItems, token } = useSelector((state) => ({
-    token: state.Auth?.token,
-    cartItems: state.Cart?.data,
-  }));
+  const { token, data: user } = useSelector((state) => state.Auth);
+  const { data: cartItems } = useSelector((state) => state.Cart);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
@@ -162,10 +160,10 @@ const Checkout = () => {
 
   // Consolidate all input values into a single state object
   const [formData, setFormData] = useState({
-    contact: "",
+    email: user?.email || "",
     country: "",
-    firstName: "",
-    lastName: "",
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
     address: "",
     city: "",
     postalCode: "",
@@ -284,6 +282,7 @@ const Checkout = () => {
 
     // Required fields validation
     const requiredFields = [
+      "email",
       "firstName",
       "lastName",
       "address",
@@ -339,7 +338,7 @@ const Checkout = () => {
     try {
       const payload = {
         contact: {
-          email: formData.contact,
+          email: formData.email,
           address: formData.address,
           phone: formData.phone || "0332-3232322",
         },
@@ -521,9 +520,9 @@ const Checkout = () => {
         <InputField
           label={"Contact"}
           placeholder={"Email"}
-          value={formData.contact}
-          onChangeText={(value) => handleInputChange("contact", value)}
-          error={formErrors.contact}
+          value={formData.email}
+          onChangeText={(value) => handleInputChange("email", value)}
+          error={formErrors.email}
         />
         <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
           <CustomCheckbox

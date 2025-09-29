@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { colors } from "../constants/colors";
 import { FontSize } from "../utils/font";
 import { ProgressBar } from "./ProgressBar";
@@ -10,15 +17,14 @@ export const CustomCard = ({
   goal,
   current,
   target,
-  hideGoal,
+  showGoal,
   showProgress,
   iconImage,
   children,
   message = "",
   onPress,
 }) => {
-  const [showGoal, setShowGoal] = useState(hideGoal);
-  const {height} = useWindowDimensions();
+  const { height } = useWindowDimensions();
 
   // useEffect(() => {
   //   // Check if the message does not start with "Please start" to determine if the goal should be shown
@@ -26,7 +32,10 @@ export const CustomCard = ({
   // }, [message]);
 
   return (
-    <TouchableOpacity style={[styles.activityCard, {height: height * 0.16}]} onPress={onPress}>
+    <TouchableOpacity
+      style={[styles.activityCard, { height: height * 0.16 }]}
+      onPress={onPress}
+    >
       <View style={styles.activityCardContent}>
         <Text
           style={{
@@ -58,10 +67,15 @@ export const CustomCard = ({
       <View style={{ flex: 1, paddingHorizontal: 10 }}>{children}</View>
 
       {target != 0 && showProgress && (
-        <View style={{ alignSelf: "center", width: 150, marginBottom: 10 }}>
+        <View
+          style={{
+            width: "100%",
+            marginBottom: 10,
+          }}
+        >
           <ProgressBar
             progress={(current / target) * 100}
-            style={{ height: 15 }}
+            style={{ height: 12, marginHorizontal: 10 }}
           />
         </View>
       )}

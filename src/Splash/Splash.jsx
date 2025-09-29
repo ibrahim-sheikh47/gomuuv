@@ -20,32 +20,6 @@ import { FontSize } from "../utils/font";
 const Splash = () => {
   const navigation = useNavigation();
 
-  const { isLoggedIn, data } = useSelector((state) => state.Auth);
-
-  useLayoutEffect(() => {
-    if (isLoggedIn) {
-      if (data.role === "user") {
-        navigation.reset({
-          index: 0, // Ensures TabNavigator is at the top
-          routes: [
-            {
-              name: "UserApp", // Parent navigator (UserApp)
-            },
-          ],
-        });
-      } else {
-        navigation.reset({
-          index: 0, // Ensures TabNavigator is at the top
-          routes: [
-            {
-              name: "TrainerApp", // Parent navigator (UserApp)
-            },
-          ],
-        });
-      }
-    }
-  }, []);
-
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000" />

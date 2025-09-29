@@ -1,9 +1,7 @@
 import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
-import icons from "../../constants/icons";
-import { useNavigation } from "@react-navigation/native";
 import MealCard from "../../components/MealCard";
 import BreakfastIcon from "../../assets/svgs/BreakfastIcon";
 import LunchIcon from "../../assets/svgs/LunchIcon";

@@ -1,19 +1,13 @@
 import React, { useState } from "react";
 import {
   StyleSheet,
-  Text,
   View,
-  Image,
   ScrollView,
-  TouchableOpacity,
 } from "react-native";
 import Container from "../../components/Container";
 import BackHeader from "../../components/BackHeader";
 import InputField from "../../components/InputField";
 import CustomButton from "../../components/CustomButton";
-import { colors } from "../../constants/colors";
-import icons from "../../constants/icons";
-import EditIcon from "../../assets/svgs/EditIcon";
 import { FontSize } from "../../utils/font";
 import { useDispatch, useSelector } from "react-redux";
 import Toast from "react-native-toast-message";

@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 // Initial state
 let initialState = {
   data: {},
+  targetWeight: null,
   token: null,
   isLoggedIn: false,
 };
@@ -16,6 +17,9 @@ export const AuthSlice = createSlice({
     },
     setUserData: (state, action) => {
       state.data = action.payload;
+    },
+    setTargetWeight: (state, action) => {
+      state.targetWeight = action.payload;
     },
     clearUserData: (state) => {
       state.data = {};
@@ -38,6 +42,7 @@ export const AuthSlice = createSlice({
 export const {
   setToken,
   setUserData,
+  setTargetWeight,
   clearUserData,
   userLoggedIn,
   setAuthData,

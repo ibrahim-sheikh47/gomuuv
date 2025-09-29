@@ -30,10 +30,8 @@ const ProductDetailScreen = ({ route }) => {
   const navigation = useNavigation();
   const { product } = route.params;
 
-  const { token, cartItems } = useSelector((state) => ({
-    token: state.Auth?.token,
-    cartItems: state.Cart?.data,
-  }));
+  const { token } = useSelector((state) => state.Auth);
+  const { data: cartItems } = useSelector((state) => state.Cart);
   let items = Array.isArray(cartItems) ? [...cartItems] : [];
 
   // State to manage quantity
@@ -117,11 +115,7 @@ const ProductDetailScreen = ({ route }) => {
   };
   return (
     <Container>
-      <Header
-        title={"Shop"}
-        showBackButton={true}
-        rightIcon1={<CartIcon />}
-      />
+      <Header title={"Shop"} showBackButton={true} rightIcon1={<CartIcon />} />
 
       <ScrollView
         style={{ marginBottom: 30 }}

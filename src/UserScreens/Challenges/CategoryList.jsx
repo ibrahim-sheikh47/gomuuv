@@ -33,7 +33,7 @@ const CategoryList = () => {
   const [selectedTitle, setSelectedTitle] = useState("");
   const [filteredChallenges, setFilteredChallenges] = useState([]);
 
-  const { token, data:userData } = useSelector((state) => state.Auth);
+  const { token, data: userData } = useSelector((state) => state.Auth);
 
   useEffect(() => {
     getFilteredChallenges();
@@ -47,6 +47,7 @@ const CategoryList = () => {
   const closeModal = () => {
     setModalVisible(false);
     setSelectedTitle("");
+    getFilteredChallenges();
   };
 
   const getFilteredChallenges = async () => {
@@ -101,26 +102,11 @@ const CategoryList = () => {
           source={{ uri: item.workout.image }}
         />
 
-        <Text
-          style={[
-            styles.absoluteText,
-            { color: colors.green, fontSize: FontSize.small },
-            {
-              backgroundColor: "#3C3C3C",
-              position: "absolute",
-              borderRadius: 15,
-              bottom: height * 0.02,
-              right: height * 0.02,
-              justifyContent: "center",
-              alignItems: "center",
-              paddingHorizontal: width * 0.04,
-              paddingVertical: width * 0.02,
-            },
-          ]}
-        >
-          {`${moment(item.startDate).format("DD MMM")} - ${moment(
-            item.endDate
-          ).format("DD MMM")}`}
+        {/* Display challenge duration instead of dates */}
+        <Text style={styles.dateText}>
+          {item.workout.days.length > 0
+            ? `${item.workout.days.length} Days`
+            : "Challenge"}
         </Text>
       </View>
 
@@ -225,6 +211,20 @@ const styles = StyleSheet.create({
   absoluteText: {
     fontFamily: "Poppins-SemiBold",
     color: "white",
+  },
+  dateText: {
+    fontFamily: "Poppins-SemiBold",
+    color: colors.green,
+    fontSize: FontSize.small,
+    backgroundColor: "#3C3C3C",
+    position: "absolute",
+    borderRadius: 15,
+    bottom: 10,
+    right: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
   modalText: {
     fontSize: FontSize.medium,

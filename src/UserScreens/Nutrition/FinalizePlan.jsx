@@ -19,10 +19,8 @@ const FinalizePlan = ({ route }) => {
   const currentValue = "1800 kcal";
 
   const [addedMeals, setAddedMeals] = useState({}); // Track added meals by ID
-  const { token, nutritionMeals } = useSelector((state) => ({
-    token: state.Auth?.token,
-    nutritionMeals: state.Nutrition.data,
-  }));
+  const { token } = useSelector((state) => state.Auth);
+  const { data: nutritionMeals } = useSelector((state) => state.Nutrition);
 
   const handleAddRemove = (mealName, mealId) => {
     const isAdded = !!addedMeals[mealId];
@@ -57,11 +55,12 @@ const FinalizePlan = ({ route }) => {
 
     const payload = {
       ...planData,
-      dailyMeals: selectedMealIds, // Add selected meal IDs to payload
+      meals: selectedMealIds,
+      type: "customized_plan",
     };
 
     try {
-      const res = await API.post(END_POINTS.PERSONALIZED_PLANS, payload, token);
+      const res = await API.post(END_POINTS.DIET_PLANS, payload, token);
       if (res.data.success) {
         Toast.show({
           type: "success",

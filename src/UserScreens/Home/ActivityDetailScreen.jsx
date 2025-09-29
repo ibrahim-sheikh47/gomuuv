@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import {
   View,
   Text,
@@ -20,7 +20,6 @@ import { colors } from "../../constants/colors";
 import icons from "../../constants/icons";
 import { CustomCard } from "../../components/CustomCard";
 import images from "../../constants/images";
-import RunningIcon from "../../assets/svgs/RunningIcon";
 import DistanceIcon from "../../assets/svgs/DistanceIcon";
 import TimeIcon from "../../assets/svgs/TimeIcon";
 import CaloriesIcon from "../../assets/svgs/CaloriesIcon";
@@ -30,7 +29,6 @@ import { FontSize } from "../../utils/font";
 import { END_POINTS } from "../../config/routes";
 import { API } from "../../config/apiClient";
 import { useSelector } from "react-redux";
-import moment from "moment";
 import Toast from "react-native-toast-message";
 
 const ActivityDetailScreen = () => {
@@ -40,14 +38,8 @@ const ActivityDetailScreen = () => {
 
   const [goal, setGoal] = useState(item);
   const [stats, setStats] = useState(null);
-  const date = moment().format("DD/MM/yyyy");
   const duration = ["Today", "Weekly", "Monthly", "Quarterly", "Yearly"];
   const [selectedPeriod, setSelectedPeriod] = useState("Today");
-  const [activityResult, setActivityResult] = useState({
-    time: 0,
-    distance: "0 meters",
-    coordinates: [],
-  });
 
   const { token } = useSelector((state) => state.Auth);
   // Button dimensions
@@ -78,59 +70,44 @@ const ActivityDetailScreen = () => {
     }).start();
   };
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        // Save the current position of the pan
-        pan.setOffset({
-          x: pan.x._value,
-          y: 0,
-        });
-        // Reset the value to avoid jumping
-        pan.setValue({ x: 0, y: 0 });
-      },
-      onPanResponderMove: (evt, gestureState) => {
-        // Limit the drag to stay within the button and only horizontal
-        // Using clamp to keep the value between 0 and maxDragDistance
-        const newX = Math.max(0, Math.min(gestureState.dx, maxDragDistance));
-        pan.x.setValue(newX);
-      },
-      onPanResponderRelease: (evt, gestureState) => {
-        // Clear the offset to avoid accumulation
-        pan.flattenOffset();
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: () => true,
+        onPanResponderGrant: () => {
+          pan.setOffset({ x: pan.x._value, y: 0 });
+          pan.setValue({ x: 0, y: 0 });
+        },
+        onPanResponderMove: (evt, gestureState) => {
+          const newX = Math.max(0, Math.min(gestureState.dx, maxDragDistance));
+          pan.x.setValue(newX);
+        },
+        onPanResponderRelease: () => {
+          pan.flattenOffset();
 
-        if (pan.x._value > dragThreshold) {
-          if (goal !== null && goal !== undefined) {
-            navigation.navigate("Map", {
-              goal,
-              activityName,
-              activityType,
-              heartRate,
-              calories,
-            });
-          } else {
-            Toast.show({
-              text1: "Kindly set a goal before starting",
-              type: "error",
-            });
+          if (pan.x._value > dragThreshold) {
+            if (goal) {
+              navigation.navigate("Map", {
+                goal,
+                activityName,
+                activityType,
+                heartRate,
+                calories,
+              });
+            } else {
+              Toast.show({
+                text1: "Kindly set a goal before starting",
+                type: "error",
+              });
+            }
           }
 
-          // navigation.navigate("FinishActivity", {
-          //   activityName: activityName,
-          //   distance: distance,
-          //   time: time,
-          //   distanceUnit: distanceUnit,
-          //   heartRate: heartRate,
-          //   calories: calories,
-          // });
-        }
-
-        resetPan();
-      },
-    })
-  ).current;
+          resetPan();
+        },
+      }),
+    [goal, activityName, activityType, heartRate, calories]
+  );
 
   const heartRate = "0bpm";
   const calories = "0kcal";
@@ -142,7 +119,6 @@ const ActivityDetailScreen = () => {
         {},
         token
       );
-      console.log(response?.data?.success);
 
       if (response?.data?.success) {
         setGoal(response?.data?.data?.goal);
@@ -151,6 +127,23 @@ const ActivityDetailScreen = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const formatElapsedTime = (totalSeconds = 0) => {
+    if (totalSeconds < 60) {
+      return `${totalSeconds}s`;
+    }
+
+    if (totalSeconds < 3600) {
+      const minutes = parseInt(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+      return `${minutes}m ${secs}s`;
+    }
+
+    const hours = parseInt(totalSeconds / 3600);
+    const minutes = parseInt(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${hours || 0}h ${minutes || 0}m ${secs || 0}s`;
   };
 
   return (
@@ -172,6 +165,7 @@ const ActivityDetailScreen = () => {
               navigation.navigate("ActivityScreen", {
                 activityName,
                 activityType,
+                goal,
                 refresh: () => {
                   fetchActiveGoal();
                 },
@@ -189,8 +183,8 @@ const ActivityDetailScreen = () => {
             icon={DistanceIcon}
             showProgress={true}
             current={stats?.distance || 0}
-            target={goal?.targetDistance?.value || 0}
-            hideGoal={goal?.distance == null || false}
+            target={goal ? goal.targetDistance?.value : 0}
+            showGoal={goal ? goal.targetDistance.value !== null : false}
             goal={`Goal: ${goal?.targetDistance?.value || 0} ${
               goal?.targetDistance?.unit || "mi"
             }`}
@@ -201,26 +195,24 @@ const ActivityDetailScreen = () => {
           <CustomCard
             label="Time"
             icon={TimeIcon}
-            hideGoal={goal?.duration == null || false}
-            goal={`Goal: ${goal?.targetDuration?.value || 0} ${
-              goal?.targetDuration?.unit || "mins"
-            }`}
-            message={`${Math.floor(stats?.duration) || 0} ${
-              goal?.targetDuration?.unit || "mins"
-            }`}
+            showGoal={goal ? goal.targetDuration.value !== null : false}
+            goal={`Goal: ${goal?.targetDuration?.hours || 0} hours ${
+              goal?.targetDuration?.minutes || 0
+            } mins`}
+            message={`${formatElapsedTime(stats?.duration)}`}
           />
         </View>
 
         <View style={styles.gridContainer}>
           <CustomCard
             label="Calories"
-            hideGoal={true}
+            showGoal={false}
             icon={CaloriesIcon}
             message={calories}
           />
           <CustomCard
             label="Heart Rate"
-            hideGoal={true}
+            showGoal={false}
             icon={HeartRateIcon}
             message={heartRate}
           />

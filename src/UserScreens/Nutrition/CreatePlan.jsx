@@ -121,6 +121,7 @@ const CreatePlan = () => {
 
   // Single state object to hold all input values
   const [formData, setFormData] = useState({
+    name: "",
     age: "",
     height: "",
     heightUnit: "cm",
@@ -209,6 +210,15 @@ const CreatePlan = () => {
   };
 
   const handleSave = async () => {
+    if (formData.name.trim().length < 4) {
+      Toast.show({
+        type: "error",
+        text1: "Alert!",
+        text2: "Please enter plan name",
+      });
+      return;
+    }
+
     if (!selectedPeriod) {
       Toast.show({
         type: "error",
@@ -334,6 +344,7 @@ const CreatePlan = () => {
     // Prepare Payload
     const createPlanPayload = {
       user: userData?._id,
+      name: formData.name,
       goal: selectedPeriod?.toLowerCase(),
       gender: selectedGender?.toLowerCase(),
       age: parseInt(formData.age, 10),
@@ -436,8 +447,20 @@ const CreatePlan = () => {
       <Header title={"Create Plan"} showBackButton={true} />
       <ScrollView style={{ marginVertical: 30 }}>
         <View>
+          <InputField
+            label="Plan name"
+            value={formData.name}
+            onChangeText={(value) => handleInputChange("name", value)}
+            placeholder="Enter plan name"
+          />
+
           <Text
-            style={{ color: "white", fontSize: 16, fontFamily: "Poppins-Bold" }}
+            style={{
+              color: "white",
+              fontSize: 16,
+              fontFamily: "Poppins-Bold",
+              marginTop: 10,
+            }}
           >
             What's Your Main Goal
           </Text>
@@ -508,6 +531,7 @@ const CreatePlan = () => {
               </Text>
             </TouchableOpacity>
           </View>
+
           <InputField
             label="What's Your Age"
             value={formData.age}

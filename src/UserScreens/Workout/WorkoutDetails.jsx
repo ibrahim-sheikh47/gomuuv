@@ -43,7 +43,6 @@ const WorkoutDetails = () => {
   const dayName = moment().format("dddd");
 
   const [workout, setWorkout] = useState(item);
-
   const [selectedPeriod, setSelectedPeriod] = useState(
     workout?.days[
       workout?.days?.indexOf(
@@ -123,21 +122,20 @@ const WorkoutDetails = () => {
 
   const handleStartWorkout = async () => {
     try {
-      // deleteWorkoutSession();
       let payload = { user: userData?._id, workout: workout?._id };
       const res = await API.post(END_POINTS.WORKOUT_SESSIONS, payload, token);
       if (res.data.success) {
         dispatch(setTodaySessions([res?.data?.data]));
 
-        const day = workout?.days?.find(
-          (d) => date === d.date || d.weekDay === dayName
-        );
-
         navigation.navigate("StartWorkout", {
           title: workout.name,
           image: workout.image,
+          workoutTime: workout.workoutTime,
           time: workout.workoutTime * 60,
-          exercises: selectedExercises.filter((e) => !e.isCompleted),
+          // exercises: selectedExercises.filter((e) => !e.isCompleted),
+          exercises: getExercisesForDay(
+            workout.days[0]?.shortName
+          ).exercises.filter((e) => !e.isCompleted),
           level: workout.level,
           calories: workout.calories,
           workoutSessionId: res?.data?.data?._id,

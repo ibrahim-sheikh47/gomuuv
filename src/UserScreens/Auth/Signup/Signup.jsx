@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
@@ -8,8 +7,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Modal,
-  FlatList,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { useDispatch } from "react-redux";
@@ -20,7 +17,6 @@ import AuthHeader from "../../../components/AuthHeader";
 import Container from "../../../components/Container";
 import CustomButton from "../../../components/CustomButton";
 import InputField from "../../../components/InputField";
-import Loader from "../../../components/Loader";
 import { SocialButton } from "../../../components/SocialButton";
 import { API } from "../../../config/apiClient";
 import { END_POINTS } from "../../../config/routes";
@@ -46,7 +42,6 @@ const Signup = (props) => {
     password: "",
     confirmPassword: "",
   });
-  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (field, value) => {
     setForm((prevState) => ({
@@ -110,11 +105,8 @@ const Signup = (props) => {
   const handleSignup = async () => {
     if (!validateForm()) return; // Stop if validation fails
 
-    setLoading(true);
-
     try {
       const response = await API.post(END_POINTS.SIGNUP, form);
-      setLoading(false);
       if (response?.data?.success) {
         dispatch(
           setAuthData({
@@ -162,7 +154,6 @@ const Signup = (props) => {
         });
       }
     } catch (error) {
-      setLoading(false);
       Toast.show({
         type: "error",
         text1: "Error",
@@ -288,7 +279,6 @@ const Signup = (props) => {
           style={{ marginTop: 50 }}
           title="Join now"
           onPress={handleSignup}
-          disabled={loading}
         />
 
         <View style={styles.dividerContainer}>
@@ -309,8 +299,6 @@ const Signup = (props) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-
-      <Loader isLoading={loading} message="Processing your request..." />
     </Container>
   );
 };

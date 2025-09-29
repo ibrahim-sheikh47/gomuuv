@@ -27,11 +27,10 @@ const ViewAllMeals = ({ route, navigation }) => {
   const [filteredData, setFilteredData] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All"); // Default to 'All'
 
-  const { token, dailyPlans, nutritionMeals } = useSelector((state) => ({
-    token: state.Auth?.token,
-    nutritionMeals: state.Nutrition.data,
-    dailyPlans: state.Nutrition.dailyPlans,
-  }));
+  const { token } = useSelector((state) => state.Auth);
+  const { dailyPlans, data: nutritionMeals } = useSelector(
+    (state) => state.Nutrition
+  );
 
   useEffect(() => {
     if (title === "Recipes") {
@@ -165,7 +164,12 @@ const ViewAllMeals = ({ route, navigation }) => {
               time={item?.preparationTime}
               iconType={title.toLowerCase() === "recipes" ? "next" : "delete"}
               onPress={() =>
-                navigation.navigate("MealDetailScreen", { meal: item })
+                navigation.navigate("MealDetailScreen", {
+                  meal: item,
+                  ...(title.toLowerCase() === "recipes" && {
+                    source: "popularRecipes",
+                  }),
+                })
               }
               onDelete={(mealId) => removeMealFromPlan(mealId)}
             />
@@ -174,7 +178,6 @@ const ViewAllMeals = ({ route, navigation }) => {
           showsVerticalScrollIndicator={false}
           ListFooterComponent={<View style={{ marginBottom: 25 }} />}
         />
-
       </View>
 
       {title.toLowerCase() !== "recipes" && (
@@ -202,6 +205,6 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Bold",
     fontSize: FontSize.regular,
     marginBottom: 5,
-    marginTop: 20
+    marginTop: 20,
   },
 });

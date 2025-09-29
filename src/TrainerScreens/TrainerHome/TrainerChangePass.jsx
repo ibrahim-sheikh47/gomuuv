@@ -4,7 +4,6 @@ import Container from "../../components/Container";
 import BackHeader from "../../components/BackHeader";
 import InputField from "../../components/InputField";
 import CustomButton from "../../components/CustomButton";
-import Loader from "../../components/Loader";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import { END_POINTS } from "../../config/routes";
@@ -114,7 +113,6 @@ const TrainerChangePass = () => {
   };
 
   const performChangePassword = async (currentPassword, newPassword) => {
-    setLoading(true);
     try {
       const response = await API.post(
         END_POINTS.CHANGE_PASSWORD,
@@ -140,8 +138,6 @@ const TrainerChangePass = () => {
         text1: "Could not changed password!",
         text2: error.response?.data?.message || error || "Please try again.",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -176,7 +172,6 @@ const TrainerChangePass = () => {
       </View>
 
       <CustomButton title="Save Changes" onPress={handleSaveChange} />
-      <Loader isLoading={loading} />
       <Toast />
     </Container>
   );

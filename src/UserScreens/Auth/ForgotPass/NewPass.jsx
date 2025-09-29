@@ -4,7 +4,6 @@ import Container from "../../../components/Container";
 import BackHeader from "../../../components/BackHeader";
 import InputField from "../../../components/InputField";
 import CustomButton from "../../../components/CustomButton";
-import Loader from "../../../components/Loader";
 import { useNavigation } from "@react-navigation/native";
 
 const NewPass = () => {
@@ -28,10 +27,7 @@ const NewPass = () => {
     const { password, confirmPassword } = formData;
 
     if (password === confirmPassword) {
-      // Proceed to the next step, such as navigation to Verify
-      setLoading(true);
       setTimeout(() => {
-        setLoading(false);
         alert("Password changed successfully!");
       }, 2000);
     } else {
@@ -60,7 +56,6 @@ const NewPass = () => {
         />
       </View>
       <CustomButton title="Save Changes" onPress={handleSaveChange} />
-      <Loader isLoading={loading} />
     </Container>
   );
 };

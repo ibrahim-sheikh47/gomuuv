@@ -25,15 +25,20 @@ const ChallengeDetail = () => {
   const { token, data: userData } = useSelector((state) => state.Auth);
   const [challenge, setChallenge] = useState(item);
   const date = moment().format("DD/MM/yyyy");
+  const dayName = moment().format("dddd");
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTitle, setSelectedTitle] = useState("");
   const [selectedPeriod, setSelectedPeriod] = useState(
-    challenge?.workout?.days[
-      challenge?.workout?.days?.indexOf(
-        challenge?.workout?.days?.find((d) => d.date === date)
-      )
-    ]?.shortName || `${challenge?.workout?.days.length} Days`
+    challenge.participants.includes(userData._id)
+      ? challenge?.workout?.days[
+          challenge?.workout?.days?.indexOf(
+            challenge?.workout?.days?.find(
+              (d) => d.date === date || d.weekDay === dayName
+            )
+          )
+        ]?.shortName
+      : "Day 1" || `${challenge?.workout?.days.length} Days`
   );
 
   const openModal = (title) => {
@@ -45,17 +50,17 @@ const ChallengeDetail = () => {
     setModalVisible(false);
     setSelectedTitle("");
     // navigation.goBack();
-    const day = challenge.workout.days.find(
-      (d) => d.shortName === selectedPeriod && date === d.date
-    );
-
+    const day = challenge.workout.days.find((d) => date === d.date);
+    const activity = day.activities.find((a) => date === a.date) || null;
     if (day) {
       navigation.navigate("StartWorkout", {
         title: challenge.workout.name,
         image: challenge.workout?.image,
-        time: challenge.workout.workoutTime * 60 - day.durationCompleted,
+        time:
+          challenge.workout.workoutTime * 60 -
+          (activity?.durationCompleted || 0),
         workoutTime: challenge.workout.workoutTime,
-        exercises: selectedExercises,
+        exercises: selectedExercises.filter((e) => !e.isCompleted),
         level: challenge.workout.level,
         calories: challenge.workout.calories,
         workoutSessionId: challenge._id,
@@ -79,7 +84,6 @@ const ChallengeDetail = () => {
         token
       );
       if (res.data.success) {
-        console.log("challenge fetched");
         setChallenge(res.data.data);
       }
     } catch (error) {
@@ -149,7 +153,9 @@ const ChallengeDetail = () => {
           </View>
         </View>
 
-        <Text style={[styles.sectionTitle, { marginTop: 40 }]}>Description</Text>
+        <Text style={[styles.sectionTitle, { marginTop: 40 }]}>
+          Description
+        </Text>
         <Text style={styles.description}>{challenge.workout.description}</Text>
 
         <View style={styles.infoBox}>
@@ -160,11 +166,11 @@ const ChallengeDetail = () => {
                 <Text style={styles.value}>
                   {label === "Exercises"
                     ? challenge.workout.days.reduce((sum, day) => {
-                      return sum + day.exercises.length;
-                    }, 0) + " Exercises"
+                        return sum + day.exercises.length;
+                      }, 0) + " Exercises"
                     : label === "Calories"
-                      ? challenge.workout.calories + " kcal"
-                      : challenge.workout.timePerWorkout + ""}
+                    ? challenge.workout.calories + " kcal"
+                    : challenge.workout.timePerWorkout + ""}
                 </Text>
               </View>
             ))}
@@ -206,9 +212,9 @@ const ChallengeDetail = () => {
             challenge?.workout?.days
               .find((d) => d.shortName === selectedPeriod && date === d.date)
               ?.exercises.some((ex) => !ex.isCompleted) === undefined ||
-              challenge?.workout?.days
-                .find((d) => d.shortName === selectedPeriod && date === d.date)
-                ?.exercises.some((ex) => !ex.isCompleted)
+            challenge?.workout?.days
+              .find((d) => d.shortName === selectedPeriod && date === d.date)
+              ?.exercises.some((ex) => !ex.isCompleted)
               ? "Continue Challenge"
               : "Day Completed"
           }
@@ -265,7 +271,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 30,
     left: 20,
-    right:20,
+    right: 20,
     fontSize: 28,
     fontFamily: "Poppins-Bold",
     color: colors.green,

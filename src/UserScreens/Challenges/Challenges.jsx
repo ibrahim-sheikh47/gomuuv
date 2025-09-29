@@ -14,7 +14,6 @@ import { colors } from "../../constants/colors";
 import Header from "../../components/Header";
 import TabContainer from "../../components/TabContainer";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import images from "../../constants/images";
 // import { challenges } from "../../utils/data";
 import CustomButton from "../../components/CustomButton";
 import GoalModal from "../../components/GoalModal";
@@ -26,16 +25,16 @@ import ChallengesIcon from "../../assets/svgs/ChallengesIcon";
 import FlexibilityIcon from "../../assets/svgs/FlexibilityIcon";
 import HealthWellIcon from "../../assets/svgs/HealthWellIcon";
 import HabitIcon from "../../assets/svgs/HabitIcon";
-import LevelIcon from "../../assets/svgs/LevelIcon";
-import SearchIcon from "../../assets/svgs/SearchIcon";
-import WeightLossIcon from "../../assets/svgs/WeightLossIcon";
 import { FontSize } from "../../utils/font";
 import { END_POINTS } from "../../config/routes";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { API } from "../../config/apiClient";
 import moment from "moment";
+import { setTargetWeight, setUserData } from "../../redux/reducers/AuthSlice";
+import Toast from "react-native-toast-message";
 
 const ChallengesScreen = () => {
+  const dispatch = useDispatch();
   const { height, width } = useWindowDimensions();
   const [activeTab, setActiveTab] = useState("Challenges"); // Set default to Goals to match your screenshot
   const [weightModalVisible, setWeightModalVisible] = useState(false);
@@ -46,14 +45,18 @@ const ChallengesScreen = () => {
   const [enrolledChallenges, setEnrolledChallenges] = useState([]);
   const [upcomingChallenges, setUpcomingChallenges] = useState([]);
 
-  const { token, data: userData } = useSelector((state) => state.Auth);
+  const {
+    token,
+    data: userData,
+    targetWeight,
+  } = useSelector((state) => state.Auth);
 
   const [currentWeight, setCurrentWeight] = useState(
     userData?.weight.replace("kg", "").replace("lbs", "") || 0
-  ); // Set to 63 to match your screenshot
-  const [targetWeight, setTargetWeight] = useState(0); // Set to 54 to match your screenshot
-  const [progressPercentage, setProgressPercentage] = useState(0); // Set to 54 to match your screenshot
-  const [bmiValue, setBmiValue] = useState(0); // Initial BMI value
+  );
+  const weightUnit = userData?.weight.includes("kg") ? "kg" : "lbs";
+  const [progressPercentage, setProgressPercentage] = useState(0);
+  const [bmiValue, setBmiValue] = useState(0);
 
   const [rangeModalVisible, setRangeModalVisible] = useState(false);
   const [selectedRange, setSelectedRange] = useState("Weekly");
@@ -99,9 +102,8 @@ const ChallengesScreen = () => {
   }, [currentWeight]);
 
   useEffect(() => {
-    const data = generateGraphData(selectedRange);
-    setGraphData(data);
-  }, [selectedRange]);
+    fetchCurrentWeightStats();
+  }, [selectedRange, currentWeight]);
 
   const getBmiLabel = (bmi) => {
     if (bmi < 18.5) return "Underweight";
@@ -111,16 +113,112 @@ const ChallengesScreen = () => {
   };
 
   const handleUpdateWeight = (newWeight) => {
-    setCurrentWeight(newWeight); // Update the current weight
-    setWeightModalVisible(false);
-    setWeightUpdatedVisible(true); // Close the modal
-    // You might want to recalculate BMI here
+    handleSave(newWeight);
   };
 
   const handleUpdateTargetWeight = (newTargetWeight) => {
-    setTargetWeight(newTargetWeight);
-    setTargetModalVisible(false);
-    setTargetUpdatedVisible(true);
+    updateGoal(newTargetWeight);
+  };
+
+  const updateGoal = async (newTargetWeight) => {
+    try {
+      let payload;
+      let apiMethod;
+
+      if (targetWeight === null) {
+        payload = {
+          type: "Weight",
+          targetDistance: {
+            value: newTargetWeight,
+            unit: weightUnit,
+          },
+          targetDuration: {
+            hours: 0,
+            minutes: 0,
+            totalSeconds: 0,
+          },
+        };
+        apiMethod = API.post;
+      } else {
+        payload = {
+          type: "Weight",
+          distance: {
+            value: newTargetWeight,
+            unit: weightUnit,
+          },
+          duration: {
+            hours: 0,
+            minutes: 0,
+            totalSeconds: 0,
+          },
+        };
+        apiMethod = API.patch;
+      }
+
+      const response = await apiMethod(`${END_POINTS.GOALS}`, payload, token);
+
+      if (response?.data?.success) {
+        const newValue = response.data.data.targetDistance?.value;
+
+        dispatch(setTargetWeight(newValue));
+        setTargetModalVisible(false);
+        setTargetUpdatedVisible(true);
+      }
+    } catch (error) {
+      console.error("updateGoal error:", error);
+    }
+  };
+
+  const handleSave = async (newWeight) => {
+    let weightFormatted = `${newWeight}${weightUnit}`;
+
+    try {
+      const updatedData = {
+        weight: weightFormatted,
+      };
+      const response = await API.patch(
+        END_POINTS.UPDATE_USER + `${userData?._id}`,
+        updatedData,
+        token
+      );
+
+      if (response?.data?.success) {
+        dispatch(setUserData(response?.data?.data));
+        setCurrentWeight(newWeight);
+        setWeightModalVisible(false);
+        setWeightUpdatedVisible(true);
+      } else {
+        throw new Error("Failed to update information.");
+      }
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2:
+          error.response?.data?.message ||
+          error ||
+          "An error occurred. Please try again.",
+      });
+    }
+  };
+
+  const fetchCurrentWeightStats = async () => {
+    try {
+      const response = await API.post(
+        `${END_POINTS.GOALS_CURRENT_WEIGHT_STATS}`,
+        {
+          filter: selectedRange,
+        },
+        token
+      );
+
+      if (response?.data?.success) {
+        setGraphData(response?.data?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const navigation = useNavigation();
@@ -162,12 +260,10 @@ const ChallengesScreen = () => {
 
   const getUpcomingChallenges = async () => {
     try {
-      const res = await API.get(
-        `${END_POINTS.CHALLENGES}/upcoming/challenges`,
-        null,
-        token
-      );
+      // Fetch all challenges instead of just "upcoming"
+      const res = await API.get(`${END_POINTS.CHALLENGES}`, null, token);
       if (res.data.success) {
+        // Filter out challenges the user is already enrolled in
         setUpcomingChallenges(
           res.data.data.filter((d) => !d.participants.includes(userData._id))
         );
@@ -194,28 +290,16 @@ const ChallengesScreen = () => {
             style={[styles.cardImage, { height: "100%" }]}
             source={{ uri: item.workout.image }}
           />
-
-          <Text
-            style={[
-              styles.absoluteText,
-              { color: colors.green, fontSize: FontSize.small },
-              {
-                backgroundColor: "#3C3C3C",
-                position: "absolute",
-                borderRadius: 15,
-                bottom: height * 0.02,
-                right: height * 0.02,
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: width * 0.04,
-                paddingVertical: width * 0.02,
-              },
-            ]}
-          >
-            {`${moment(item.startDate).format("DD MMM")} - ${moment(
-              item.endDate
-            ).format("DD MMM")}`}
-          </Text>
+          {/* Conditional Date/Duration Display */}
+          {item.userStartDate && item.userEndDate ? (
+            <Text style={styles.dateText}>
+              {`${moment(item.userStartDate).format("DD MMM")} - ${moment(
+                item.userEndDate
+              ).format("DD MMM")}`}
+            </Text>
+          ) : (
+            <Text style={styles.dateText}>{item.workout.days.length} Days</Text>
+          )}
         </View>
 
         <View style={styles.cardContent}>
@@ -250,40 +334,14 @@ const ChallengesScreen = () => {
 
   // Calculate progress percentage for the progress bar
   const calculateProgressPercentage = () => {
-    if (currentWeight <= targetWeight) return 100;
-
-    const totalLoss = 100; // Let's say 100 kg is the max weight loss we'd show
-    const currentLoss = currentWeight - targetWeight;
-    return Math.min(100, (currentLoss / totalLoss) * 100);
+    const percentage = (currentWeight / targetWeight) * 100;
+    const clampedProgress = Math.min(Math.max(percentage, 0), 100);
+    return clampedProgress;
   };
 
   useEffect(() => {
     setProgressPercentage(calculateProgressPercentage());
   }, [currentWeight, targetWeight]);
-
-  const weeklyData = [
-    { day: "M", value: 10 },
-    { day: "T", value: 0 },
-    { day: "W", value: 0 },
-    { day: "T", value: 15 },
-    { day: "F", value: 0 },
-    { day: "S", value: 22 },
-    { day: "S", value: 0 },
-  ];
-
-  const yearlyData = [
-    { day: "Jan", value: 0 },
-    { day: "Feb", value: 12 },
-    { day: "Mar", value: 0 },
-    { day: "Apr", value: 44 },
-    { day: "May", value: 0 },
-    { day: "Jun", value: 0 },
-    { day: "Jul", value: 34 },
-    { day: "Sep", value: 0 },
-    { day: "Oct", value: 55 },
-    { day: "Nov", value: 56 },
-    { day: "Dec", value: 87 },
-  ];
 
   const BarGraph = ({ data }) => {
     const maxHeight = 160;
@@ -306,7 +364,7 @@ const ChallengesScreen = () => {
           onLayout={(e) => {
             setParentWidth(e.nativeEvent.layout.width);
           }}
-          style={[styles.barOuterContainer, { flex: 1, }]}
+          style={[styles.barOuterContainer, { flex: 1 }]}
         >
           {data.map((item, index) => {
             const barHeight = (item.value / maxValue) * maxHeight;
@@ -402,7 +460,7 @@ const ChallengesScreen = () => {
           <View>
             <Text style={styles.progressLabelText}>Current</Text>
             <Text style={styles.currentWeightText}>
-              {currentWeight ? `${currentWeight} kg` : "N/A"}
+              {currentWeight ? `${currentWeight} ${weightUnit}` : "N/A"}
             </Text>
           </View>
           <View>
@@ -410,28 +468,34 @@ const ChallengesScreen = () => {
               Target
             </Text>
             <Text style={[styles.targetWeightText, { textAlign: "right" }]}>
-              {targetWeight ? `${targetWeight} kg` : "N/A"}
+              {targetWeight ? `${targetWeight} ${weightUnit}` : "N/A"}
             </Text>
           </View>
         </View>
 
         {/* Progress Bar */}
         <View style={styles.customProgressBarContainer}>
+          <View style={[styles.customProgressBar, { width: "100%" }]} />
           <View
             style={[
               styles.customProgressBar,
-              { width: progressPercentage ? `${progressPercentage}%` : "0%" },
-            ]}
-          />
-          <View
-            style={[
-              styles.progressMarker,
               {
-                left: progressPercentage ? `${progressPercentage}%` : "0%",
-                marginLeft: -8,
+                width: `${progressPercentage}%`,
+                backgroundColor: colors.green,
+                position: "absolute",
               },
             ]}
-          />
+          >
+            <View
+              style={[
+                styles.progressMarker,
+                {
+                  alignSelf: "flex-end",
+                  marginTop: -4,
+                },
+              ]}
+            />
+          </View>
         </View>
       </View>
 
@@ -539,14 +603,6 @@ const ChallengesScreen = () => {
     </>
   );
 
-  const generateGraphData = (range) => {
-    if (range === "Weekly") {
-      return weeklyData;
-    } else {
-      return yearlyData;
-    }
-  };
-
   const RangeModal = ({ visible, onClose, onSelect }) => (
     <Modal
       animationType="slide"
@@ -555,18 +611,18 @@ const ChallengesScreen = () => {
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Select Range</Text>
           {["Weekly", "Yearly"].map((range) => (
             <TouchableOpacity
               key={range}
-              style={styles.modalButton}
+              style={[styles.unitOption]}
               onPress={() => {
                 onSelect(range);
                 onClose();
               }}
             >
-              <Text style={styles.modalButtonText}>{range}</Text>
+              <Text style={styles.unitOptionText}>{range}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -609,7 +665,8 @@ const ChallengesScreen = () => {
         visible={weightModalVisible}
         onClose={() => setWeightModalVisible(false)}
         modalText="Update Your Weight"
-        value={currentWeight}
+        weightUnit={weightUnit}
+        currentWeight={currentWeight}
         onSave={handleUpdateWeight}
       />
       <CustomModal
@@ -627,7 +684,12 @@ const ChallengesScreen = () => {
         visible={targetModalVisible}
         onClose={() => setTargetModalVisible(false)}
         modalText="Set your Target Weight"
-        value={targetWeight}
+        weightUnit={weightUnit}
+        currentWeight={
+          targetWeight !== null && targetWeight !== undefined
+            ? targetWeight
+            : currentWeight
+        }
         onSave={handleUpdateTargetWeight}
       />
       <CustomModal
@@ -686,6 +748,20 @@ const styles = StyleSheet.create({
   absoluteText: {
     fontFamily: "Poppins-SemiBold",
     color: "white",
+  },
+  dateText: {
+    fontFamily: "Poppins-SemiBold",
+    color: colors.green,
+    fontSize: FontSize.small,
+    backgroundColor: "#3C3C3C",
+    position: "absolute",
+    borderRadius: 15,
+    bottom: 10,
+    right: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
   cardHeader: {
     flexDirection: "row",
@@ -760,7 +836,7 @@ const styles = StyleSheet.create({
   },
   customProgressBar: {
     height: "100%",
-    backgroundColor: colors.green,
+    backgroundColor: colors.bgColorOpaque,
     borderRadius: 4,
   },
   progressMarker: {
@@ -768,8 +844,6 @@ const styles = StyleSheet.create({
     height: 16,
     borderRadius: 8,
     backgroundColor: "#fff",
-    position: "absolute",
-    top: -4,
     borderWidth: 2,
     borderColor: colors.green,
   },
@@ -860,28 +934,35 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
-  modalContainer: {
-    backgroundColor: "white",
-    margin: 30,
+  modalContent: {
+    width: "80%",
+    backgroundColor: "#222",
     borderRadius: 10,
     padding: 20,
     alignItems: "center",
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
+    fontSize: FontSize.large,
+    color: "#fff",
+    fontFamily: "Poppins-Bold",
+    marginBottom: 20,
   },
-  modalButton: {
-    paddingVertical: 10,
+  unitOption: {
     width: "100%",
-    alignItems: "center",
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
   },
-  modalButtonText: {
-    fontSize: 16,
-    color: "#007AFF",
+  unitOptionText: {
+    color: "#fff",
+    fontSize: FontSize.regular,
+    textAlign: "center",
+  },
+  selectedUnit: {
+    backgroundColor: colors.green,
   },
   rangeSelectText: {
     fontSize: 16,

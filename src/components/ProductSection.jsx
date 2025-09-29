@@ -43,6 +43,7 @@ const ProductSection = ({ title, products }) => {
       if (response?.data?.success) {
         const cartItems = response?.data?.data?.items;
         dispatch(setCartData(cartItems));
+        setModalVisible(true);
       } else {
         // Show error toast if success is false
         Toast.show({
@@ -67,9 +68,8 @@ const ProductSection = ({ title, products }) => {
       title={item.name}
       amount={item?.price}
       onPress={() => {
-        items.push({ product: item });
-        dispatch(setCartData(items));
-        setModalVisible(true);
+        // items.push({ product: item });
+        // dispatch(setCartData(items));
         addToCart(item);
       }} // Optional, can be removed
       product={item} // Pass the entire product object

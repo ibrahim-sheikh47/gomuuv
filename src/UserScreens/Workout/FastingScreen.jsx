@@ -30,7 +30,7 @@ const FastingScreen = () => {
   const route = useRoute(); // Use route to access navigation parameters
   const [activeTab, setActiveTab] = useState("Current Fast");
   const tabs = ["Current Fast", "Stats and History"];
-  const { token, data:userData } = useSelector((state) => state.Auth);
+  const { token, data: userData } = useSelector((state) => state.Auth);
   const [selectedFilter, setSelectedFilter] = useState("weekly");
 
   const [modalVisible, setModalVisible] = useState(false); // Modal visibility state
@@ -138,6 +138,7 @@ const FastingScreen = () => {
         setSelectedPlan(res.data.data);
       }
     } catch (error) {
+      setSelectedPlan(null);
       console.error("Error fetching history", error);
     }
   };
@@ -242,7 +243,6 @@ const FastingScreen = () => {
       <Header
         title={"Fasting"}
         showBackButton={true}
-        rightIcon1={<SearchIcon />}
       />
 
       <TabContainer

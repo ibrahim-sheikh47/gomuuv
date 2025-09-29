@@ -2,7 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import {
-  Alert,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,22 +17,20 @@ import AuthHeader from "../../../components/AuthHeader";
 import Container from "../../../components/Container";
 import CustomButton from "../../../components/CustomButton";
 import InputField from "../../../components/InputField";
-import Loader from "../../../components/Loader";
 import { SocialButton } from "../../../components/SocialButton";
 import { colors } from "../../../constants/colors";
 import { END_POINTS } from "../../../config/routes";
 import { API } from "../../../config/apiClient";
 import { setAuthData } from "../../../redux/reducers/AuthSlice";
 import { useDispatch } from "react-redux";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { googleSignIn } from "../../../services/authService";
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: "ahmad.muzaffar@gomuuv.com",
-    password: "Abcd@12345",
+    email: "",
+    password: "",
     rememberMe: false,
   });
 
@@ -63,7 +61,6 @@ const Login = () => {
     // Validate the form
     const validationError = validateForm();
     if (validationError) {
-      setLoading(false);
       Toast.show({
         type: "error",
         text1: "Validation Error",
@@ -72,7 +69,6 @@ const Login = () => {
       return; // Stop further execution
     }
 
-    setLoading(true);
     try {
       const response = await API.post(END_POINTS.LOGIN, {
         email: formData.email,
@@ -113,7 +109,7 @@ const Login = () => {
         }
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       // Handle error response
       Toast.show({
         type: "error",
@@ -123,8 +119,65 @@ const Login = () => {
           error ||
           "Login failed. Please try again.",
       });
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    try {
+      const res = await googleSignIn();
+
+      const response = await API.post(END_POINTS.SOCIAL_LOGIN, {
+        firstName: res.data.user.givenName,
+        lastName: res.data.user.familyName,
+        email: res.data.user.email,
+        image: res.data.user.photo,
+        socialAccessToken: res.data.idToken,
+        authType: "google",
+      });
+      if (response?.data?.success) {
+        dispatch(
+          setAuthData({
+            token: response?.data?.token,
+            data: response?.data?.data,
+          })
+        );
+        // Successful login
+        Toast.show({
+          type: "success",
+          text1: "Login Successful!",
+          text2: "Welcome back 👋",
+        });
+
+        if (response.data.data.role === "user") {
+          navigation.reset({
+            index: 0, // Ensures TabNavigator is at the top
+            routes: [
+              {
+                name: "UserApp",
+              },
+            ],
+          });
+        } else {
+          navigation.reset({
+            index: 0, // Ensures TabNavigator is at the top
+            routes: [
+              {
+                name: "TrainerApp",
+              },
+            ],
+          });
+        }
+      }
+    } catch (error) {
+      // Handle error response
+      Toast.show({
+        type: "error",
+        text1: "Login Failed",
+        text2:
+          error.response?.data?.message ||
+          error ||
+          "Login failed. Please try again.",
+      });
     }
   };
 
@@ -153,7 +206,7 @@ const Login = () => {
           />
         </View>
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => handleInputChange("rememberMe", !formData.rememberMe)}
           style={styles.rememberMeContainer}
         >
@@ -166,7 +219,7 @@ const Login = () => {
             {formData.rememberMe && <Text style={styles.checkmark}>✓</Text>}
           </View>
           <Text style={styles.rememberMeText}>Remember Me</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <CustomButton
           style={{ marginTop: 50 }}
@@ -185,9 +238,9 @@ const Login = () => {
 
         <View style={styles.socialButtonContainer}>
           {/** Repeated styles are now combined */}
-          <SocialButton icon={GoogleLogo} />
+          <SocialButton icon={GoogleLogo} onPress={signInWithGoogle} />
           <SocialButton icon={FacebookLogo} />
-          <SocialButton icon={AppleLogo} />
+          {Platform.OS === "ios" && <SocialButton icon={AppleLogo} />}
         </View>
         <View
           style={{
@@ -199,21 +252,22 @@ const Login = () => {
           }}
         >
           <Text style={styles.signInText}>Don’t have an account?</Text>
-          <TouchableOpacity onPress={() => {
-            navigation.reset({
-              index: 0,
-              routes: [
-                {
-                  name: "Splash",
-                },
-              ],
-            });
-          }}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.reset({
+                index: 0,
+                routes: [
+                  {
+                    name: "Splash",
+                  },
+                ],
+              });
+            }}
+          >
             <Text style={styles.signInLink}> Sign up</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <Loader isLoading={loading} message="Processing your request..." />
     </Container>
   );
 };

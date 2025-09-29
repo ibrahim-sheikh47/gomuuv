@@ -60,7 +60,10 @@ const StartWorkout = () => {
   useEffect(() => {
     return () => {
       if (!movingNext.current) {
-        updateDayStats(false, getExerciseParam(exercises[currentExerciseIndex])?._id);
+        updateDayStats(
+          false,
+          getExerciseParam(exercises[currentExerciseIndex])?._id
+        );
       }
     };
   }, []);
@@ -84,27 +87,30 @@ const StartWorkout = () => {
         token
       );
       if (res.data.success) {
-        setCurrentExerciseIndex(currentExerciseIndex + 1);
-        if (
-          isDayComplete &&
-          getExerciseParam(exercises[currentExerciseIndex])._id.toString === exercise
-        ) {
+        const nextIndex = currentExerciseIndex + 1;
+
+        // If nextIndex is still within the exercises list, just move forward
+        if (nextIndex < exercises.length) {
+          setCurrentExerciseIndex(nextIndex);
+        } else {
+          // Last exercise completed → navigate
+          movingNext.current = true;
           navigation.reset({
             routes: [
               {
                 name: "TabNavigator",
                 params: {
-                  screen: "Challenges", // Navigate to the "Chats" screen within the TabNavigator
+                  screen: "Challenges",
                 },
               },
               {
                 name: "WorkoutCompleted",
                 params: {
                   duration: time - secondsRemainingValue.current,
-                  image: image,
-                  title: title,
-                  level: level,
-                  calories: calories,
+                  image,
+                  title,
+                  level,
+                  calories,
                   lastExerciseId: exercise,
                   workoutSessionId,
                   isChallenge,
@@ -113,8 +119,8 @@ const StartWorkout = () => {
             ],
             index: 1,
           });
-          movingNext.current = true;
         }
+
         route?.params?.refresh();
       }
     } catch (error) {
@@ -207,16 +213,19 @@ const StartWorkout = () => {
                 style={styles.firstExerciseTitle}
                 onPress={() => {
                   if (
-                    getExerciseParam(exercises[currentExerciseIndex]).videoUrl !== ""
+                    getExerciseParam(exercises[currentExerciseIndex])
+                      .videoUrl !== ""
                   ) {
                     navigation.navigate("VideoPlayerScreen", {
-                      videoUrl:
-                      getExerciseParam(exercises[currentExerciseIndex]).videoUrl, // Assuming each exercise has a videoUrl property
+                      videoUrl: getExerciseParam(
+                        exercises[currentExerciseIndex]
+                      ).videoUrl, // Assuming each exercise has a videoUrl property
                     });
                   }
                 }}
               >
-                {getExerciseParam(exercises[currentExerciseIndex]).videoUrl !== "" && (
+                {getExerciseParam(exercises[currentExerciseIndex]).videoUrl !==
+                  "" && (
                   <Icon name="play-circle" size={24} color={colors.green} />
                 )}
                 <Text style={[styles.title, { color: colors.green }]}>

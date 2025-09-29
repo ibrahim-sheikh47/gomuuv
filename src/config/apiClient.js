@@ -1,12 +1,12 @@
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { SERVER_URL } from "./routes";
 import axiosRetry from "axios-retry";
+import { toastMessage } from "../components/toastMessage";
+import { loaderRef } from "../contexts/LoaderRef";
 
 // Create an Axios instance
 const apiClient = axios.create({
-  baseURL: SERVER_URL,
-  timeout: 10000,
+  baseURL: process.env.EXPO_PUBLIC_BASE_URL,
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -16,9 +16,15 @@ const apiClient = axios.create({
 // Apply retry logic to Axios instance
 axiosRetry(apiClient, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
+let activeRequests = 0;
+const showLoader = () => loaderRef.show();
+const hideLoader = () => loaderRef.hide();
+
 // Add a request interceptor
 apiClient.interceptors.request.use(
   async (config) => {
+    activeRequests++;
+    showLoader();
     if (config.authorized) {
       const token = config.token;
       if (token) {
@@ -37,32 +43,33 @@ apiClient.interceptors.request.use(
 // Add a response interceptor
 apiClient.interceptors.response.use(
   (response) => {
-    // Return response data directly
+    activeRequests--;
+    if (activeRequests === 0) hideLoader();
     return response;
   },
-  async (error) => {
-    // Handle errors globally
-    let errorMessage = "Something went wrong, please try again later.";
+  async (err) => {
+    activeRequests--;
+    if (activeRequests === 0) hideLoader();
 
-    if (error.response) {
-      const { status, data } = error.response;
-      if (status === 401) {
-        errorMessage = "Unauthorized! Please log in again.";
-        // Optionally handle token refresh here
-        // Example: await refreshAuthToken();
-      } else if (status === 500) {
-        errorMessage = "Server error. Please try again later.";
-      } else if (data && data.message) {
-        errorMessage = data.message;
-      }
-    } else if (error.message === "Network Error") {
-      errorMessage = "Please check your internet connection.";
+    const error = {
+      url: err.config?.url,
+      data: err.config?.data,
+      headers: err.config?.headers,
+      method: err.config?.method,
+      code: err.response?.status || 404,
+      message:
+        err.response?.data?.message || err.response?.data?.msg || err.message,
+    };
+    if (error.code !== 404) {
+      toastMessage({
+        type: "error",
+        text1: "Error",
+        text2: error.message,
+        duration: 2000,
+      });
     }
 
-    // Optionally log errors
-    // logErrorToService(error);
-
-    return Promise.reject(errorMessage); // Throw error for individual calls to handle
+    return Promise.reject(error);
   }
 );
 

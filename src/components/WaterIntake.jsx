@@ -7,7 +7,13 @@ import { colors } from "../constants/colors";
 import GlassIcon from "../assets/svgs/GlassIcon";
 import { FontSize } from "../utils/font";
 
-const WaterIntake = ({ consumedGlasses, totalGlasses, totalVolume, onAddWater }) => {
+const WaterIntake = ({
+  consumedGlasses,
+  totalGlasses,
+  consumedVolume,
+  totalVolume,
+  onAddWater,
+}) => {
   const waterProgress = Math.min((consumedGlasses / totalGlasses) * 100, 100);
 
   return (
@@ -23,7 +29,7 @@ const WaterIntake = ({ consumedGlasses, totalGlasses, totalVolume, onAddWater })
       <Text
         style={{ textAlign: "right", color: "#A4A4A4", marginVertical: 10 }}
       >
-        {totalVolume} ml{" "}
+        {consumedVolume}/{totalVolume} ml{" "}
       </Text>
     </TouchableOpacity>
   );

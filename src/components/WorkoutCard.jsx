@@ -9,7 +9,6 @@ import { colors } from "../constants/colors";
 import { FontSize } from "../utils/font";
 
 const WorkoutCard = ({ title, calories, time, category, image, onPress }) => {
-  console.log(image);
   return (
     <TouchableOpacity style={styles.sessionContainer} onPress={onPress}>
       <Image

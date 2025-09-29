@@ -8,7 +8,6 @@ import Container from "../../components/Container";
 import CustomModal from "../../components/CustomModal";
 import Header from "../../components/Header";
 import ProductSection from "../../components/ProductSection";
-import SearchBar from "../../components/SearchBar";
 import Selectable from "../../components/Selectable";
 import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
@@ -16,16 +15,15 @@ import {
   setCategoriesData,
   setProductsData,
 } from "../../redux/reducers/ShopSlice";
-import { colors } from "../../constants/colors";
+
 const ShopScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  // Combine all useSelector Hooks
-  const { token, categoriesArr, productsArr } = useSelector((state) => ({
-    token: state.Auth?.token,
-    categoriesArr: state.Shop?.categories,
-    productsArr: state.Shop?.products,
-  }));
+  const { token } = useSelector((state) => state.Auth);
+
+  const { categories: categoriesArr, products: productsArr } = useSelector(
+    (state) => state.Shop
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const onChangeSearch = (query) => setSearchQuery(query);
 

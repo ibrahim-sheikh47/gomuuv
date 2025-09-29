@@ -7,13 +7,10 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import images from "../../constants/images";
-import icons from "../../constants/icons";
 import { colors } from "../../constants/colors";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
 import Selectable from "../../components/Selectable";
-import SearchIcon from "../../assets/svgs/SearchIcon";
 import StrengthIcon from "../../assets/svgs/StrengthIcon";
 import LevelIcon from "../../assets/svgs/LevelIcon";
 import { FontSize } from "../../utils/font";

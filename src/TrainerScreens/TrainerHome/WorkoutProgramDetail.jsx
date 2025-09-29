@@ -41,7 +41,6 @@ const WorkoutProgramDetails = () => {
 
   const date = moment().format("DD/MM/yyyy");
   const dayName = moment().format("dddd");
-  console.log(dayName);
 
   const [workout, setWorkout] = useState(item);
 

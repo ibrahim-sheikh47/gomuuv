@@ -19,10 +19,10 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.gomuuv.ios",
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "This app requires access to the photo library to update your profile picture.",
-        "NSCameraUsageDescription": "This app requires access to the camera to take profile pictures.",
-        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show your position on the map.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to your location to show your position on the map.",
+        "NSPhotoLibraryUsageDescription": "Gomuuv needs access to your photo library so you can upload and update your profile picture.",
+        "NSCameraUsageDescription": "Gomuuv needs access to your camera so you can take photos and update your profile picture.",
+        "NSLocationWhenInUseUsageDescription": "Gomuuv needs access to your location to show your position on the map.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Gomuuv needs access to your location to show your position on the map.",
         "ITSAppUsesNonExemptEncryption": false
       },
       "buildNumber": "1"
@@ -32,11 +32,6 @@
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "config": {
-        "googleMaps": {
-          "apiKey": "AIzaSyCSz-v30_BxTuT6a23e78UUy0ANbRd0gC4"
-        }
       },
       "package": "com.gomuuv.android",
       "permissions": [
@@ -65,6 +60,7 @@
     },
     "plugins": [
       "expo-font",
+      "expo-apple-authentication",
       "react-native-video",
       "expo-video",
       [
@@ -76,19 +72,17 @@
         }
       ],
       [
-        "expo-image-picker",
+          "expo-image-picker",
         {
-          "photosPermission": "The app accesses your photos to let you share them with your friends.",
-          "cameraPermission": "The app needs access to your camera to take photos."
+          "photosPermission": "Gomuuv needs access to your photo library so you can upload and update your profile picture.",
+          "cameraPermission": "Gomuuv needs access to your camera so you can take photos and update your profile picture."
         }
       ],
       "@react-native-firebase/app",
       [
-        "expo-build-properties",
+        "@react-native-google-signin/google-signin",
         {
-          "ios": {
-            "useFrameworks": "static"
-          }
+          "iosUrlScheme": "com.googleusercontent.apps.927173641477-7teeobddmcmo7e2jpk99bjrj9o599mgi"
         }
       ]
     ]

@@ -22,11 +22,13 @@ const Selectable = ({
   useEffect(() => {
     if (!wrapOnLineChange && scrollViewRef.current && selectedItem) {
       const selectedIndex = items.indexOf(selectedItem);
-      if (itemRefs.current[selectedIndex]) {
-        itemRefs.current[selectedIndex].measureLayout(
-          scrollViewRef.current.getInnerViewNode(), // Parent node inside ScrollView
+      const selectedRef = itemRefs.current[selectedIndex];
+
+      if (selectedRef) {
+        selectedRef.measureLayout(
+          scrollViewRef.current, // ✅ measure relative to ScrollView
           (x, y, width, height) => {
-            scrollViewRef.current.scrollTo({ x: x - 20, animated: true }); // Scroll to x position
+            scrollViewRef.current.scrollTo({ x: x - 20, animated: true });
           }
         );
       }
@@ -36,24 +38,25 @@ const Selectable = ({
   const content = (
     <View style={styles.timeRow}>
       {items.map((item, index) => (
-        <TouchableOpacity
+        <View
           key={index}
-          ref={(ref) => (itemRefs.current[index] = ref)} // Attach ref to each button
+          ref={(ref) => (itemRefs.current[index] = ref)} // attach ref to View, not TouchableOpacity
           style={[
             styles.timePeriodButton,
             selectedItem === item ? styles.activeButton : styles.inactiveButton,
           ]}
-          onPress={() => setSelectedItem(item)}
         >
-          <Text
-            style={[
-              styles.timePeriodText,
-              selectedItem === item ? styles.activeText : styles.inactiveText,
-            ]}
-          >
-            {item}
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => setSelectedItem(item)}>
+            <Text
+              style={[
+                styles.timePeriodText,
+                selectedItem === item ? styles.activeText : styles.inactiveText,
+              ]}
+            >
+              {item}
+            </Text>
+          </TouchableOpacity>
+        </View>
       ))}
     </View>
   );

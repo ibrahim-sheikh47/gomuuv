@@ -23,12 +23,10 @@ import { END_POINTS } from "../../../config/routes";
 import { setAuthData } from "../../../redux/reducers/AuthSlice";
 import Toast from "react-native-toast-message";
 import { useDispatch } from "react-redux";
-import Loader from "../../../components/Loader";
 
 const TrainerSignup = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false);
 
   // Single state for all form fields
   const [form, setForm] = useState({
@@ -83,7 +81,6 @@ const TrainerSignup = () => {
   const handleSignup = async () => {
     if (!validateForm()) return;
 
-    setLoading(true);
     let body = {
       ...form,
       firstName: form.name,
@@ -129,7 +126,6 @@ const TrainerSignup = () => {
         });
       }
     } catch (error) {
-      setLoading(false);
       Toast.show({
         type: "error",
         text1: "Error",
@@ -152,10 +148,10 @@ const TrainerSignup = () => {
         <View style={styles.inputContainer}>
           <InputField
             type={"first_name"}
-            label="First Name"
+            label="Full Name"
             value={form.name}
             onChangeText={(value) => handleInputChange("name", value)}
-            placeholder="Enter your name"
+            placeholder="Enter your fullname"
           />
           <InputField
             label="Email"
@@ -206,8 +202,6 @@ const TrainerSignup = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-
-      <Loader isLoading={loading} message="Processing your request..." />
     </Container>
   );
 };

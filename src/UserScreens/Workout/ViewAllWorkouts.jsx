@@ -18,10 +18,8 @@ const ViewAllWorkouts = () => {
   const navigation = useNavigation();
   const { category } = useRoute()?.params || {};
 
-  const { token, trendingData } = useSelector((state) => ({
-    token: state.Auth?.token,
-    trendingData: state.Workout.trendingData,
-  }));
+  const { token } = useSelector((state) => state.Auth);
+  const { trendingData } = useSelector((state) => state.Workout);
 
   const getTrendingWorkouts = async () => {
     try {

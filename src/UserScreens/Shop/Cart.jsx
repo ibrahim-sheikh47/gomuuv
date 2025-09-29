@@ -29,10 +29,8 @@ const Cart = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { width } = useWindowDimensions(); // Get screen width for responsive design
-  const { token, cartItems } = useSelector((state) => ({
-    token: state.Auth?.token,
-    cartItems: state.Cart?.data,
-  }));
+  const { token } = useSelector((state) => state.Auth);
+  const { data: cartItems } = useSelector((state) => state.Cart);
 
   // Responsive values based on screen width
   const isSmallScreen = width < 360;

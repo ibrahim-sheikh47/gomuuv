@@ -35,6 +35,23 @@ const WorkoutCompleted = ({ route }) => {
     });
   };
 
+  const formatElapsedTime = (totalSeconds = 0) => {
+    if (totalSeconds < 60) {
+      return `${totalSeconds}(sec)`;
+    }
+
+    if (totalSeconds < 3600) {
+      const minutes = parseInt(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+      return `${minutes}(mins) ${secs}(sec)`;
+    }
+
+    const hours = parseInt(totalSeconds / 3600);
+    const minutes = parseInt(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${hours || 0}(hour) ${minutes || 0}(mins) ${secs || 0}(sec)`;
+  };
+
   return (
     <Container cusStyles={{ paddingHorizontal: 0 }}>
       <View style={styles.imageContainer}>
@@ -63,7 +80,7 @@ const WorkoutCompleted = ({ route }) => {
                 <Text style={styles.durationLabel}>Duration</Text>
                 {/* Display the formatted duration */}
                 <Text style={styles.durationText}>
-                  {parseInt(duration / 60)} (mins)
+                  {formatElapsedTime(duration)}
                 </Text>
               </View>
               <View>

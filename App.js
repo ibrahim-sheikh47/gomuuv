@@ -11,6 +11,8 @@ import { PersistGate } from "redux-persist/integration/react";
 import AppNavigator from "./src/navigation/AppNavigator/AppNavigator";
 import { persistor, store } from "./src/redux/store";
 import { LogBox } from "react-native";
+import { LoaderProvider } from "./src/contexts/LoaderContext";
+import AppLoader from "./src/components/AppLoader";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -38,14 +40,17 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Provider store={store}>
-        <PersistGate persistor={persistor}>
-          <NavigationContainer>
-            <AppNavigator />
-            <Toast topOffset={60} />
-          </NavigationContainer>
-        </PersistGate>
-      </Provider>
+      <LoaderProvider>
+        <Provider store={store}>
+          <PersistGate persistor={persistor}>
+            <NavigationContainer>
+              <AppNavigator />
+              <Toast topOffset={60} />
+              <AppLoader />
+            </NavigationContainer>
+          </PersistGate>
+        </Provider>
+      </LoaderProvider>
     </GestureHandlerRootView>
   );
 }

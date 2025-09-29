@@ -13,7 +13,6 @@ import Header from "../../components/Header";
 import InputField from "../../components/InputField";
 import CustomButton from "../../components/CustomButton";
 import { colors } from "../../constants/colors";
-import EditIcon from "../../assets/svgs/EditIcon";
 import { FontSize } from "../../utils/font";
 import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
@@ -21,22 +20,21 @@ import { useSelector } from "react-redux";
 
 const ActivityScreen = () => {
   const route = useRoute();
-  const { activityType, activityName } = route.params;
+  const { activityType, activityName, goal } = route.params;
   const navigation = useNavigation();
   const [formValues, setFormValues] = useState({
-    pace: "",
-    timeHours: "",
-    timeMinutes: "",
-    distance: "",
-    distanceUnit: "mi",
+    timeHours: goal?.targetDuration?.hours?.toString() || "",
+    timeMinutes: goal?.targetDuration?.minutes?.toString() || "",
+    distance: goal?.targetDistance?.value?.toString() || "",
+    distanceUnit: goal?.targetDistance?.unit || "mi",
   });
-  const [modalVisible, setModalVisible] = useState(false);
   const { token } = useSelector((state) => state.Auth);
+
+  const [modalVisible, setModalVisible] = useState(false);
 
   const distanceUnits = [
     { label: "Miles", value: "mi" },
-    { label: "Inches", value: "in" },
-    { label: "Feet", value: "ft" },
+    { label: "Kilometers", value: "km" },
   ];
 
   const handleInputChange = (field, value) => {
@@ -61,11 +59,11 @@ const ActivityScreen = () => {
             unit: formValues.distanceUnit,
           },
           targetDuration: {
-            value: convertToMinutes(
-              parseInt(formValues.timeHours),
-              parseInt(formValues.timeMinutes)
-            ),
-            unit: "minute",
+            hours: formValues.timeHours || 0,
+            minutes: formValues.timeMinutes || 0,
+            totalSeconds:
+              (formValues.timeHours || 0) * 3600 +
+              (formValues.timeMinutes || 0) * 60,
           },
         },
         token
@@ -82,12 +80,6 @@ const ActivityScreen = () => {
 
   const handleSave = () => {
     createGoal();
-    // navigation.navigate("ActivityDetailScreen", {
-    //   activityName: activityName,
-    //   distance: formValues.distance,
-    //   time: `${formValues.timeHours}h ${formValues.timeMinutes}m`,
-    //   distanceUnit: formValues.distanceUnit,
-    // });
   };
 
   const toggleModal = () => {
@@ -124,9 +116,6 @@ const ActivityScreen = () => {
               onChangeText={(value) => handleInputChange("timeHours", value)}
               keyboardType="numeric"
             />
-            <TouchableOpacity style={styles.editIcon}>
-              <EditIcon />
-            </TouchableOpacity>
           </View>
           <View style={{ flex: 1 }}>
             <InputField
@@ -136,9 +125,6 @@ const ActivityScreen = () => {
               onChangeText={(value) => handleInputChange("timeMinutes", value)}
               keyboardType="numeric"
             />
-            <TouchableOpacity style={styles.editIcon}>
-              <EditIcon />
-            </TouchableOpacity>
           </View>
         </View>
 
@@ -151,9 +137,6 @@ const ActivityScreen = () => {
               placeholder="Enter distance"
               keyboardType="numeric"
             />
-            <TouchableOpacity style={styles.editIcon}>
-              <EditIcon />
-            </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.unitSelector} onPress={toggleModal}>
             <Text style={styles.unitText}>{formValues.distanceUnit}</Text>

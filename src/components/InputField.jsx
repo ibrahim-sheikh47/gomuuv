@@ -13,193 +13,212 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { colors } from "../constants/colors";
 import { FontSize } from "../utils/font";
 
-const InputField = ({
-  isRichText = false,
-  type,
-  label,
-  value,
-  cusStyles,
-  onChangeText,
-  secureTextEntry = false,
-  keyboardType = "default",
-  autoFocus = false,
-  placeholder,
-  unitType, // "height" | "weight" | undefined
-  unitValue, // e.g., "cm", "ft-in"
-  onUnitChange, // function to update unit
-  compositeFields = [], // [{ key, value, onChangeText, placeholder }]
-  editable = true,
-}) => {
-  const [isFocused, setIsFocused] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(
-    value ? new Date(value) : new Date()
-  );
-  const inputRef = useRef(null);
+const InputField = React.forwardRef(
+  (
+    {
+      isRichText = false,
+      type,
+      label,
+      value,
+      cusStyles,
+      onChangeText,
+      secureTextEntry = false,
+      keyboardType = "default",
+      autoFocus = false,
+      placeholder,
+      unitType, // "height" | "weight" | undefined
+      unitValue, // e.g., "cm", "ft-in"
+      onUnitChange, // function to update unit
+      compositeFields = [], // [{ key, value, onChangeText, placeholder }]
+      editable = true,
+    },
+    ref
+  ) => {
+    const [isFocused, setIsFocused] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(
+      value ? new Date(value) : new Date()
+    );
+    const inputRef = useRef(null);
+    useEffect(() => {
+      if (ref) {
+        if (typeof ref === "function") {
+          ref(inputRef.current);
+        } else {
+          ref.current = inputRef.current;
+        }
+      }
+    }, [ref]);
 
-  // States for modal visibility
-  const [heightModalVisible, setHeightModalVisible] = useState(false);
-  const [weightModalVisible, setWeightModalVisible] = useState(false);
+    // States for modal visibility
+    const [heightModalVisible, setHeightModalVisible] = useState(false);
+    const [weightModalVisible, setWeightModalVisible] = useState(false);
 
-  // Options for the dropdowns
-  const heightUnitOptions = ["cm", "ft-in"];
-  const weightUnitOptions = ["kg", "lbs"];
+    // Options for the dropdowns
+    const heightUnitOptions = ["cm", "ft-in"];
+    const weightUnitOptions = ["kg", "lbs"];
 
-  useEffect(() => {
-    if (autoFocus && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [autoFocus]);
+    useEffect(() => {
+      if (autoFocus && inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, [autoFocus]);
 
-  const handleDateChange = (event, date) => {
-    setShowDatePicker(false);
-    if (date) {
-      setSelectedDate(date);
-      onChangeText(date.toISOString().split("T")[0]);
-    }
-  };
+    const handleDateChange = (event, date) => {
+      setShowDatePicker(false);
+      if (date) {
+        setSelectedDate(date);
+        onChangeText(date.toISOString().split("T")[0]);
+      }
+    };
 
-  const renderCompositeInputs = () => (
-    <View style={styles.row}>
-      {compositeFields.map((field) => (
-        <TextInput
-          key={field.key}
-          value={field.value?.toString()}
-          onChangeText={field.onChangeText}
-          placeholder={field.placeholder}
-          placeholderTextColor="#AFAFAF"
-          keyboardType="numeric"
-          style={[styles.input, styles.flexHalf]}
-        />
-      ))}
+    const renderCompositeInputs = () => (
+      <View style={styles.row}>
+        {compositeFields.map((field) => (
+          <TextInput
+            key={field.key}
+            value={field.value?.toString()}
+            onChangeText={field.onChangeText}
+            placeholder={field.placeholder}
+            placeholderTextColor="#AFAFAF"
+            keyboardType="numeric"
+            style={[styles.input, styles.flexHalf]}
+          />
+        ))}
 
-      {/* Unit selector */}
-      {unitType && (
-        <TouchableOpacity
-          style={styles.unitSelector}
-          onPress={() => setHeightModalVisible(true)}
-        >
-          <Text style={styles.unitSelectorText}>{unitValue}</Text>
-        </TouchableOpacity>
-      )}
-    </View>
-  );
+        {/* Unit selector */}
+        {unitType && (
+          <TouchableOpacity
+            style={styles.unitSelector}
+            onPress={() => setHeightModalVisible(true)}
+          >
+            <Text style={styles.unitSelectorText}>{unitValue}</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
 
-  return (
-    <View style={styles.container}>
-      {label && <Text style={styles.label}>{label}</Text>}
+    return (
+      <View style={styles.container}>
+        {label && <Text style={styles.label}>{label}</Text>}
 
-      {/* Input */}
-      {type === "date" ? (
-        <TouchableOpacity
-          onPress={() => setShowDatePicker(true)}
-          style={[
-            styles.input,
-            { flexDirection: "row-reverse", alignItems: "center" },
-          ]}
-        >
-          <Text
+        {/* Input */}
+        {type === "date" ? (
+          <TouchableOpacity
+            onPress={() => setShowDatePicker(true)}
             style={[
               styles.input,
-              {
-                flex: 1,
-                textAlignVertical: "center",
-                height: "auto",
-                borderWidth: 0,
-              },
-              isFocused && { borderColor: colors.green },
-              cusStyles,
+              { flexDirection: "row-reverse", alignItems: "center" },
             ]}
           >
-            {selectedDate?.toDateString() ?? (placeholder || "Select Date")}
-          </Text>
-          <Icon name="calendar" size={20} color={"#888"} style={styles.icon} />
-        </TouchableOpacity>
-      ) : compositeFields.length > 0 && type === "height" ? (
-        renderCompositeInputs()
-      ) : (
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-          <View style={[styles.inputContainer, { flex: 1 }]}>
-            <TextInput
-              ref={inputRef}
+            <Text
               style={[
                 styles.input,
+                {
+                  flex: 1,
+                  textAlignVertical: "center",
+                  height: "auto",
+                  borderWidth: 0,
+                },
                 isFocused && { borderColor: colors.green },
                 cusStyles,
-                isRichText && { height: 140, textAlignVertical: "top" },
               ]}
-              value={value?.toString()}
-              onChangeText={onChangeText}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              secureTextEntry={secureTextEntry && !showPassword}
-              keyboardType={keyboardType}
-              placeholder={placeholder}
-              placeholderTextColor="#AFAFAF"
-              editable={editable}
+            >
+              {selectedDate?.toDateString() ?? (placeholder || "Select Date")}
+            </Text>
+            <Icon
+              name="calendar"
+              size={20}
+              color={"#888"}
+              style={styles.icon}
             />
-            {secureTextEntry && (
+          </TouchableOpacity>
+        ) : compositeFields.length > 0 && type === "height" ? (
+          renderCompositeInputs()
+        ) : (
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+            <View style={[styles.inputContainer, { flex: 1 }]}>
+              <TextInput
+                ref={inputRef}
+                style={[
+                  styles.input,
+                  isFocused && { borderColor: colors.green },
+                  cusStyles,
+                  isRichText && { height: 140, textAlignVertical: "top" },
+                ]}
+                value={value?.toString()}
+                onChangeText={onChangeText}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                secureTextEntry={secureTextEntry && !showPassword}
+                keyboardType={keyboardType}
+                placeholder={placeholder}
+                placeholderTextColor="#AFAFAF"
+                editable={editable}
+              />
+              {secureTextEntry && (
+                <TouchableOpacity
+                  onPress={() => setShowPassword(!showPassword)}
+                  style={styles.iconContainer}
+                >
+                  <Icon
+                    name={showPassword ? "eye" : "eye-slash"}
+                    size={22}
+                    color={"#888"}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {/* Unit selector */}
+            {unitType && (
               <TouchableOpacity
-                onPress={() => setShowPassword(!showPassword)}
-                style={styles.iconContainer}
+                style={styles.unitSelector}
+                onPress={() =>
+                  type === "height"
+                    ? setHeightModalVisible(true)
+                    : setWeightModalVisible(true)
+                }
               >
-                <Icon
-                  name={showPassword ? "eye" : "eye-slash"}
-                  size={22}
-                  color={"#888"}
-                />
+                <Text style={styles.unitSelectorText}>{unitValue}</Text>
               </TouchableOpacity>
             )}
           </View>
+        )}
 
-          {/* Unit selector */}
-          {unitType && (
-            <TouchableOpacity
-              style={styles.unitSelector}
-              onPress={() =>
-                type === "height"
-                  ? setHeightModalVisible(true)
-                  : setWeightModalVisible(true)
-              }
-            >
-              <Text style={styles.unitSelectorText}>{unitValue}</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      )}
+        {showDatePicker && (
+          <DateTimePicker
+            value={selectedDate}
+            mode="date"
+            display="default"
+            onChange={handleDateChange}
+          />
+        )}
 
-      {showDatePicker && (
-        <DateTimePicker
-          value={selectedDate}
-          mode="date"
-          display="default"
-          onChange={handleDateChange}
+        <SelectionModal
+          visible={heightModalVisible}
+          onClose={() => setHeightModalVisible(false)}
+          options={heightUnitOptions}
+          onSelect={(value) => {
+            onUnitChange(value);
+          }}
+          title="Select Height Unit"
         />
-      )}
 
-      <SelectionModal
-        visible={heightModalVisible}
-        onClose={() => setHeightModalVisible(false)}
-        options={heightUnitOptions}
-        onSelect={(value) => {
-          onUnitChange(value);
-        }}
-        title="Select Height Unit"
-      />
-
-      <SelectionModal
-        visible={weightModalVisible}
-        onClose={() => setWeightModalVisible(false)}
-        options={weightUnitOptions}
-        onSelect={(value) => {
-          onUnitChange(value);
-        }}
-        title="Select Weight Unit"
-      />
-    </View>
-  );
-};
+        <SelectionModal
+          visible={weightModalVisible}
+          onClose={() => setWeightModalVisible(false)}
+          options={weightUnitOptions}
+          onSelect={(value) => {
+            onUnitChange(value);
+          }}
+          title="Select Weight Unit"
+        />
+      </View>
+    );
+  }
+);
 
 // Custom modal selection component
 const SelectionModal = ({ visible, onClose, options, onSelect, title }) => {

@@ -12,7 +12,6 @@ import { useNavigation } from "@react-navigation/native";
 import Container from "../../../components/Container";
 import AuthHeader from "../../../components/AuthHeader";
 import { colors } from "../../../constants/colors";
-import Loader from "../../../components/Loader";
 import CustomButton from "../../../components/CustomButton";
 import Toast from "react-native-toast-message";
 import { API } from "../../../config/apiClient";
@@ -23,7 +22,6 @@ const Verify = (props) => {
   const navigation = useNavigation();
   const params = props.route.params;
   const [code, setCode] = useState(["", "", "", ""]);
-  const [loading, setLoading] = useState(false); // Loader state
   const inputRefs = useRef([]);
 
   useEffect(() => {
@@ -47,10 +45,8 @@ const Verify = (props) => {
   };
 
   const resendOtp = async (email) => {
-    setLoading(true);
     try {
       const response = await API.post(END_POINTS.FORGOT_PASSWORD, { email });
-      setLoading(false);
 
       if (response?.data?.success) {
         Toast.show({
@@ -69,7 +65,6 @@ const Verify = (props) => {
         });
       }
     } catch (error) {
-      setLoading(false);
       Toast.show({
         type: "error",
         text1: "Error",
@@ -85,10 +80,7 @@ const Verify = (props) => {
 
   const handleVerify = () => {
     if (isCodeComplete) {
-      setLoading(true); // Show the loader
-      setTimeout(() => {
-        setLoading(false); // Hide the loader after verification
-      }, 20000); // Simulate a network request delay
+      setTimeout(() => {}, 20000); // Simulate a network request delay
     }
   };
 
@@ -156,9 +148,6 @@ const Verify = (props) => {
             // navigation.navigate("NewPass");
           }}
         />
-
-        {/* Loader while verifying */}
-        <Loader isLoading={loading} message="Processing your request..." />
       </ScrollView>
     </Container>
   );

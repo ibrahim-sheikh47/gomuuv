@@ -4,7 +4,6 @@ import Container from "../../../components/Container";
 import BackHeader from "../../../components/BackHeader";
 import InputField from "../../../components/InputField";
 import CustomButton from "../../../components/CustomButton";
-import Loader from "../../../components/Loader";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import { END_POINTS } from "../../../config/routes";
@@ -13,7 +12,6 @@ import { useSelector } from "react-redux";
 
 const ChangePassScreen = () => {
   const navigation = useNavigation();
-  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const { token } = useSelector((state) => state.Auth);
 
@@ -114,7 +112,6 @@ const ChangePassScreen = () => {
   };
 
   const performChangePassword = async (currentPassword, newPassword) => {
-    setLoading(true);
     try {
       const response = await API.post(
         END_POINTS.CHANGE_PASSWORD,
@@ -140,9 +137,7 @@ const ChangePassScreen = () => {
         text1: "Could not changed password!",
         text2: error.response?.data?.message || error || "Please try again.",
       });
-    } finally {
-      setLoading(false);
-    }
+    } 
   };
 
   return (
@@ -176,7 +171,6 @@ const ChangePassScreen = () => {
       </View>
 
       <CustomButton title="Save Changes" onPress={handleSaveChange} />
-      <Loader isLoading={loading} />
       <Toast />
     </Container>
   );

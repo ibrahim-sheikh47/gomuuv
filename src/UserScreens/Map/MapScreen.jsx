@@ -1,10 +1,10 @@
-import { View, Text, Alert } from "react-native";
+import { View, Text } from "react-native";
 import React, { useEffect, useState } from "react";
 import Map from "../../components/Maps";
 import CustomButton from "../../components/CustomButton";
 import { FontSize } from "../../utils/font";
 import { StatusBar, Platform } from "react-native";
-import { useNavigation, useParams } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 
 const MapScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -25,9 +25,9 @@ const MapScreen = ({ route }) => {
         goal: params.goal,
         activityName: params.activityName,
         activityType: params.activityType,
-        distance: (totalDistance / 1609.34).toFixed(2),
+        distance: totalDistance,
         time: elapsedTime,
-        distanceUnit: "mi",
+        distanceUnit: params.goal.targetDistance.unit,
         heartRate: params.heartRate,
         calories: params.calories,
         snapshot: snapshot,
@@ -58,9 +58,24 @@ const MapScreen = ({ route }) => {
     setTracking(false);
   };
 
+  const formatElapsedTime = (timeObj) => {
+    const { hours = 0, minutes = 0, seconds = 0 } = timeObj;
+
+    if (hours === 0 && minutes === 0) {
+      return `${seconds}s`;
+    }
+
+    if (hours === 0) {
+      return `${minutes}m ${seconds}s`;
+    }
+
+    return `${hours}h ${minutes}m ${seconds}s`;
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <Map
+        goal={params.goal}
         onLocationUpdate={onLocationUpdate} // Pass the callback to Map.js
         address={location}
         pathCoordinates={[]}
@@ -93,7 +108,7 @@ const MapScreen = ({ route }) => {
             textAlign: "center",
           }}
         >
-          Time: {Math.floor(elapsedTime / 60)}m {elapsedTime % 60}s
+          Time: {formatElapsedTime(elapsedTime)}
         </Text>
         <Text
           style={{
@@ -103,7 +118,7 @@ const MapScreen = ({ route }) => {
             textAlign: "center",
           }}
         >
-          Distance: {totalDistance.toFixed(2)} meters
+          Distance: {totalDistance.toFixed(2)} {params.goal.targetDistance.unit}
         </Text>
       </View>
 

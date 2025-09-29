@@ -30,10 +30,7 @@ const TrainerProfile = () => {
   const dispatch = useDispatch();
 
   // Combine all useSelector Hooks
-  const { userData, token } = useSelector((state) => ({
-    userData: state.Auth?.data,
-    token: state.Auth?.token,
-  }));
+  const { data: userData, token } = useSelector((state) => state.Auth);
   const [profileImage, setProfileImage] = useState(
     userData.image !== "" ? { uri: userData.image } : images.dp
   );
@@ -52,7 +49,7 @@ const TrainerProfile = () => {
     {
       icon: <SyncSecureIcon />,
       text: "Sync and Secure Data",
-      route: "SyncSecureDataScreen",
+      route: null,
     },
   ];
 
@@ -165,7 +162,9 @@ const TrainerProfile = () => {
             key={index}
             icon={item.icon}
             text={item.text}
-            onPress={() => navigation.navigate(item.route)}
+            onPress={() => {
+              if (item.route) navigation.navigate(item.route);
+            }}
           />
         ))}
       </View>

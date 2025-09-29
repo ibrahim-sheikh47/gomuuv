@@ -21,6 +21,7 @@ import { useSelector } from "react-redux";
 const FinishActivity = () => {
   const route = useRoute();
   const {
+    goal,
     activityName,
     activityType,
     distance,
@@ -34,21 +35,6 @@ const FinishActivity = () => {
   const navigation = useNavigation();
   const { token } = useSelector((state) => state.Auth);
 
-  // Convert time from seconds (assuming time is given in seconds)
-  const timeInSeconds = time; // time is in seconds from params
-  const distanceInMiles = distance; // Assuming distance is in miles
-
-  // Calculate Time Per Mile (in minutes and seconds)
-  const timePerMileInSeconds =
-    timeInSeconds / (distanceInMiles > 0.0 ? distanceInMiles : 1);
-
-  const minutesPerMile = Math.floor(timePerMileInSeconds / 60) || 0;
-  const secondsPerMile = Math.round(timePerMileInSeconds % 60) || 0;
-
-  // Calculate Pace (in miles per hour)
-  const paceInHours = distanceInMiles / (timeInSeconds / 60) || 0; // timeInSeconds is divided by 3600 to convert time to hours
-  const pace = paceInHours.toFixed(2) || 0; // Format the pace to 2 decimal places
-
   const finishActivity = async () => {
     try {
       const response = await API.patch(
@@ -57,17 +43,17 @@ const FinishActivity = () => {
           type: activityType,
           distance: {
             value: distance,
-            unit: "mi",
+            unit: distanceUnit,
           },
           duration: {
-            value: time / 60,
-            unit: "minute",
+            hours: time.hours,
+            minutes: time.minutes,
+            totalSeconds: time.hours * 3600 + time.minutes * 60 + time.seconds,
           },
         },
         token
       );
 
-      console.log(response.data.data);
       if (response?.data?.success) {
         navigation.reset({
           routes: [
@@ -92,6 +78,42 @@ const FinishActivity = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const computePace = (timeObj, distance, unit = "meter") => {
+    const { hours = 0, minutes = 0, seconds = 0 } = timeObj;
+
+    const timeInSeconds = hours * 3600 + minutes * 60 + seconds;
+    const dist = distance;
+
+    const timePerUnitInSeconds = dist > 0 ? timeInSeconds / dist : 0;
+    const hoursTotal = timeInSeconds > 0 ? timeInSeconds / 3600 : 0;
+    const paceUnitsPerHour = dist / hoursTotal;
+
+    return {
+      timePerUnit: timePerUnitInSeconds,
+      paceUnitsPerHour: parseFloat(paceUnitsPerHour.toFixed(2)),
+      unit,
+    };
+  };
+
+  const result = computePace(time, distance, distanceUnit);
+
+  const formatElapsedTime = (totalSeconds = 0) => {
+    if (totalSeconds < 60) {
+      return `${totalSeconds}s`;
+    }
+
+    if (totalSeconds < 3600) {
+      const minutes = parseInt(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+      return `${minutes}m ${secs}s`;
+    }
+
+    const hours = parseInt(totalSeconds / 3600);
+    const minutes = parseInt(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${hours || 0}h ${minutes || 0}m ${secs || 0}s`;
   };
 
   return (
@@ -163,29 +185,29 @@ const FinishActivity = () => {
         )}
         <View style={styles.gridContainer}>
           <CustomCard
-            label="Time Per Mile"
+            label={`Time Per ${distanceUnit === "mi" ? "Mile" : "Km"}`}
             iconImage={icons.timePerMile}
-            message={`${minutesPerMile}m:${secondsPerMile}s/mi`}
+            message={`${formatElapsedTime(result.timePerUnit)}/${distanceUnit}`}
           />
           <CustomCard
             label="Total Time"
             icon={TimeIcon}
-            message={`${Math.floor(timeInSeconds / 60)}m ${
-              timeInSeconds % 60
-            }s`}
-            goal={"Goal: 30 min daily"}
+            message={`${formatElapsedTime(
+              time.hours * 3600 + time.minutes * 60 + time.seconds
+            )}`}
+            goal={`Goal: ${time.hours}hours ${time.minutess}mins daily`}
           />
         </View>
         <View style={styles.gridContainer}>
           <CustomCard
             label="Pace"
             icon={PaceIcon}
-            message={`${pace} mi/minute`}
+            message={`${result.paceUnitsPerHour} ${result.unit}/hour`}
           />
           <CustomCard
             label="Distance"
             icon={DistanceIcon}
-            goal={"Goal: 2mi daily"}
+            goal={`Goal: ${goal.targetDistance.value}${distanceUnit} daily`}
             message={`${distance} ${distanceUnit}`}
           />
         </View>

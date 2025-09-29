@@ -6,7 +6,6 @@ import AuthHeader from "../../../components/AuthHeader";
 import Container from "../../../components/Container";
 import CustomButton from "../../../components/CustomButton";
 import InputField from "../../../components/InputField";
-import Loader from "../../../components/Loader";
 import { API } from "../../../config/apiClient";
 import { END_POINTS } from "../../../config/routes";
 import { colors } from "../../../constants/colors";
@@ -14,8 +13,7 @@ import { FontSize } from "../../../utils/font";
 
 const ForgotPass = () => {
   const navigation = useNavigation();
-  const [email, setEmail] = useState("ahmadmuzaffar6228@gmail.com");
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -41,10 +39,8 @@ const ForgotPass = () => {
       return;
     }
 
-    setLoading(true);
     try {
       const response = await API.post(END_POINTS.FORGOT_PASSWORD, { email });
-      setLoading(false);
 
       if (response?.data?.success) {
         Toast.show({
@@ -66,7 +62,6 @@ const ForgotPass = () => {
         });
       }
     } catch (error) {
-      setLoading(false);
       Toast.show({
         type: "error",
         text1: "Error",
@@ -97,12 +92,7 @@ const ForgotPass = () => {
           onChangeText={setEmail}
         />
       </View>
-      <CustomButton
-        title="Continue"
-        onPress={handleResetPassword}
-        disabled={loading}
-      />
-      <Loader isLoading={loading} message="Processing your request..." />
+      <CustomButton title="Continue" onPress={handleResetPassword} />
     </Container>
   );
 };

@@ -39,7 +39,7 @@ const NewWorkout = () => {
         `${END_POINTS.EQUIPMENTS_WORKOUTS}`,
         {
           name: workoutName,
-          type: category.label.replace(" ", "_").replace("-", "").toLowerCase(),
+          type: category.value,
           notes,
           mode: selectedPeriod,
           duration: {

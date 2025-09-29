@@ -11,8 +11,16 @@ import { colors } from "../constants/colors"; // Adjust the import path as neede
 import { IconButton } from "react-native-paper";
 import { FontSize } from "../utils/font";
 
-const GoalModal = ({ visible, onClose, modalText, textStyle, onSave }) => {
-  const [value, setValue] = useState(0); // State to track the current value
+const GoalModal = ({
+  visible,
+  onClose,
+  modalText,
+  textStyle,
+  onSave,
+  currentWeight,
+  weightUnit,
+}) => {
+  const [value, setValue] = useState(parseInt(currentWeight)); // State to track the current value
 
   const handleIncrement = () => {
     setValue(value + 1); // Increment the value by 1
@@ -47,7 +55,9 @@ const GoalModal = ({ visible, onClose, modalText, textStyle, onSave }) => {
             >
               <Text style={styles.adjustButtonText}>-</Text>
             </TouchableOpacity>
-            <Text style={styles.valueText}>{value} kg</Text>
+            <Text style={styles.valueText}>
+              {value} {weightUnit}
+            </Text>
             <TouchableOpacity
               style={styles.adjustButton}
               onPress={handleIncrement}
