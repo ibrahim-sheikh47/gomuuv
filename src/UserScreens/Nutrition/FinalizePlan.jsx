@@ -86,12 +86,7 @@ const FinalizePlan = ({ route }) => {
         });
       }
     } catch (error) {
-      console.error("Error finalizing plan:", JSON.stringify(error, null, 2));
-      Toast.show({
-        type: "error",
-        text1: "Error!",
-        text2: "Failed to finalize the plan. Please try again.",
-      });
+      console.log(error);
     }
   };
 

@@ -65,14 +65,7 @@ const Verify = (props) => {
         });
       }
     } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2:
-          error.response?.data?.message ||
-          error ||
-          "Something went wrong. Please try again later.",
-      });
+      console.log(error);
     }
   };
 

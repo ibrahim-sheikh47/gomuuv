@@ -427,15 +427,7 @@ const CreateProgram = () => {
           openCreatedModal();
         }
       } catch (error) {
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2:
-            error.response?.data?.message ||
-            error ||
-            "Failed to complete signup. Please try again.",
-        });
-        console.error("Error fetching workouts:", error);
+        console.log(error);
       }
     } else {
       console.log("not validated");

@@ -65,14 +65,7 @@ const ManageNotifications = () => {
       }
     } catch (error) {
       console.log(error);
-      Toast.show({
-        type: "error",
-        text1: "Could not changed notification settings!",
-        text2: error.response?.data?.message || error || "Please try again.",
-      });
-    } finally {
-      // setLoading(false);
-    }
+    } 
   };
 
   return (

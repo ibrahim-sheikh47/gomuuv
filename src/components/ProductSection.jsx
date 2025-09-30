@@ -53,12 +53,7 @@ const ProductSection = ({ title, products }) => {
         });
       }
     } catch (error) {
-      // Show error toast if there's an error in the API request
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: error?.response?.data?.message || error || "An error occurred.",
-      });
+      console.log(error);
     }
   };
 

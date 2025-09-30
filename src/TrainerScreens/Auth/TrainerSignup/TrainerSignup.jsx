@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import {
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -23,6 +24,7 @@ import { END_POINTS } from "../../../config/routes";
 import { setAuthData } from "../../../redux/reducers/AuthSlice";
 import Toast from "react-native-toast-message";
 import { useDispatch } from "react-redux";
+import { appleSignIn } from "../../../services/authService";
 
 const TrainerSignup = () => {
   const navigation = useNavigation();
@@ -126,14 +128,87 @@ const TrainerSignup = () => {
         });
       }
     } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2:
-          error.response?.data?.message ||
-          error ||
-          "Failed to complete signup. Please try again.",
+      console.log(error);
+    }
+  };
+
+  const signUpWithGoogle = async () => {
+    try {
+      const res = await googleSignIn();
+
+      const response = await API.post(END_POINTS.SOCIAL_LOGIN, {
+        firstName: res.data.user.givenName,
+        lastName: res.data.user.familyName,
+        email: res.data.user.email,
+        image: res.data.user.photo,
+        socialAccessToken: res.data.idToken,
+        authType: "google",
+        role: "trainer",
       });
+      if (response?.data?.success) {
+        dispatch(
+          setAuthData({
+            token: response?.data?.token,
+            data: response?.data?.data,
+          })
+        );
+        // Successful login
+        Toast.show({
+          type: "success",
+          text1: "Login Successful!",
+          text2: "Welcome back 👋",
+        });
+
+        navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: "TrainerApp",
+            },
+          ],
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const signUpWithApple = async () => {
+    try {
+      const res = await appleSignIn();
+      const response = await API.post(END_POINTS.SOCIAL_LOGIN, {
+        email: res.email,
+        firstName: `${res.fullName?.givenName || ""} ${
+          res.fullName?.familyName || ""
+        }`,
+        socialAccessToken: res.identityToken,
+        authType: "apple",
+      });
+      if (response?.data?.success) {
+        dispatch(
+          setAuthData({
+            token: response?.data?.token,
+            data: response?.data?.data,
+          })
+        );
+        // Successful login
+        Toast.show({
+          type: "success",
+          text1: "Login Successful!",
+          text2: "Welcome back 👋",
+        });
+
+        navigation.reset({
+          index: 0, // Ensures TabNavigator is at the top
+          routes: [
+            {
+              name: "TrainerApp",
+            },
+          ],
+        });
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -191,9 +266,11 @@ const TrainerSignup = () => {
         </View>
 
         <View style={styles.socialButtonContainer}>
-          <SocialButton icon={GoogleLogo} />
-          <SocialButton icon={FacebookLogo} />
-          <SocialButton icon={AppleLogo} />
+          <SocialButton onPress={signUpWithGoogle} icon={GoogleLogo} />
+          {/* <SocialButton icon={FacebookLogo} /> */}
+          {Platform.OS === "ios" && (
+            <SocialButton icon={AppleLogo} onPress={signUpWithApple} />
+          )}
         </View>
         <View style={styles.signInRow}>
           <Text style={styles.signInText}>Already a member?</Text>

@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import AppleLogo from "../../../assets/svgs/AppleLogo";
-import FacebookLogo from "../../../assets/svgs/FacebookLogo";
 import GoogleLogo from "../../../assets/svgs/GoogleLogo";
 import AuthHeader from "../../../components/AuthHeader";
 import Container from "../../../components/Container";
@@ -23,7 +22,7 @@ import { END_POINTS } from "../../../config/routes";
 import { API } from "../../../config/apiClient";
 import { setAuthData } from "../../../redux/reducers/AuthSlice";
 import { useDispatch } from "react-redux";
-import { googleSignIn } from "../../../services/authService";
+import { appleSignIn, googleSignIn } from "../../../services/authService";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -110,15 +109,6 @@ const Login = () => {
       }
     } catch (error) {
       console.log(error);
-      // Handle error response
-      Toast.show({
-        type: "error",
-        text1: "Login Failed",
-        text2:
-          error.response?.data?.message ||
-          error ||
-          "Login failed. Please try again.",
-      });
     }
   };
 
@@ -169,15 +159,56 @@ const Login = () => {
         }
       }
     } catch (error) {
-      // Handle error response
-      Toast.show({
-        type: "error",
-        text1: "Login Failed",
-        text2:
-          error.response?.data?.message ||
-          error ||
-          "Login failed. Please try again.",
+      console.log(error);
+    }
+  };
+
+  const signInWithApple = async () => {
+    try {
+      const res = await appleSignIn();
+      const response = await API.post(END_POINTS.SOCIAL_LOGIN, {
+        email: res.email,
+        firstName: res.fullName?.givenName || "",
+        lastName: res.fullName?.familyName || "",
+        socialAccessToken: res.identityToken,
+        authType: "apple",
       });
+      if (response?.data?.success) {
+        dispatch(
+          setAuthData({
+            token: response?.data?.token,
+            data: response?.data?.data,
+          })
+        );
+        // Successful login
+        Toast.show({
+          type: "success",
+          text1: "Login Successful!",
+          text2: "Welcome back 👋",
+        });
+
+        if (response.data.data.role === "user") {
+          navigation.reset({
+            index: 0, // Ensures TabNavigator is at the top
+            routes: [
+              {
+                name: "UserApp",
+              },
+            ],
+          });
+        } else {
+          navigation.reset({
+            index: 0, // Ensures TabNavigator is at the top
+            routes: [
+              {
+                name: "TrainerApp",
+              },
+            ],
+          });
+        }
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -239,8 +270,10 @@ const Login = () => {
         <View style={styles.socialButtonContainer}>
           {/** Repeated styles are now combined */}
           <SocialButton icon={GoogleLogo} onPress={signInWithGoogle} />
-          <SocialButton icon={FacebookLogo} />
-          {Platform.OS === "ios" && <SocialButton icon={AppleLogo} />}
+          {/* <SocialButton icon={FacebookLogo} /> */}
+          {Platform.OS === "ios" && (
+            <SocialButton icon={AppleLogo} onPress={signInWithApple} />
+          )}
         </View>
         <View
           style={{

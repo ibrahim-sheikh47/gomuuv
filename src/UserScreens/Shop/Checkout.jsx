@@ -370,11 +370,6 @@ const Checkout = () => {
       }
     } catch (error) {
       console.error("Error placing order:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Unable to place order. Please try again.",
-      });
     }
   };
 

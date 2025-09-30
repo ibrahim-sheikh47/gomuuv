@@ -131,12 +131,7 @@ const ChangePassScreen = () => {
         navigation.goBack();
       }
     } catch (error) {
-      // Handle error response
-      Toast.show({
-        type: "error",
-        text1: "Could not changed password!",
-        text2: error.response?.data?.message || error || "Please try again.",
-      });
+      console.log(error);
     } 
   };
 

@@ -63,8 +63,7 @@ apiClient.interceptors.response.use(
     if (error.code !== 404) {
       toastMessage({
         type: "error",
-        text1: "Error",
-        text2: error.message,
+        text1: error.message,
         duration: 2000,
       });
     }

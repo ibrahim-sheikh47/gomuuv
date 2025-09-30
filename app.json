@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "gomuuv",
+    "name": "Gomuuv",
     "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -10,7 +10,7 @@
       "assets/**/*"
     ],
     "splash": {
-      "image": "./src/assets/splash.png",
+      "image": "./src/assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
