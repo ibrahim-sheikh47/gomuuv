@@ -3,14 +3,13 @@ import React, { useRef, useState, useEffect } from "react";
 import Geocoder from "react-native-geocoding";
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from "react-native-maps";
 import MapStyle from "../utils/MapStyle";
-import Commons from "../utils/Commons";
 import haversine from "haversine"; // Install via `npm install haversine`
+import LocationHelper from "../services/locationHelper";
 
 const Map = (props) => {
   const { tracking, onLocationUpdate, goal } = props;
   const map = useRef(null); // Reference to MapView
   const [locationHistory, setLocationHistory] = useState([]); // Track location history
-  const [location, setLocation] = useState(null); // Store the location
   const [elapsedTime, setElapsedTime] = useState(0); // Store elapsed time
   const [totalDistance, setTotalDistance] = useState(0); // Store total distance
   const [address, setAddress] = useState(""); // Store total distance
@@ -22,10 +21,24 @@ const Map = (props) => {
   const [mapReady, setMapReady] = useState(false);
   Geocoder.init(process.env.EXPO_PUBLIC_MAPS_API_KEY);
 
+  const [locationState, setLocationState] = useState({
+    permission: null,
+    servicesEnabled: null,
+    location: null,
+  });
+
   useEffect(() => {
-    // Initial fetch location on component mount
-    fetchLocation();
+    const helper = new LocationHelper(setLocationState);
+    helper.start();
+
+    return () => helper.stop();
   }, []);
+
+  useEffect(() => {
+    if (locationState.location) {
+      processLocation(locationState.location);
+    }
+  }, [locationState]);
 
   useEffect(() => {
     // Handle tracking state change
@@ -74,6 +87,42 @@ const Map = (props) => {
     updateLocationWithSnapshot(); // call async function
   }, [address, totalDistance, elapsedTime]);
 
+  const processLocation = async (res) => {
+    try {
+      if (!startLocation.current) {
+        startLocation.current = res;
+      }
+
+      // Immediately add the fetched location to location history for start marker
+      setLocationHistory((prevHistory) => {
+        const newLocation = {
+          latitude: res.latitude,
+          longitude: res.longitude,
+        };
+        return [...prevHistory, newLocation];
+      });
+
+      // Animate camera to the current location
+      if (map.current) {
+        map.current.animateCamera({
+          center: {
+            latitude: res.latitude,
+            longitude: res.longitude,
+          },
+          zoom: 14, // Adjust zoom level if necessary
+          pitch: 1,
+          heading: 0,
+          altitude: 500,
+        });
+      }
+
+      // Get address from location and send it back to MapScreen
+      setAddress(await getAddress(res.latitude, res.longitude));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const formatElapsedTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -109,48 +158,6 @@ const Map = (props) => {
     } catch (error) {
       console.log("Error taking snapshot:", error);
       return null;
-    }
-  };
-
-  // Fetch location function
-  const fetchLocation = async () => {
-    try {
-      const res = await Commons.fetchLocation();
-      if (!startLocation.current) {
-        startLocation.current = res;
-      }
-      setLocation({
-        latitude: res.latitude,
-        longitude: res.longitude,
-      });
-
-      // Immediately add the fetched location to location history for start marker
-      setLocationHistory((prevHistory) => {
-        const newLocation = {
-          latitude: res.latitude,
-          longitude: res.longitude,
-        };
-        return [...prevHistory, newLocation];
-      });
-
-      // Animate camera to the current location
-      if (map.current) {
-        map.current.animateCamera({
-          center: {
-            latitude: res.latitude,
-            longitude: res.longitude,
-          },
-          zoom: 14, // Adjust zoom level if necessary
-          pitch: 1,
-          heading: 0,
-          altitude: 500,
-        });
-      }
-
-      // Get address from location and send it back to MapScreen
-      setAddress(await getAddress(res.latitude, res.longitude));
-    } catch (err) {
-      console.log("Error fetching location:", err);
     }
   };
 
