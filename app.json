@@ -6,9 +6,7 @@
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "light",
-    "assetBundlePatterns": [
-      "assets/**/*"
-    ],
+    "assetBundlePatterns": ["assets/**/*"],
     "splash": {
       "image": "./src/assets/splash-icon.png",
       "resizeMode": "contain",
@@ -63,6 +61,8 @@
       "expo-apple-authentication",
       "react-native-video",
       "expo-video",
+      "@react-native-firebase/crashlytics",
+      "@react-native-firebase/app",
       [
         "expo-build-properties",
         {
@@ -72,13 +72,12 @@
         }
       ],
       [
-          "expo-image-picker",
+        "expo-image-picker",
         {
           "photosPermission": "Gomuuv needs access to your photo library so you can upload and update your profile picture.",
           "cameraPermission": "Gomuuv needs access to your camera so you can take photos and update your profile picture."
         }
       ],
-      "@react-native-firebase/app",
       [
         "@react-native-google-signin/google-signin",
         {

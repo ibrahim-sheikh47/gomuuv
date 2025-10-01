@@ -15,7 +15,6 @@ const Map = (props) => {
   const [address, setAddress] = useState(""); // Store total distance
 
   const startLocation = useRef(null);
-  const intervalRef = useRef(null); // For tracking location updates
   const timerRef = useRef(null); // For tracking elapsed time
 
   const [mapReady, setMapReady] = useState(false);
@@ -36,7 +35,7 @@ const Map = (props) => {
 
   useEffect(() => {
     if (locationState.location) {
-      processLocation(locationState.location);
+      processLocation(locationState.location.coords);
     }
   }, [locationState]);
 
@@ -49,7 +48,6 @@ const Map = (props) => {
     }
 
     return () => {
-      clearInterval(intervalRef.current);
       clearInterval(timerRef.current);
     };
   }, [tracking]);
@@ -180,18 +178,11 @@ const Map = (props) => {
         setElapsedTime((prevTime) => prevTime + 1); // Increment time every second
       }, 1000);
     }
-
-    // Fetch location every 10 seconds
-    if (!intervalRef.current) {
-      intervalRef.current = setInterval(fetchLocation, 1000); // Fetch every 10 seconds
-    }
   };
 
   // Stop location tracking
   const stopLocationTracking = async () => {
-    clearInterval(intervalRef.current);
     clearInterval(timerRef.current);
-    intervalRef.current = null;
     timerRef.current = null;
 
     if (onLocationUpdate && mapReady) {
@@ -228,7 +219,7 @@ const Map = (props) => {
         {locationHistory.length > 1 && (
           <Polyline
             coordinates={locationHistory}
-            strokeWidth={5}
+            strokeWidth={3}
             strokeColor="white"
           />
         )}

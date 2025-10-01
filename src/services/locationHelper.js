@@ -107,7 +107,7 @@ export default class LocationHelper {
     this.locationWatcher = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.Balanced,
-        distanceInterval: 50, // update every 50m
+        distanceInterval: 5, // update every 5m
       },
       (loc) => {
         this.onUpdate({

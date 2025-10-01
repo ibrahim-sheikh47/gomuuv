@@ -106,13 +106,13 @@ const FinishActivity = () => {
 
     if (totalSeconds < 3600) {
       const minutes = parseInt(totalSeconds / 60);
-      const secs = totalSeconds % 60;
+      const secs = parseInt(totalSeconds % 60);
       return `${minutes}m ${secs}s`;
     }
 
     const hours = parseInt(totalSeconds / 3600);
     const minutes = parseInt(totalSeconds / 60);
-    const secs = totalSeconds % 60;
+    const secs = parseInt(totalSeconds % 60);
     return `${hours || 0}h ${minutes || 0}m ${secs || 0}s`;
   };
 
@@ -202,13 +202,15 @@ const FinishActivity = () => {
           <CustomCard
             label="Pace"
             icon={PaceIcon}
-            message={`${result.paceUnitsPerHour} ${result.unit}/hour`}
+            message={`${result.paceUnitsPerHour.toFixed(2)} ${
+              result.unit
+            }/hour`}
           />
           <CustomCard
             label="Distance"
             icon={DistanceIcon}
             goal={`Goal: ${goal.targetDistance.value}${distanceUnit} daily`}
-            message={`${distance} ${distanceUnit}`}
+            message={`${Math.round(distance).toFixed(2)} ${distanceUnit}`}
           />
         </View>
       </ScrollView>
