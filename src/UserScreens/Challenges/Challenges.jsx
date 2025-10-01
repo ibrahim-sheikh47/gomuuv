@@ -52,9 +52,9 @@ const ChallengesScreen = () => {
   } = useSelector((state) => state.Auth);
 
   const [currentWeight, setCurrentWeight] = useState(
-    userData?.weight.replace("kg", "").replace("lbs", "") || 0
+    userData?.weight?.replace("kg", "").replace("lbs", "") || 0
   );
-  const weightUnit = userData?.weight.includes("kg") ? "kg" : "lbs";
+  const weightUnit = userData?.weight?.includes("kg") ? "kg" : "lbs" || "kg";
   const [progressPercentage, setProgressPercentage] = useState(0);
   const [bmiValue, setBmiValue] = useState(0);
 
@@ -76,10 +76,12 @@ const ChallengesScreen = () => {
 
       if (!currentWeight) return;
 
-      if (userData?.height.toLowerCase().includes("cm")) {
-        const cmValue = parseFloat(userData?.height.replace("cm", "").trim());
+      if (userData?.height?.toLowerCase().includes("cm")) {
+        const cmValue = parseFloat(
+          userData?.height?.replace("cm", "").trim() || 0
+        );
         heightInMeters = cmValue / 100;
-      } else if (userData?.height.includes("ft")) {
+      } else if (userData?.height?.includes("ft")) {
         // handle height in ft'in format (e.g., 5'9)
         const [feet, inches] = userData?.height
           .split(" ")
