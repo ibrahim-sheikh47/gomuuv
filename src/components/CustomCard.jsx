@@ -26,14 +26,9 @@ export const CustomCard = ({
 }) => {
   const { height } = useWindowDimensions();
 
-  // useEffect(() => {
-  //   // Check if the message does not start with "Please start" to determine if the goal should be shown
-  //   setShowGoal(!/^Please start/.test(message));
-  // }, [message]);
-
   return (
     <TouchableOpacity
-      style={[styles.activityCard, { height: height * 0.16 }]}
+      style={[styles.activityCard, { minHeight: height * 0.16 }]}
       onPress={onPress}
     >
       <View style={styles.activityCardContent}>
@@ -104,7 +99,7 @@ const styles = StyleSheet.create({
   activityCard: {
     flex: 1,
     backgroundColor: colors.bgColor,
-    height: 162,
+    minHeight: 162,
     borderRadius: 14,
   },
   cardHeader: {

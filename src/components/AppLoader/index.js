@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   useWindowDimensions,
   Modal,
+  StyleSheet,
 } from "react-native";
 import React from "react";
 import { colors } from "../../constants/colors";
@@ -13,14 +14,22 @@ export default function AppLoader() {
   const { loading } = useLoader();
 
   return (
-    <Modal transparent visible={loading} animationType="fade">
+    <Modal
+      transparent
+      visible={loading}
+      animationType="fade"
+      statusBarTranslucent
+      presentationStyle="overFullScreen"
+    >
       <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "rgba(0, 0, 0, 0.4)",
-        }}
+        style={[
+          StyleSheet.absoluteFillObject,
+          {
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
+          },
+        ]}
       >
         <View
           style={{

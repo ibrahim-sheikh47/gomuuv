@@ -29,6 +29,7 @@ import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
 import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
+import icons from "../../constants/icons";
 
 const CreateProgram = () => {
   const navigation = useNavigation();
@@ -864,7 +865,22 @@ const CreateProgram = () => {
         visible={createdModalVisible}
         onClose={closeCreatedModal}
         modalText={"Program Created !"}
-        modalIcon={<StrengthIcon width={50} height={50} />}
+        modalIcon={
+          <View>
+            <StrengthIcon width={50} height={50} color={colors.white} />
+
+            <Image
+              source={icons.iconTick}
+              style={{
+                width: 22,
+                height: 22,
+                position: "absolute",
+                bottom: -5,
+                right: -5,
+              }}
+            />
+          </View>
+        }
       />
     </Container>
   );

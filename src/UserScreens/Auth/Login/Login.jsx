@@ -23,6 +23,7 @@ import { API } from "../../../config/apiClient";
 import { setAuthData } from "../../../redux/reducers/AuthSlice";
 import { useDispatch } from "react-redux";
 import { appleSignIn, googleSignIn } from "../../../services/authService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -69,9 +70,11 @@ const Login = () => {
     }
 
     try {
+      let deviceId = await AsyncStorage.getItem("fcmToken");
       const response = await API.post(END_POINTS.LOGIN, {
         email: formData.email,
         password: formData.password,
+        deviceId,
       });
       if (response?.data?.success) {
         dispatch(
@@ -114,6 +117,7 @@ const Login = () => {
 
   const signInWithGoogle = async () => {
     try {
+      let deviceId = await AsyncStorage.getItem("fcmToken");
       const res = await googleSignIn();
 
       const response = await API.post(END_POINTS.SOCIAL_LOGIN, {
@@ -122,6 +126,7 @@ const Login = () => {
         email: res.data.user.email,
         image: res.data.user.photo,
         socialAccessToken: res.data.idToken,
+        deviceId,
         authType: "google",
       });
       if (response?.data?.success) {
@@ -165,12 +170,14 @@ const Login = () => {
 
   const signInWithApple = async () => {
     try {
+      let deviceId = await AsyncStorage.getItem("fcmToken");
       const res = await appleSignIn();
       const response = await API.post(END_POINTS.SOCIAL_LOGIN, {
         email: res.email,
         firstName: res.fullName?.givenName || "",
         lastName: res.fullName?.familyName || "",
         socialAccessToken: res.identityToken,
+        deviceId,
         authType: "apple",
       });
       if (response?.data?.success) {

@@ -1,4 +1,8 @@
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   Image,
@@ -36,9 +40,11 @@ import moment from "moment";
 
 const WorkoutScreen = () => {
   const dispatch = useDispatch();
+  const route = useRoute();
+  const { screen } = route.params || {};
   const navigation = useNavigation();
   const [stats, setStats] = useState(null);
-  const [activeTab, setActiveTab] = useState("Workout");
+  const [activeTab, setActiveTab] = useState(screen ? "Fasting" : "Workout");
   const tabs = ["Workout", "Fasting"];
   const duration = ["Today", "Weekly", "Monthly", "Quarterly", "Yearly"];
 

@@ -13,6 +13,7 @@ import { persistor, store } from "./src/redux/store";
 import { LogBox } from "react-native";
 import { LoaderProvider } from "./src/contexts/LoaderContext";
 import AppLoader from "./src/components/AppLoader";
+import { toastConfig } from "./src/components/toastMessage";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -45,7 +46,7 @@ export default function App() {
           <PersistGate persistor={persistor}>
             <NavigationContainer>
               <AppNavigator />
-              <Toast topOffset={60} />
+              <Toast topOffset={60} config={toastConfig} />
               <AppLoader />
             </NavigationContainer>
           </PersistGate>

@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   mealContainer: {
     marginTop: 10,
     backgroundColor: "#242425",
-    height: 100,
+    minHeight: 100,
     width: 260,
     borderRadius: 15,
     flexDirection: "row",

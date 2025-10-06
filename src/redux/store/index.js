@@ -7,6 +7,7 @@ import Cart from "../reducers/CartSlice";
 import Shop from "../reducers/ShopSlice";
 import Nutrition from "../reducers/NutritionSlice";
 import Workout from "../reducers/WorkoutSlice";
+import tracking from "../reducers/trackingSlice";
 
 const persistConfig = {
   key: "root",
@@ -18,6 +19,7 @@ const reducerToPersist = combineReducers({
   Shop,
   Nutrition,
   Workout,
+  tracking,
 });
 const persistedReducer = persistReducer(persistConfig, reducerToPersist);
 const store = configureStore({

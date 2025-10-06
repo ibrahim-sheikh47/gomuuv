@@ -1,16 +1,18 @@
+import { useIsFocused, useNavigation } from "@react-navigation/native"; // Import useRoute
+import React, { useEffect, useState } from "react";
 import {
-  useFocusEffect,
-  useNavigation,
-  useRoute,
-} from "@react-navigation/native"; // Import useRoute
-import React, { act, useCallback, useEffect, useState } from "react";
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+  Dimensions,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import FastingIcon from "../../assets/svgs/FastingIcon";
 import FastTypeIcon from "../../assets/svgs/FastTypeIcon";
-import GlassIcon from "../../assets/svgs/GlassIcon";
 import ProgressIcon from "../../assets/svgs/ProgressIcon";
-import SearchIcon from "../../assets/svgs/SearchIcon";
 import Container from "../../components/Container";
 import CustomButton from "../../components/CustomButton";
 import CustomModal from "../../components/CustomModal"; // Import your CustomModal
@@ -19,19 +21,21 @@ import Header from "../../components/Header";
 import { StatsHistoryCard } from "../../components/StatsHistoryCard";
 import TabContainer from "../../components/TabContainer";
 import { colors } from "../../constants/colors";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
 import { FontSize } from "../../utils/font";
+import { useIsForeground } from "../../hooks/useIsForeground";
+import { getResponsiveFontSize } from "../../utils/utilities";
 
 const FastingScreen = () => {
-  const dispatch = useDispatch();
+  const isFocussed = useIsFocused();
+  const isForeground = useIsForeground();
   const navigation = useNavigation();
-  const route = useRoute(); // Use route to access navigation parameters
   const [activeTab, setActiveTab] = useState("Current Fast");
   const tabs = ["Current Fast", "Stats and History"];
   const { token, data: userData } = useSelector((state) => state.Auth);
-  const [selectedFilter, setSelectedFilter] = useState("weekly");
+  const [selectedFilter, setSelectedFilter] = useState("Weekly");
 
   const [modalVisible, setModalVisible] = useState(false); // Modal visibility state
   const [filterModalVisible, setFilterModalVisible] = useState(false);
@@ -39,7 +43,7 @@ const FastingScreen = () => {
   const [fastingHistories, setFastingHistories] = useState([]); // Modal visibility state
   const [selectedPlan, setSelectedPlan] = useState(null); // Modal visibility state
 
-  const filters = ["weekly", "monthly", "yearly"];
+  const filters = ["Weekly", "Monthly", "Yearly"];
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -49,16 +53,14 @@ const FastingScreen = () => {
   const [remainingTime, setRemainingTime] = useState(0);
   const [totalDuration, setTotalDuration] = useState(0); // Total duration in seconds
 
-  useFocusEffect(
-    useCallback(() => {
-      if (activeTab === "Stats and History") {
-        getFastingHistory();
-        getFastingHistories();
-      } else {
-        getCurrentFast();
-      }
-    }, [activeTab])
-  );
+  useEffect(() => {
+    if (activeTab === "Stats and History") {
+      getFastingHistory();
+      getFastingHistories();
+    } else {
+      getCurrentFast();
+    }
+  }, [activeTab, isFocussed, isForeground]);
 
   useEffect(() => {
     if (selectedPlan && selectedPlan.startedAt) {
@@ -99,12 +101,6 @@ const FastingScreen = () => {
   useEffect(() => {
     getFastingHistories();
   }, [selectedFilter]);
-
-  const selectUnit = (value) => {
-    setSelectedFilter(value.toLowerCase()); // Ensure it matches 'weekly', 'monthly', 'yearly'
-    toggleModal();
-    fetchChartData(value.toLowerCase());
-  };
 
   const endFastingSession = async () => {
     try {
@@ -156,7 +152,11 @@ const FastingScreen = () => {
 
   const getFastingHistories = async () => {
     try {
-      const res = await API.post(`${END_POINTS.FASTING_CHART_DATA}`, {}, token);
+      const res = await API.post(
+        `${END_POINTS.FASTING_CHART_DATA}`,
+        { filter: selectedFilter },
+        token
+      );
       if (res?.data?.success) {
         setFastingHistories(res.data.data);
       }
@@ -188,42 +188,128 @@ const FastingScreen = () => {
     setFill(0); // Reset circular progress fill
   };
 
-  const MAX_HOURS = 20; // for scaling
+  const MAX_CHART_HEIGHT = 160;
 
   const FastingBarChart = (data) => {
+    const screenWidth = Dimensions.get("window").width;
+    const chartWidth = screenWidth - 120;
+    const maxDuration = Math.max(...data.map((d) => d.duration), 1);
+    const yLabels = [
+      maxDuration,
+      maxDuration * 0.75,
+      maxDuration * 0.5,
+      maxDuration * 0.25,
+      0,
+    ];
+
+    let xLabels = [];
+    if (selectedFilter === "Weekly") {
+      xLabels = ["M", "T", "W", "Th", "F", "Sa", "Su"];
+    } else if (selectedFilter === "Monthly") {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      xLabels = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+    } else if (selectedFilter === "Yearly") {
+      xLabels = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+    }
+
+    let barWidth = getResponsiveFontSize(35);
+    const SPACING = getResponsiveFontSize(10);
+    const chartContentWidth =
+      data.length * barWidth + (data.length - 1) * SPACING;
+
+    const shouldStretch = chartContentWidth < chartWidth;
+    const effectiveWidth = shouldStretch ? chartWidth : chartContentWidth;
+
+    const dynamicBarWidth = shouldStretch
+      ? (chartWidth - SPACING * (data.length - 1)) / data.length
+      : barWidth;
+
     return (
       <View style={styles.container}>
-        <View style={styles.chart}>
-          {data.map((item, index) => {
-            const barHeight = (item.duration / MAX_HOURS) * 160;
-            return (
-              <View key={index} style={styles.barContainer}>
-                <View
-                  style={[
-                    styles.bar,
-                    {
-                      height: barHeight,
-                      backgroundColor: item.goalMet ? "#B6FF5B" : "#333",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    },
-                  ]}
-                >
-                  <Text
+        <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+          <View
+            style={{
+              justifyContent: "space-between",
+              height: MAX_CHART_HEIGHT + 20,
+            }}
+          >
+            {yLabels.map((label, i) => (
+              <Text
+                key={i}
+                style={{
+                  fontSize: 10,
+                  color: "#aaa",
+                }}
+              >
+                {Math.round(label)}h
+              </Text>
+            ))}
+          </View>
+
+          {/* Bars */}
+          <ScrollView
+            horizontal
+            scrollEnabled={!shouldStretch}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+              flexDirection: "row",
+              alignItems: "flex-end",
+              height: MAX_CHART_HEIGHT + 20,
+            }}
+          >
+            {data.map((item, index) => {
+              const barHeight =
+                (item.duration / maxDuration) * MAX_CHART_HEIGHT;
+              return (
+                <View key={index} style={[styles.barContainer]}>
+                  <View
                     style={[
-                      styles.dayLabel,
-                      { color: item.goalMet ? "#000" : "#fff" },
+                      styles.bar,
+                      {
+                        marginHorizontal: SPACING / 2,
+                        width: dynamicBarWidth,
+                        height: barHeight,
+                        backgroundColor: item.goalMet ? "#B6FF5B" : "#333",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      },
                     ]}
                   >
-                    {item.duration}
+                    <Text
+                      style={[
+                        styles.barText,
+                        { color: item.goalMet ? "#000" : "#fff" },
+                      ]}
+                    >
+                      {item.duration}
+                    </Text>
+                  </View>
+                  <Text style={styles.dayLabel}>
+                    {xLabels[index] || item.day}
                   </Text>
                 </View>
-                <Text style={[styles.dayLabel]}>{item.day}</Text>
-              </View>
-            );
-          })}
+              );
+            })}
+          </ScrollView>
         </View>
 
+        {/* Legend */}
         <View style={styles.legend}>
           <View style={styles.legendItem}>
             <View style={[styles.dot, { backgroundColor: "#B6FF5B" }]} />
@@ -240,10 +326,7 @@ const FastingScreen = () => {
 
   return (
     <Container>
-      <Header
-        title={"Fasting"}
-        showBackButton={true}
-      />
+      <Header title={"Fasting"} showBackButton={true} />
 
       <TabContainer
         activeTab={activeTab}
@@ -337,9 +420,7 @@ const FastingScreen = () => {
                   <>
                     <Text style={styles.remainingTime}>Remaining time</Text>
                     <Text style={styles.remaining}>
-                      {`${formattedTime(remainingTime)} /\n${formattedTime(
-                        totalDuration
-                      )}`}
+                      {`${formattedTime(remainingTime)}`}
                     </Text>
                   </>
                 )}
@@ -358,6 +439,22 @@ const FastingScreen = () => {
               />
 
               <View style={{ marginTop: 20 }}>
+                <Text
+                  style={{
+                    color: "white",
+                    fontSize: FontSize.regular,
+                    fontWeight: "bold",
+                    marginBottom: 10,
+                  }}
+                >
+                  Current Fasting Plan
+                </Text>
+
+                <FastingCard
+                  plan={selectedPlan?.fastingPlan}
+                  currentPlan={selectedPlan}
+                />
+
                 <View
                   style={{
                     flexDirection: "row",
@@ -373,7 +470,7 @@ const FastingScreen = () => {
                       marginBottom: 10,
                     }}
                   >
-                    Current Fasting Plan
+                    Upcoming Fasting Plan
                   </Text>
                   <TouchableOpacity
                     onPress={() =>
@@ -393,22 +490,6 @@ const FastingScreen = () => {
                     </Text>
                   </TouchableOpacity>
                 </View>
-
-                <FastingCard
-                  plan={selectedPlan?.fastingPlan}
-                  currentPlan={selectedPlan}
-                />
-
-                <Text
-                  style={{
-                    color: "white",
-                    fontSize: FontSize.regular,
-                    fontWeight: "bold",
-                    marginBottom: 10,
-                  }}
-                >
-                  Upcoming Fasting Plan
-                </Text>
                 <FastingCard
                   plan={selectedPlan?.fastingPlan}
                   currentPlan={selectedPlan}
@@ -473,12 +554,12 @@ const FastingScreen = () => {
                 Fasting History
               </Text>
 
-              {/* <TouchableOpacity
+              <TouchableOpacity
                 style={{
                   borderRadius: 8,
                   borderWidth: 0.8,
                   paddingHorizontal: 10,
-                  borderColor: colors.green,
+                  borderColor: "#c2c2c2",
                   paddingVertical: 4,
                 }}
                 onPress={() => setFilterModalVisible(true)}
@@ -489,9 +570,9 @@ const FastingScreen = () => {
                     fontSize: FontSize.medium,
                   }}
                 >
-                  {selectedFilter}
+                  {selectedFilter} ▼
                 </Text>
-              </TouchableOpacity> */}
+              </TouchableOpacity>
             </View>
 
             {FastingBarChart(fastingHistories)}
@@ -580,7 +661,6 @@ const styles = StyleSheet.create({
   },
   barContainer: {
     alignItems: "center",
-    width: 30,
   },
   bar: {
     width: 20,

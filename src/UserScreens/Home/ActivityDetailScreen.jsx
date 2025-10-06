@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useEffect } from "react";
 import {
   View,
   Text,
@@ -30,6 +30,7 @@ import { END_POINTS } from "../../config/routes";
 import { API } from "../../config/apiClient";
 import { useSelector } from "react-redux";
 import Toast from "react-native-toast-message";
+import TrackingHelper from "../../services/trackingHelper";
 
 const ActivityDetailScreen = () => {
   const navigation = useNavigation();
@@ -48,6 +49,68 @@ const ActivityDetailScreen = () => {
 
   const pan = useRef(new Animated.ValueXY()).current;
   const dragThreshold = maxDragDistance * 0.9; // Trigger navigation when dragged 80% of max distance
+
+  const [isTracking, setIsTracking] = useState(false);
+  const [time, setTime] = useState(0);
+  const [distance, setDistance] = useState(0);
+  const [currentLocation, setCurrentLocation] = useState(null);
+
+  // Get data from Redux as backup/confirmation
+  const trackingData = useSelector((state) => state.tracking);
+
+  const trackerRef = useRef(null);
+
+  const handleUpdate = (update) => {
+    console.log("Tracking update:", update);
+
+    // Update local state based on what's in the update object
+    if (update.active !== undefined) {
+      setIsTracking(update.active);
+    }
+
+    if (update.duration !== undefined) {
+      setTime(update.duration);
+    }
+
+    if (update.distance !== undefined) {
+      setDistance(update.distance);
+    }
+
+    if (update.location) {
+      setCurrentLocation(update.location);
+    }
+  };
+
+  useEffect(() => {
+    const initTracker = async () => {
+      // Create tracker instance with the callback
+      trackerRef.current = new TrackingHelper(handleUpdate);
+
+      // Initialize (checks if tracking was active before app closed)
+      await trackerRef.current.initialize();
+
+      // Check current tracking status
+      const tracking = await TrackingHelper.isTracking();
+      setIsTracking(tracking);
+
+      if (tracking) {
+        // Get current stats if tracking
+        const statsData = TrackingHelper.getStats();
+        setTime(statsData.duration);
+        setDistance(statsData.distance);
+      }
+    };
+
+    initTracker();
+
+    // Cleanup on unmount
+    return () => {
+      if (trackerRef.current) {
+        // Don't stop tracking, just cleanup listeners
+        // tracking continues in background
+      }
+    };
+  }, []);
 
   // Reset position when the screen comes into focus
   useFocusEffect(
@@ -87,20 +150,13 @@ const ActivityDetailScreen = () => {
           pan.flattenOffset();
 
           if (pan.x._value > dragThreshold) {
-            if (goal) {
-              navigation.navigate("Map", {
-                goal,
-                activityName,
-                activityType,
-                heartRate,
-                calories,
-              });
-            } else {
-              Toast.show({
-                text1: "Kindly set a goal before starting",
-                type: "error",
-              });
-            }
+            navigation.navigate("Map", {
+              goal,
+              activityName,
+              activityType,
+              heartRate,
+              calories,
+            });
           }
 
           resetPan();
@@ -182,14 +238,14 @@ const ActivityDetailScreen = () => {
             label="Distance"
             icon={DistanceIcon}
             showProgress={true}
-            current={stats?.distance || 0}
+            current={stats?.distance || distance}
             target={goal ? goal.targetDistance?.value : 0}
             showGoal={goal ? goal.targetDistance.value !== null : false}
             goal={`Goal: ${goal?.targetDistance?.value || 0} ${
               goal?.targetDistance?.unit || "mi"
             }`}
-            message={`${Math.floor(stats?.distance) || 0} ${
-              goal?.targetDistance?.unit || "mi"
+            message={`${Math.floor(stats?.distance) || Math.floor(distance)} ${
+              goal?.targetDistance?.unit || "km"
             }`}
           />
           <CustomCard
@@ -199,7 +255,7 @@ const ActivityDetailScreen = () => {
             goal={`Goal: ${goal?.targetDuration?.hours || 0} hours ${
               goal?.targetDuration?.minutes || 0
             } mins`}
-            message={`${formatElapsedTime(stats?.duration)}`}
+            message={`${formatElapsedTime(stats?.duration || time)}`}
           />
         </View>
 

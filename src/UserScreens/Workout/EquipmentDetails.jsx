@@ -115,11 +115,6 @@ const EquipmentDetails = () => {
 
   const updateDaysStats = async (isReset = false) => {
     try {
-      console.log(totalDuration);
-      console.log(secondsRemainingValue.current);
-      console.log(
-        parseFloat((totalDuration - secondsRemainingValue.current) / 60.0)
-      );
       const res = await API.patch(
         `${END_POINTS.UPDATE_EQUIPMENTS_WORKOUTS}/${selectedWorkout._id}`,
         {
@@ -198,9 +193,10 @@ const EquipmentDetails = () => {
               <>
                 <Text style={styles.remainingTime}>Remaining time</Text>
                 <Text style={styles.remaining}>
-                  {`${formattedTime(remainingTime)} /\n${formattedTime(
+                  {`${formattedTime(remainingTime)}`}
+                  {/* {`${formattedTime(remainingTime)} /\n${formattedTime(
                     totalDuration
-                  )}`}
+                  )}`} */}
                 </Text>
               </>
             )}
@@ -288,12 +284,12 @@ const EquipmentDetails = () => {
                       <Text style={styles.detailText}>{workout.level}</Text>
                     </View>
 
-                    <IconButton
+                    {/* <IconButton
                       icon="arrow-right"
                       size={20} // Adjust the size as needed
                       color="#aaa" // Adjust the color as needed
                       style={styles.nextIcon}
-                    />
+                    /> */}
                   </View>
                 </TouchableOpacity>
               );
@@ -374,7 +370,8 @@ const styles = StyleSheet.create({
     bottom: 15,
     flexDirection: "row",
     width: "100%",
-    justifyContent: "space-between",
+    gap: 20,
+    // justifyContent: "space-between",
     paddingHorizontal: 10,
   },
   sessionDetail: {

@@ -110,6 +110,36 @@ const Profile = ({ navigation }) => {
     }
   };
 
+  const logout = async () => {
+    try {
+      const response = await API.patch(
+        `${END_POINTS.UPDATE_USER}${userData?._id}`,
+        { deviceId: null },
+        token,
+        false
+      );
+
+      if (response?.data?.success) {
+        dispatch(clearUserData());
+        if (isSignedIn()) {
+          signOutUser();
+        }
+        navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: "Splash",
+            },
+          ],
+        });
+      } else {
+        throw new Error("Failed to update information.");
+      }
+    } catch (error) {
+      console.error("Upload failed", error);
+    }
+  };
+
   return (
     <Container>
       <BackHeader title="Profile" showBackButton={true} />
@@ -156,23 +186,7 @@ const Profile = ({ navigation }) => {
         />
       </ScrollView>
 
-      <CustomButton
-        title="Log Out"
-        onPress={async () => {
-          dispatch(clearUserData());
-          if (isSignedIn()) {
-            signOutUser();
-          }
-          navigation.reset({
-            index: 0,
-            routes: [
-              {
-                name: "Splash",
-              },
-            ],
-          });
-        }}
-      />
+      <CustomButton title="Log Out" onPress={logout} />
     </Container>
   );
 };

@@ -17,6 +17,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.gomuuv.ios",
       "infoPlist": {
+        "UIBackgroundModes": ["location"],
         "NSPhotoLibraryUsageDescription": "Gomuuv needs access to your photo library so you can upload and update your profile picture.",
         "NSCameraUsageDescription": "Gomuuv needs access to your camera so you can take photos and update your profile picture.",
         "NSLocationWhenInUseUsageDescription": "Gomuuv needs access to your location to show your position on the map.",
@@ -31,15 +32,23 @@
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDxUS3vkTDbeRjguPLTqZEBUR3tVhykIqM"
+        }
+      },
       "package": "com.gomuuv.android",
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.READ_MEDIA_IMAGES",
-        "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_LOCATION"
       ],
       "versionCode": 1
     },
@@ -63,6 +72,16 @@
       "expo-video",
       "@react-native-firebase/crashlytics",
       "@react-native-firebase/app",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Gomuuv needs access to your location to show your position on the map.",
+          "locationAlwaysPermission": "Gomuuv needs access to your location in the background for continuous tracking.",
+          "locationWhenInUsePermission": "Gomuuv needs access to your location to show your position on the map.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ],
       [
         "expo-build-properties",
         {

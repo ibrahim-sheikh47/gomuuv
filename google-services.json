@@ -14,11 +14,19 @@
       },
       "oauth_client": [
         {
-          "client_id": "927173641477-ku49ms32gs4vhh9j35t9ccl4ojujpbnf.apps.googleusercontent.com",
+          "client_id": "927173641477-2fsr1ovrfh5m1kl079trh5tb8n8aihce.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.gomuuv.android",
-            "certificate_hash": "8abc0c78cad40cb55fa55a23746532a6abec6cbf"
+            "certificate_hash": "e48baf25298e76e5329ec2b6442e2359ccfd9be4"
+          }
+        },
+        {
+          "client_id": "927173641477-ne071tmmep7fdndguqm3dfj5sj9m86ud.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gomuuv.android",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
           }
         },
         {
@@ -37,6 +45,14 @@
             {
               "client_id": "927173641477-irrkglah24ke9olvq38nr4r7uuq70rlt.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "927173641477-7teeobddmcmo7e2jpk99bjrj9o599mgi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.gomuuv.ios",
+                "app_store_id": "6745766725"
+              }
             }
           ]
         }

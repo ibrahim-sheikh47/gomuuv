@@ -11,9 +11,6 @@ export const FastingCard = ({ plan, currentPlan }) => {
     event.persist();
     navigation.navigate("FastingPlanDetail", {
       selectedPlan: plan,
-      title: plan.name,
-      type: plan.type,
-      description: plan.description,
       currentPlan,
     });
   };

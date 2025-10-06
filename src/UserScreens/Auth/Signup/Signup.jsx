@@ -25,6 +25,7 @@ import { colors } from "../../../constants/colors";
 import { setAuthData } from "../../../redux/reducers/AuthSlice";
 import { FontSize } from "../../../utils/font";
 import { appleSignIn, googleSignIn } from "../../../services/authService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Signup = (props) => {
   const dispatch = useDispatch();
@@ -108,7 +109,11 @@ const Signup = (props) => {
     if (!validateForm()) return; // Stop if validation fails
 
     try {
-      const response = await API.post(END_POINTS.SIGNUP, form);
+      let deviceId = await AsyncStorage.getItem("fcmToken");
+      const response = await API.post(END_POINTS.SIGNUP, {
+        ...form,
+        deviceId,
+      });
       if (response?.data?.success) {
         dispatch(
           setAuthData({
@@ -162,6 +167,7 @@ const Signup = (props) => {
 
   const signUpWithGoogle = async () => {
     try {
+      let deviceId = await AsyncStorage.getItem("fcmToken");
       const res = await googleSignIn();
 
       const response = await API.post(END_POINTS.SOCIAL_LOGIN, {
@@ -170,6 +176,7 @@ const Signup = (props) => {
         email: res.data.user.email,
         image: res.data.user.photo,
         socialAccessToken: res.data.idToken,
+        deviceId,
         authType: "google",
       });
       if (response?.data?.success) {
@@ -202,12 +209,14 @@ const Signup = (props) => {
 
   const signUpWithApple = async () => {
     try {
+      let deviceId = await AsyncStorage.getItem("fcmToken");
       const res = await appleSignIn();
       const response = await API.post(END_POINTS.SOCIAL_LOGIN, {
         email: res.email,
         firstName: res.fullName?.givenName || "",
         lastName: res.fullName?.familyName || "",
         socialAccessToken: res.identityToken,
+        deviceId,
         authType: "apple",
       });
       if (response?.data?.success) {

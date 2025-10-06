@@ -40,11 +40,65 @@ import MapScreen from "../../UserScreens/Map/MapScreen";
 import NutritionPlan from "../../UserScreens/Nutrition/NutritionPlan";
 import Orders from "../../UserScreens/Shop/Orders";
 import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { navigationRef } from "../RootNavigation";
+import { fcmService } from "../../services/fcmService";
 
 const Stack = createNativeStackNavigator();
 
 export default function UserNavigator() {
+  const callbackQueue = [];
   const { isLoggedIn } = useSelector((state) => state.Auth);
+
+  useEffect(() => {
+    const onOpenNotification = (payload) => {
+      if (payload != null && payload != undefined && isLoggedIn) {
+        const { type, subType, reference } = payload;
+
+        if (type === "Fasting") {
+          if (subType === "fasting_started") {
+            const callback = () =>
+              reset(
+                [
+                  {
+                    name: "TabNavigator",
+                    params: {
+                      screen: "Home",
+                    },
+                  },
+                  {
+                    name: "Workout",
+                    params: {
+                      screen: "FastingScreen",
+                    },
+                  },
+                ],
+                1
+              );
+
+            if (navigationRef.current) {
+              callback();
+            } else {
+              callbackQueue.push(callback);
+            }
+          }
+        }
+      }
+    };
+
+    fcmService.register(onOpenNotification);
+
+    return () => {
+      fcmService.unRegister();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (navigationRef.current) {
+      callbackQueue.forEach((callback) => callback());
+      callbackQueue.length = 0;
+    }
+  }, [navigationRef.current]);
 
   return (
     <Stack.Navigator

@@ -1,6 +1,6 @@
 import DateTimePicker from "@react-native-community/datetimepicker"; // Ensure you have this library installed
 import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, Modal, StyleSheet, Text, View } from "react-native";
 import FastingIcon from "../../assets/svgs/FastingIcon";
 import Container from "../../components/Container";
@@ -13,40 +13,39 @@ import { END_POINTS } from "../../config/routes";
 import { useSelector } from "react-redux";
 import { FontSize } from "../../utils/font";
 import { colors } from "../../constants/colors";
+import TwoStepDateTimePicker from "../../components/TwoStepDateTimePicker";
+import { toastMessage } from "../../components/toastMessage";
+import moment from "moment";
 
 const FastingPlanDetail = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { title, type, description, selectedPlan, currentPlan } = route.params;
+  const { selectedPlan, currentPlan } = route.params;
 
   const [startTime, setStartTime] = useState(null);
   const [showPicker, setShowPicker] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const { token, data:userData } = useSelector((state) => state.Auth);
+  const { token, data: userData } = useSelector((state) => state.Auth);
 
-  const [filteredMeals, setFilteredMeals] = useState(
-    selectedPlan?.mealsToBreakFast || []
-  );
+  const filteredMeals = selectedPlan?.mealsToBreakFast || [];
 
-  // Function to calculate end time based on duration
-  const calculateEndTime = (start) => {
-    if (!start) return null; // Check if start time is defined
-    const end = new Date(start);
-    end.setHours(end.getHours() + extractNumberBeforeColon(selectedPlan?.type)); // Add duration hours to start time
-    return end;
-  };
-
-  function extractNumberBeforeColon(timeString) {
-    const parts = timeString.split(":");
-    return parseInt(parts[0], 10);
-  }
-
-  // Calculate endTime based on startTime and duration
-  const endTime = calculateEndTime(startTime);
+  useEffect(() => {
+    if (startTime) {
+      setTimeout(() => {
+        startFastingSession();
+      }, 1000);
+    }
+  }, [startTime]);
 
   const startFastingSession = async () => {
     try {
-      let payload = { user: userData?._id, fastingPlan: selectedPlan?._id };
+      let payload = {
+        user: userData?._id,
+        fastingPlan: selectedPlan?._id,
+        ...(startTime && {
+          startLaterAt: startTime.toISOString(),
+        }),
+      };
       const res = await API.post(
         END_POINTS.GET_ALL_FASTING_HISTORY,
         payload,
@@ -57,6 +56,15 @@ const FastingPlanDetail = () => {
         openModal();
         setStartTime(currentTime); // Set current time as start time
         setShowPicker(false); // Close the picker if it was open
+
+        if (startTime) {
+          toastMessage({
+            text1: `${res.data.message}${moment(res.data.data).format(
+              "DD/MM/yyyy - hh:mm A"
+            )}`,
+            type: "success",
+          });
+        }
 
         navigation.goBack();
         navigation.goBack();
@@ -69,14 +77,6 @@ const FastingPlanDetail = () => {
   // Function to handle starting now
   const handleStartNow = () => {
     startFastingSession();
-  };
-
-  const handleStartTimeChange = (event, selectedTime) => {
-    const currentTime = selectedTime || startTime; // Use the selected time or keep the current time
-    if (event.type === "set") {
-      setStartTime(currentTime); // Set the selected start time
-    }
-    setShowPicker(false); // Always close the picker, whether time is selected or not
   };
 
   // Format start time to display day and time
@@ -97,13 +97,42 @@ const FastingPlanDetail = () => {
   const closeModal = () => {
     setModalVisible(false);
   };
+
   return (
     <Container style={styles.container}>
-      <Header title={`${title}`} showBackButton={true} />
+      <Header title={`${selectedPlan?.name}`} showBackButton={true} />
 
-      <Text style={styles.elapsedTimeText}>
-        Elapsed Time: {selectedPlan?.duration?.value} hrs
-      </Text>
+      <View style={{ marginVertical: 30 }}>
+        <Text style={styles.elapsedTimeText}>
+          Plan Duration:{" "}
+          <Text style={{ fontFamily: "Poppins-Regular" }}>
+            {selectedPlan?.totalDuration?.value}{" "}
+            {selectedPlan?.totalDuration?.unit}
+          </Text>
+        </Text>
+        <Text style={styles.elapsedTimeText}>
+          Fasting Duration:{" "}
+          <Text style={{ fontFamily: "Poppins-Regular" }}>
+            {selectedPlan?.fastingDuration?.value}{" "}
+            {selectedPlan?.fastingDuration?.unit}
+          </Text>
+        </Text>
+        <Text style={styles.elapsedTimeText}>
+          Eating Duration:{" "}
+          <Text style={{ fontFamily: "Poppins-Regular" }}>
+            {selectedPlan?.totalDuration?.value -
+              selectedPlan?.fastingDuration?.value}{" "}
+            {selectedPlan?.totalDuration?.unit}
+          </Text>
+        </Text>
+
+        <Text style={styles.elapsedTimeText}>
+          Best For:{" "}
+          <Text style={{ fontFamily: "Poppins-Regular" }}>
+            {selectedPlan?.bestFor}
+          </Text>
+        </Text>
+      </View>
 
       {!currentPlan && (
         <View style={styles.buttonContainer}>
@@ -114,15 +143,14 @@ const FastingPlanDetail = () => {
               textStyle={{ fontSize: 14 }}
               onPress={handleStartNow}
             />
-            <View>
-              <Text style={styles.timeText}>Start Time:</Text>
-              <Text style={styles.timeDetail}>
-                {selectedPlan?.fastingTime?.start
-                  ? formatDateTime(new Date(selectedPlan?.fastingTime?.start))
-                  : "Not Set"}
-                {/* Display formatted start time */}
-              </Text>
-            </View>
+            {startTime && (
+              <View>
+                <Text style={styles.timeText}>Start Time:</Text>
+                <Text style={styles.timeDetail}>
+                  {formatDateTime(startTime)}
+                </Text>
+              </View>
+            )}
           </View>
           <View>
             <CustomButton
@@ -131,14 +159,6 @@ const FastingPlanDetail = () => {
               textStyle={{ fontSize: 14 }}
               onPress={() => setShowPicker(true)}
             />
-            {endTime && (
-              <View>
-                <Text style={styles.timeText}>End Time</Text>
-                <Text style={styles.timeDetail}>
-                  {endTime ? formatDateTime(endTime) : "Not Set"}
-                </Text>
-              </View>
-            )}
           </View>
         </View>
       )}
@@ -155,69 +175,90 @@ const FastingPlanDetail = () => {
         </Text>
       )}
 
-      {/* Date/Time Picker for Start Time */}
-      {showPicker && (
-        <Modal transparent={true} animationType="slide">
-          <View style={styles.pickerContainer}>
-            <DateTimePicker
-              value={startTime || new Date()} // Default to current time if startTime is null
-              mode="time"
-              is24Hour={true}
-              display="default"
-              onChange={handleStartTimeChange}
-            />
-          </View>
-        </Modal>
-      )}
-      <Text
-        style={{
-          marginTop: 40,
-          color: "#fff",
-          fontSize: FontSize.regular,
-          fontFamily: "Poppins-Bold",
-        }}
-      >
-        Meals to break your {""}
-        {type} fast
-      </Text>
-
-      <FlatList
-        vertical
-        data={filteredMeals} // Use the filtered meals here
-        keyExtractor={(item) => item._id?.toString()} // Ensure the id is a string
-        renderItem={({ item }) => (
-          <MealItem
-            style={{ width: "100%" }}
-            mealName={item.name}
-            mealImage={item.mealImage}
-            calories={item.calories}
-            time={item?.preparationTime}
-            onPress={() => {
-              navigation.navigate("MealDetailScreen", {
-                meal: item,
-                source: "dailyPlan",
-              });
-            }}
-          />
-        )}
-        contentContainerStyle={{ gap: 10, marginBottom: 20 }}
-        showsHorizontalScrollIndicator={false}
-        ListEmptyComponent={
-          <>
-            <Text
-              style={{
-                color: "white",
-                fontFamily: "Poppins-Medium",
-                fontSize: FontSize.xlarge,
-                textAlign: "center",
-                marginTop: 30,
-              }}
-            >
-              NO PLANS YET!
-            </Text>
-          </>
-        }
+      <TwoStepDateTimePicker
+        showPicker={showPicker}
+        setShowPicker={setShowPicker}
+        startTime={startTime}
+        setStartTime={setStartTime}
       />
+
+      {selectedPlan.tips !== "" && (
+        <View>
+          <Text
+            style={{
+              marginTop: 40,
+              color: "#fff",
+              fontSize: FontSize.regular,
+              fontFamily: "Poppins-Bold",
+            }}
+          >
+            Tips:
+          </Text>
+
+          <Text
+            style={{
+              color: "#fff",
+              fontSize: FontSize.regular,
+              fontFamily: "Poppins-Regular",
+            }}
+          >
+            {selectedPlan?.tips.replace(/\\t/g, "\t")}
+          </Text>
+        </View>
+      )}
+
+      {filteredMeals.length > 0 && (
+        <Text
+          style={{
+            marginTop: 40,
+            color: "#fff",
+            fontSize: FontSize.regular,
+            fontFamily: "Poppins-Bold",
+          }}
+        >
+          Meals to break your fast
+        </Text>
+      )}
+
+      {filteredMeals.length > 0 && (
+        <FlatList
+          vertical
+          data={filteredMeals} // Use the filtered meals here
+          keyExtractor={(item) => item._id?.toString()} // Ensure the id is a string
+          renderItem={({ item }) => (
+            <MealItem
+              style={{ width: "100%" }}
+              mealName={item.name}
+              mealImage={item.mealImage}
+              calories={item.calories}
+              time={item?.preparationTime}
+              onPress={() => {
+                navigation.navigate("MealDetailScreen", {
+                  meal: item,
+                  source: "dailyPlan",
+                });
+              }}
+            />
+          )}
+          contentContainerStyle={{ gap: 10, marginBottom: 20 }}
+          showsHorizontalScrollIndicator={false}
+          ListEmptyComponent={
+            <>
+              <Text
+                style={{
+                  color: "white",
+                  fontFamily: "Poppins-Medium",
+                  fontSize: FontSize.xlarge,
+                  textAlign: "center",
+                  marginTop: 30,
+                }}
+              >
+                No meals
+              </Text>
+            </>
+          }
+        />
+      )}
 
       <CustomModal
         visible={modalVisible}
@@ -247,7 +288,6 @@ const styles = StyleSheet.create({
     color: "#AFAFAF",
   },
   elapsedTimeText: {
-    marginVertical: 30,
     color: "#fff",
     fontSize: FontSize.regular,
     fontFamily: "Poppins-Bold",
