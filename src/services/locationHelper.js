@@ -1,5 +1,8 @@
 import * as Location from "expo-location";
 import { Alert, AppState, Linking, Platform } from "react-native";
+import * as IntentLauncher from "expo-intent-launcher";
+import { BACKGROUND_TASK } from "../tasks/trackingTasks";
+import { toastMessage } from "../components/toastMessage";
 
 export default class LocationHelper {
   constructor(onUpdate) {
@@ -25,6 +28,88 @@ export default class LocationHelper {
   stop() {
     if (this.appListener) this.appListener.remove();
     if (this.locationWatcher) this.locationWatcher.remove();
+  }
+
+  async openLocationSettings() {
+    try {
+      if (Platform.OS === "android") {
+        // Open Android location settings directly
+        await IntentLauncher.startActivityAsync(
+          IntentLauncher.ActivityAction.LOCATION_SOURCE_SETTINGS
+        );
+      } else {
+        // On iOS: open app settings
+        await Linking.openSettings();
+      }
+    } catch (err) {
+      console.error("Failed to open location settings:", err);
+    }
+  }
+
+  async checkForPermissionsAndStartTracking() {
+    try {
+      const servicesEnabled = await Location.hasServicesEnabledAsync();
+
+      if (!servicesEnabled) {
+        Alert.alert(
+          "Location Off",
+          "Please turn on location services to continue.",
+          [
+            { text: "Cancel", style: "cancel" },
+            {
+              text: "Open Settings",
+              onPress: () => this.openLocationSettings(),
+            },
+          ]
+        );
+
+        return false;
+      }
+
+      const fgStatus = await Location.getForegroundPermissionsAsync();
+      if (fgStatus.status !== "granted") {
+        const fg = await Location.requestForegroundPermissionsAsync();
+        if (fg.status !== "granted") {
+          return false;
+        }
+      }
+
+      const bgStatus = await Location.getBackgroundPermissionsAsync();
+      if (bgStatus.status !== "granted") {
+        const bg = await Location.requestBackgroundPermissionsAsync();
+        if (bg.status !== "granted") {
+          return false;
+        }
+      }
+
+      const isRunning = await Location.hasStartedLocationUpdatesAsync(
+        BACKGROUND_TASK
+      );
+      if (!isRunning) {
+        await Location.startLocationUpdatesAsync(BACKGROUND_TASK, {
+          accuracy: Location.Accuracy.Highest,
+          distanceInterval: 0,
+          timeInterval: 1000,
+          showsBackgroundLocationIndicator: true,
+          foregroundService: {
+            notificationTitle: "🧪 Test Tracking",
+            notificationBody: "Background tracking active",
+            notificationColor: "#FF0000",
+          },
+        });
+
+        toastMessage({
+          text1: "Session Started",
+          text2: "Activity session has been started",
+          type: "success",
+        });
+      }
+
+      return true;
+    } catch (err) {
+      console.error("Permission check failed:", err);
+      return false;
+    }
   }
 
   // Check permission + GPS + location

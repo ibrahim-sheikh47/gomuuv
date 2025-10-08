@@ -5,82 +5,93 @@ import CustomButton from "../../components/CustomButton";
 import { FontSize } from "../../utils/font";
 import { StatusBar, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import { BACKGROUND_TASK, STORAGE_KEYS } from "../../tasks/trackingTasks";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Location from "expo-location";
+import { formatDistance } from "../../utils/utilities";
 
 const MapScreen = ({ route }) => {
   const navigation = useNavigation();
+  const { distance } = useSelector((state) => state.tracking);
   const params = route?.params;
   const STATUS_BAR_HEIGHT =
     Platform.OS === "ios" ? 60 : StatusBar.currentHeight;
 
-  const [location, setLocation] = useState(null); // To store the address
-  const [totalDistance, setTotalDistance] = useState(0); // To store total distance
-  const [elapsedTime, setElapsedTime] = useState(0); // To store the elapsed time
-  const [coordinates, setCoordinates] = useState([]);
+  const [elapsedTime, setElapsedTime] = useState(0);
   const [snapshot, setSnapshot] = useState(null);
-  const [tracking, setTracking] = useState(false);
+  const [tracking, setTracking] = useState(true);
 
   useEffect(() => {
     if (snapshot) {
-      navigation.navigate("FinishActivity", {
-        goal: params.goal,
-        activityName: params.activityName,
-        activityType: params.activityType,
-        distance: totalDistance,
-        time: elapsedTime,
-        distanceUnit: params.goal.targetDistance.unit,
-        heartRate: params.heartRate,
-        calories: params.calories,
-        snapshot: snapshot,
-      });
+      endTrackingAndDisplayResults();
     }
   }, [snapshot]);
 
-  const onLocationUpdate = ({
-    address,
-    distance,
-    time,
-    pathCoordinates,
-    snapshot,
-  }) => {
-    setLocation(address);
-    setTotalDistance(distance);
-    setElapsedTime(time);
-    setCoordinates(pathCoordinates);
-    setSnapshot(snapshot);
+  const endTrackingAndDisplayResults = async () => {
+    await clearBackgroundData();
+
+    navigation.navigate("FinishActivity", {
+      goal: params.goal,
+      activityName: params.activityName,
+      activityType: params.activityType,
+      time: formatElapsedTime2(elapsedTime),
+      distanceUnit: params.goal?.targetDistance?.unit || "m",
+      heartRate: params.heartRate,
+      snapshot: snapshot,
+    });
   };
 
-  const startTracking = () => {
-    setTracking(true);
-    // Optionally handle additional logic for starting tracking
+  const clearBackgroundData = async () => {
+    const isRunning = await Location.hasStartedLocationUpdatesAsync(
+      BACKGROUND_TASK
+    );
+    await AsyncStorage.multiRemove([
+      STORAGE_KEYS.LAST_COORDS,
+      STORAGE_KEYS.TOTAL_DISTANCE,
+      STORAGE_KEYS.START_TIME,
+      STORAGE_KEYS.PATH,
+    ]);
+    if (isRunning) {
+      Location.stopLocationUpdatesAsync(BACKGROUND_TASK);
+    }
+  };
+
+  const onLocationUpdate = ({ time, snapshot }) => {
+    setElapsedTime(time);
+    setSnapshot(snapshot);
   };
 
   const stopTracking = () => {
     setTracking(false);
   };
 
-  const formatElapsedTime = (timeObj) => {
-    const { hours = 0, minutes = 0, seconds = 0 } = timeObj;
+  const formatElapsedTime2 = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return { hours, minutes, seconds: seconds % 60 };
+  };
 
-    if (hours === 0 && minutes === 0) {
-      return `${seconds}s`;
+  const formatElapsedTime = (totalSeconds = 0) => {
+    if (totalSeconds < 60) {
+      return `${totalSeconds}s`;
     }
 
-    if (hours === 0) {
-      return `${minutes}m ${seconds}s`;
+    if (totalSeconds < 3600) {
+      const minutes = parseInt(totalSeconds / 60);
+      const secs = parseInt(totalSeconds % 60);
+      return `${minutes}m ${secs}s`;
     }
 
-    return `${hours}h ${minutes}m ${seconds}s`;
+    const hours = parseInt(totalSeconds / 3600);
+    const minutes = parseInt(totalSeconds / 60);
+    const secs = parseInt(totalSeconds % 60);
+    return `${hours || 0}h ${minutes || 0}m ${secs || 0}s`;
   };
 
   return (
     <View style={{ flex: 1 }}>
-      <Map
-        goal={params.goal}
-        onLocationUpdate={onLocationUpdate} // Pass the callback to Map.js
-        address={location}
-        pathCoordinates={[]}
-        tracking={tracking} // Pass the tracking state to Map.js
-      />
+      <Map onLocationUpdate={onLocationUpdate} tracking={tracking} />
 
       <View
         style={{
@@ -90,16 +101,6 @@ const MapScreen = ({ route }) => {
           right: 0,
         }}
       >
-        <Text
-          style={{
-            backgroundColor: "#000000aa",
-            fontSize: FontSize.small,
-            color: "white",
-            textAlign: "center",
-          }}
-        >
-          {location || "Fetching address..."}
-        </Text>
         <Text
           style={{
             backgroundColor: "#000000aa",
@@ -118,19 +119,23 @@ const MapScreen = ({ route }) => {
             textAlign: "center",
           }}
         >
-          Distance: {totalDistance.toFixed(2)} {params.goal.targetDistance.unit}
+          Distance:{" "}
+          {
+            formatDistance(distance, params.goal?.targetDistance?.unit || "m")
+              .formatted
+          }
         </Text>
       </View>
 
       <CustomButton
-        title={tracking ? "End" : "Start"} // Dynamically change button text based on tracking status
+        title={"End Tracking"}
         style={{
           bottom: 20,
           width: "90%",
           position: "absolute",
           alignSelf: "center",
         }}
-        onPress={tracking ? stopTracking : startTracking} // Call start/stop based on tracking status
+        onPress={stopTracking}
       />
     </View>
   );

@@ -43,6 +43,7 @@ import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { navigationRef } from "../RootNavigation";
 import { fcmService } from "../../services/fcmService";
+import TrackingTestScreen from "../../UserScreens/Home/test";
 
 const Stack = createNativeStackNavigator();
 
@@ -151,6 +152,7 @@ export default function UserNavigator() {
       <Stack.Screen name="CategoryList" component={CategoryList} />
 
       <Stack.Screen name="SleepScreen" component={SleepScreen} />
+      <Stack.Screen name="Test" component={TrackingTestScreen} />
 
       <Stack.Screen
         name="ManageNotifications"

@@ -4,7 +4,7 @@ const initialState = {
   distance: 0,
   duration: 0,
   calories: 0,
-  locations: [], // ✅ list of { latitude, longitude, timestamp }
+  locations: [],
 };
 
 const slice = createSlice({
@@ -12,10 +12,9 @@ const slice = createSlice({
   initialState,
   reducers: {
     updateStats: (state, { payload }) => {
-      const { distance = 0, duration, location } = payload;
+      const { distance = 0, location } = payload;
 
-      if (distance) state.distance += distance;
-      if (duration !== undefined) state.duration = duration;
+      if (distance) state.distance = distance;
       if (location) state.locations.push(location);
 
       state.calories = Math.round(state.distance * 60);

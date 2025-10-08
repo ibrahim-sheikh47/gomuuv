@@ -44,6 +44,7 @@
     "expo-location": "~18.1.4",
     "expo-splash-screen": "~0.30.8",
     "expo-status-bar": "~2.2.3",
+    "expo-task-manager": "~13.1.6",
     "expo-updates": "~0.28.15",
     "expo-video": "~2.1.8",
     "expo-video-player": "^2.2.0",
@@ -78,7 +79,7 @@
     "reactotron-react-native": "^5.1.12",
     "redux": "^5.0.1",
     "redux-persist": "^6.0.0",
-    "expo-task-manager": "~13.1.6"
+    "expo-intent-launcher": "~12.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -12,6 +12,7 @@ import {
   useNavigation,
   useRoute,
   useFocusEffect,
+  useIsFocused,
 } from "@react-navigation/native";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
@@ -29,16 +30,26 @@ import { FontSize } from "../../utils/font";
 import { END_POINTS } from "../../config/routes";
 import { API } from "../../config/apiClient";
 import { useSelector } from "react-redux";
-import Toast from "react-native-toast-message";
-import TrackingHelper from "../../services/trackingHelper";
+import LocationHelper from "../../services/locationHelper";
+import { STORAGE_KEYS } from "../../tasks/trackingTasks";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { convertDistanceToMeter } from "../../utils/utilities";
 
 const ActivityDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { activityType, activityName, goal: item } = route.params || {};
+  const isFocussed = useIsFocused();
+  const {
+    activityType,
+    activityName,
+    goal: item,
+    startSession,
+  } = route.params || {};
+  const { distance, calories } = useSelector((state) => state.tracking);
 
   const [goal, setGoal] = useState(item);
   const [stats, setStats] = useState(null);
+  const [time, setTime] = useState(0);
   const duration = ["Today", "Weekly", "Monthly", "Quarterly", "Yearly"];
   const [selectedPeriod, setSelectedPeriod] = useState("Today");
 
@@ -49,68 +60,8 @@ const ActivityDetailScreen = () => {
 
   const pan = useRef(new Animated.ValueXY()).current;
   const dragThreshold = maxDragDistance * 0.9; // Trigger navigation when dragged 80% of max distance
-
-  const [isTracking, setIsTracking] = useState(false);
-  const [time, setTime] = useState(0);
-  const [distance, setDistance] = useState(0);
-  const [currentLocation, setCurrentLocation] = useState(null);
-
-  // Get data from Redux as backup/confirmation
-  const trackingData = useSelector((state) => state.tracking);
-
-  const trackerRef = useRef(null);
-
-  const handleUpdate = (update) => {
-    console.log("Tracking update:", update);
-
-    // Update local state based on what's in the update object
-    if (update.active !== undefined) {
-      setIsTracking(update.active);
-    }
-
-    if (update.duration !== undefined) {
-      setTime(update.duration);
-    }
-
-    if (update.distance !== undefined) {
-      setDistance(update.distance);
-    }
-
-    if (update.location) {
-      setCurrentLocation(update.location);
-    }
-  };
-
-  useEffect(() => {
-    const initTracker = async () => {
-      // Create tracker instance with the callback
-      trackerRef.current = new TrackingHelper(handleUpdate);
-
-      // Initialize (checks if tracking was active before app closed)
-      await trackerRef.current.initialize();
-
-      // Check current tracking status
-      const tracking = await TrackingHelper.isTracking();
-      setIsTracking(tracking);
-
-      if (tracking) {
-        // Get current stats if tracking
-        const statsData = TrackingHelper.getStats();
-        setTime(statsData.duration);
-        setDistance(statsData.distance);
-      }
-    };
-
-    initTracker();
-
-    // Cleanup on unmount
-    return () => {
-      if (trackerRef.current) {
-        // Don't stop tracking, just cleanup listeners
-        // tracking continues in background
-      }
-    };
-  }, []);
+  const helper = new LocationHelper(null);
+  let timer;
 
   // Reset position when the screen comes into focus
   useFocusEffect(
@@ -122,8 +73,48 @@ const ActivityDetailScreen = () => {
       }).start();
 
       fetchActiveGoal();
+
+      return () => {
+        if (timer) clearInterval(timer);
+      };
     }, [])
   );
+
+  useEffect(() => {
+    if (startSession) {
+      checkAll();
+    }
+  }, [isFocussed]);
+
+  const checkAll = async () => {
+    const result = await helper.checkForPermissionsAndStartTracking();
+
+    if (result) {
+      startTimer();
+    }
+  };
+
+  const startTimer = async () => {
+    try {
+      let savedStartTimeStr = await AsyncStorage.getItem(
+        STORAGE_KEYS.START_TIME
+      );
+      if (!savedStartTimeStr) {
+        savedStartTimeStr = Date.now().toString();
+        await AsyncStorage.setItem(STORAGE_KEYS.START_TIME, savedStartTimeStr);
+      }
+      const savedStartTime = parseInt(savedStartTimeStr, 10);
+
+      if (timer) clearInterval(timer);
+
+      timer = setInterval(() => {
+        const elapsedSeconds = Math.floor((Date.now() - savedStartTime) / 1000);
+        setTime(elapsedSeconds);
+      }, 1000);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const resetPan = () => {
     Animated.spring(pan, {
@@ -155,7 +146,6 @@ const ActivityDetailScreen = () => {
               activityName,
               activityType,
               heartRate,
-              calories,
             });
           }
 
@@ -166,7 +156,6 @@ const ActivityDetailScreen = () => {
   );
 
   const heartRate = "0bpm";
-  const calories = "0kcal";
 
   const fetchActiveGoal = async () => {
     try {
@@ -178,6 +167,26 @@ const ActivityDetailScreen = () => {
 
       if (response?.data?.success) {
         setGoal(response?.data?.data?.goal);
+        setStats(response?.data?.data?.stats);
+        console.log(response?.data?.data?.stats);
+      }
+    } catch (error) {
+      // console.log(error);
+      if (!startSession) {
+        fetchPhysicalActivity();
+      }
+    }
+  };
+
+  const fetchPhysicalActivity = async () => {
+    try {
+      const response = await API.get(
+        `${END_POINTS.PHYSICAL_ACTIVITIES}/type/${activityType}?filter=${selectedPeriod}`,
+        {},
+        token
+      );
+
+      if (response?.data?.success) {
         setStats(response?.data?.data?.stats);
       }
     } catch (error) {
@@ -238,15 +247,27 @@ const ActivityDetailScreen = () => {
             label="Distance"
             icon={DistanceIcon}
             showProgress={true}
-            current={stats?.distance || distance}
-            target={goal ? goal.targetDistance?.value : 0}
+            current={startSession ? distance : stats?.distance || distance}
+            target={
+              goal
+                ? startSession
+                  ? convertDistanceToMeter(
+                      goal.targetDistance.value,
+                      goal.targetDistance.unit
+                    )
+                  : goal.targetDistance?.value
+                : 0
+            }
             showGoal={goal ? goal.targetDistance.value !== null : false}
             goal={`Goal: ${goal?.targetDistance?.value || 0} ${
               goal?.targetDistance?.unit || "mi"
             }`}
-            message={`${Math.floor(stats?.distance) || Math.floor(distance)} ${
-              goal?.targetDistance?.unit || "km"
-            }`}
+            message={`${
+              startSession
+                ? parseFloat(distance).toFixed(2)
+                : parseFloat(stats?.distance).toFixed(2) ||
+                  parseFloat(distance).toFixed(2)
+            } ${startSession ? "m" : goal?.targetDistance?.unit || "m"}`}
           />
           <CustomCard
             label="Time"
@@ -255,7 +276,9 @@ const ActivityDetailScreen = () => {
             goal={`Goal: ${goal?.targetDuration?.hours || 0} hours ${
               goal?.targetDuration?.minutes || 0
             } mins`}
-            message={`${formatElapsedTime(stats?.duration || time)}`}
+            message={`${formatElapsedTime(
+              startSession ? time : stats?.duration || time
+            )}`}
           />
         </View>
 
@@ -264,7 +287,9 @@ const ActivityDetailScreen = () => {
             label="Calories"
             showGoal={false}
             icon={CaloriesIcon}
-            message={calories}
+            message={`${
+              startSession ? calories : stats?.calories || calories || 0
+            }kcal`}
           />
           <CustomCard
             label="Heart Rate"

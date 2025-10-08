@@ -20,6 +20,7 @@ import { FontSize } from "../../utils/font";
 import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
 import { setTargetWeight } from "../../redux/reducers/AuthSlice";
+import { navigate } from "../../navigation/RootNavigation";
 
 const HomeScreen = () => {
   const dispatch = useDispatch();
@@ -130,30 +131,14 @@ const HomeScreen = () => {
               icon={activityIcons[activity]}
               label={activity}
               onPress={() => {
-                const goal = goals?.find((g) => g.type === activity);
+                const goal = goals?.find((g) => g.type === activity) || null;
 
-                if (goal) {
-                  navigation.navigate("ActivityDetailScreen", {
-                    activityType: goal.type,
-                    activityName: goal.type,
-                    goal,
-                  });
-                } else {
-                  navigation.navigate("ActivityDetailScreen", {
-                    activityType: activity,
-                    activityName: activity,
-                  });
-                }
-                // else {
-                //   const heartRate = "0bpm";
-                //   const calories = "0kcal";
-
-                //   navigation.navigate("Map", {
-                //     activityName: activity,
-                //     heartRate,
-                //     calories,
-                //   });
-                // }
+                navigation.navigate("ActivityDetailScreen", {
+                  activityType: goal?.type || activity,
+                  activityName: goal?.type || activity,
+                  goal,
+                  startSession: true,
+                });
               }}
             />
           ))}

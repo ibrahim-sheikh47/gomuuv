@@ -16,82 +16,111 @@ import PaceIcon from "../../assets/svgs/PaceIcon";
 import { FontSize } from "../../utils/font";
 import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { resetStats } from "../../redux/reducers/trackingSlice";
+import { formatDistance } from "../../utils/utilities";
 
 const FinishActivity = () => {
+  const dispatch = useDispatch();
   const route = useRoute();
+  const { distance, calories } = useSelector((state) => state.tracking);
   const {
     goal,
     activityName,
     activityType,
-    distance,
     distanceUnit,
     time,
     heartRate,
-    calories,
     snapshot,
   } = route.params;
 
   const navigation = useNavigation();
   const { token } = useSelector((state) => state.Auth);
 
-  const finishActivity = async () => {
-    try {
-      const response = await API.patch(
-        `${END_POINTS.GOALS}`,
+  const navigateBack = (data) => {
+    navigation.reset({
+      routes: [
         {
-          type: activityType,
-          distance: {
-            value: distance,
-            unit: distanceUnit,
-          },
-          duration: {
-            hours: time.hours,
-            minutes: time.minutes,
-            totalSeconds: time.hours * 3600 + time.minutes * 60 + time.seconds,
+          name: "TabNavigator",
+          params: {
+            screen: "Home",
           },
         },
-        token
-      );
+        {
+          name: "ActivityDetailScreen",
+          params: {
+            goal: data,
+            activityType,
+            activityName,
+            startSession: false,
+          },
+        },
+      ],
+      index: 1,
+    });
+  };
 
-      if (response?.data?.success) {
-        navigation.reset({
-          routes: [
-            {
-              name: "TabNavigator",
-              params: {
-                screen: "Home",
-              },
+  const finishActivity = async () => {
+    try {
+      if (goal) {
+        const response = await API.patch(
+          `${END_POINTS.GOALS}`,
+          {
+            type: activityType,
+            distance: {
+              value: formatDistance(distance, distanceUnit).distance,
+              unit: distanceUnit,
             },
-            {
-              name: "ActivityDetailScreen",
-              params: {
-                goal: response.data.data,
-                activityType,
-                activityName,
-              },
+            duration: {
+              hours: time.hours,
+              minutes: time.minutes,
+              totalSeconds:
+                time.hours * 3600 + time.minutes * 60 + time.seconds,
             },
-          ],
-          index: 1,
-        });
+            calories,
+          },
+          token
+        );
+
+        if (response?.data?.success) {
+          navigateBack(response.data.data);
+        }
+      } else {
+        const response = await API.patch(
+          `${END_POINTS.PHYSICAL_ACTIVITIES}`,
+          {
+            type: activityType,
+            distance: distance,
+            duration: time.hours * 3600 + time.minutes * 60 + time.seconds,
+            calories,
+          },
+          token
+        );
+
+        if (response?.data?.success) {
+          navigateBack(null);
+        }
       }
+      dispatch(resetStats());
     } catch (error) {
       console.log(error);
     }
   };
 
-  const computePace = (timeObj, distance, unit = "meter") => {
+  const computePace = (timeObj, distance, unit = "m") => {
     const { hours = 0, minutes = 0, seconds = 0 } = timeObj;
 
     const timeInSeconds = hours * 3600 + minutes * 60 + seconds;
-    const dist = distance;
+    let dist = distance;
+    if (unit === "km") dist = distance / 1000;
+    if (unit === "mi") dist = distance / 1609.34;
 
     const timePerUnitInSeconds = dist > 0 ? timeInSeconds / dist : 0;
     const hoursTotal = timeInSeconds > 0 ? timeInSeconds / 3600 : 0;
     const paceUnitsPerHour = dist / hoursTotal;
 
     return {
-      timePerUnit: timePerUnitInSeconds,
+      timePerUnit: timePerUnitInSeconds.toFixed(2),
       paceUnitsPerHour: parseFloat(paceUnitsPerHour.toFixed(2)),
       unit,
     };
@@ -185,7 +214,13 @@ const FinishActivity = () => {
         )}
         <View style={styles.gridContainer}>
           <CustomCard
-            label={`Time Per ${distanceUnit === "mi" ? "Mile" : "Km"}`}
+            label={`Time Per ${
+              distanceUnit === "mi"
+                ? "Mile"
+                : distanceUnit === "km"
+                ? "Km"
+                : "Meter"
+            }`}
             iconImage={icons.timePerMile}
             message={`${formatElapsedTime(result.timePerUnit)}/${distanceUnit}`}
           />
@@ -195,7 +230,8 @@ const FinishActivity = () => {
             message={`${formatElapsedTime(
               time.hours * 3600 + time.minutes * 60 + time.seconds
             )}`}
-            goal={`Goal: ${time.hours}hours ${time.minutess}mins daily`}
+            showGoal={goal}
+            goal={`Goal: ${time.hours}hours ${time.minutes}mins daily`}
           />
         </View>
         <View style={styles.gridContainer}>
@@ -209,8 +245,13 @@ const FinishActivity = () => {
           <CustomCard
             label="Distance"
             icon={DistanceIcon}
-            goal={`Goal: ${goal.targetDistance.value}${distanceUnit} daily`}
-            message={`${Math.round(distance).toFixed(2)} ${distanceUnit}`}
+            showGoal={goal}
+            goal={`Goal: ${
+              goal?.targetDistance?.value || 0
+            }${distanceUnit} daily`}
+            message={`${formatDistance(distance, distanceUnit).distance.toFixed(
+              2
+            )} ${distanceUnit}`}
           />
         </View>
       </ScrollView>
