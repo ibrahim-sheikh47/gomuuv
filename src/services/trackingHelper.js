@@ -2,7 +2,7 @@ import * as Location from "expo-location";
 import { Alert, AppState, Linking, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { store } from "../redux/store";
-import { updateStats, resetStats } from "../redux/reducers/trackingSlice";
+import { resetStats, updateStatsAsync } from "../redux/reducers/trackingSlice";
 import { BACKGROUND_TASK } from "../tasks/trackingTasks"; // Import task
 
 const STORAGE_KEYS = {
@@ -113,7 +113,7 @@ export default class TrackingHelper {
       if (!startTime) return;
       const duration = Math.floor((Date.now() - startTime) / 1000);
       const currentState = store.getState().tracking;
-      store.dispatch(updateStats({ duration }));
+      store.dispatch(updateStatsAsync({ duration }));
       this.onUpdate?.({
         active: true,
         duration,
@@ -221,7 +221,7 @@ export default class TrackingHelper {
         const duration = startTime
           ? Math.floor((Date.now() - startTime) / 1000)
           : 0;
-        store.dispatch(updateStats({ distance, duration, location: point }));
+        store.dispatch(updateStatsAsync({ distance, duration, location: point }));
         await saveLocationToStorage(point);
         this.onUpdate?.({
           active: true,

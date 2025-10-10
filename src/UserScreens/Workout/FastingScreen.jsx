@@ -2,6 +2,7 @@ import { useIsFocused, useNavigation } from "@react-navigation/native"; // Impor
 import React, { useEffect, useState } from "react";
 import {
   Dimensions,
+  FlatList,
   Modal,
   ScrollView,
   StyleSheet,
@@ -42,6 +43,8 @@ const FastingScreen = () => {
   const [fastingStats, setFastingStats] = useState({}); // Modal visibility state
   const [fastingHistories, setFastingHistories] = useState([]); // Modal visibility state
   const [selectedPlan, setSelectedPlan] = useState(null); // Modal visibility state
+  const [upcomingFastingPlan, setUpcomingFastingPlan] = useState(null);
+  const [fastingPlans, setFastingPlans] = useState([]);
 
   const filters = ["Weekly", "Monthly", "Yearly"];
 
@@ -59,6 +62,8 @@ const FastingScreen = () => {
       getFastingHistories();
     } else {
       getCurrentFast();
+      getUpcomingFastingPlans();
+      getAllFastingPlans();
     }
   }, [activeTab, isFocussed, isForeground]);
 
@@ -101,6 +106,33 @@ const FastingScreen = () => {
   useEffect(() => {
     getFastingHistories();
   }, [selectedFilter]);
+
+  const getAllFastingPlans = async () => {
+    try {
+      const res = await API.get(END_POINTS.FASTING_PLANS, null, token);
+      if (res?.data?.success) {
+        setFastingPlans(res.data.data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching history", error);
+    }
+  };
+
+  const getUpcomingFastingPlans = async () => {
+    try {
+      const res = await API.get(
+        `${END_POINTS.FASTING_HISTORIES}/list/upcoming`,
+        null,
+        token
+      );
+
+      if (res?.data?.success) {
+        setUpcomingFastingPlan(res.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching history", error);
+    }
+  };
 
   const endFastingSession = async () => {
     try {
@@ -324,6 +356,10 @@ const FastingScreen = () => {
     );
   };
 
+  const renderFastingItem = ({ item }) => (
+    <FastingCard plan={item} currentPlan={selectedPlan} />
+  );
+
   return (
     <Container>
       <Header title={"Fasting"} showBackButton={true} />
@@ -335,12 +371,11 @@ const FastingScreen = () => {
       />
 
       {activeTab === "Current Fast" && (
-        <>
+        <ScrollView showsVerticalScrollIndicator={false}>
           {!selectedPlan && ( // Hide this view if a plan is selected
             <View style={styles.content}>
               <View
                 style={{
-                  height: 140,
                   backgroundColor: colors.bgColor,
                   borderRadius: 15,
                   padding: 16,
@@ -375,31 +410,6 @@ const FastingScreen = () => {
                   Kickstart your journey to better health by choosing a fasting
                   plan that suits your lifestyle.
                 </Text>
-
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate("FastingPlans", {
-                      currentPlan: selectedPlan,
-                    })
-                  }
-                  style={{
-                    backgroundColor: colors.green,
-                    width: 100,
-                    paddingVertical: 3,
-                    borderRadius: 8,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: FontSize.small,
-                      fontFamily: "Poppins-Bold",
-                    }}
-                  >
-                    Explore Plans
-                  </Text>
-                </TouchableOpacity>
               </View>
             </View>
           )}
@@ -454,50 +464,38 @@ const FastingScreen = () => {
                   plan={selectedPlan?.fastingPlan}
                   currentPlan={selectedPlan}
                 />
-
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: "white",
-                      fontSize: FontSize.regular,
-                      fontWeight: "bold",
-                      marginBottom: 10,
-                    }}
-                  >
-                    Upcoming Fasting Plan
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate("FastingPlans", {
-                        currentPlan: selectedPlan.fastingPlan,
-                      })
-                    }
-                  >
-                    <Text
-                      style={{
-                        color: colors.green,
-                        fontSize: FontSize.small,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Explore More
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-                <FastingCard
-                  plan={selectedPlan?.fastingPlan}
-                  currentPlan={selectedPlan}
-                />
               </View>
             </View>
           )}
-        </>
+
+          {upcomingFastingPlan && (
+            <>
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: FontSize.regular,
+                  fontWeight: "bold",
+                  marginVertical: 10,
+                }}
+              >
+                Upcoming Fasting Plan
+              </Text>
+              <FastingCard
+                plan={upcomingFastingPlan.fastingPlan}
+                scheduledDate={upcomingFastingPlan.scheduledDate}
+              />
+            </>
+          )}
+
+          <Text style={styles.headerText}>Explore Plans</Text>
+          <FlatList
+            nestedScrollEnabled
+            data={fastingPlans}
+            renderItem={renderFastingItem}
+            keyExtractor={(item) => item._id}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          />
+        </ScrollView>
       )}
 
       {activeTab === "Stats and History" && (
@@ -745,6 +743,12 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: FontSize.regular,
     textAlign: "center",
+  },
+  headerText: {
+    color: "#f8f8f8",
+    fontSize: FontSize.regular,
+    fontFamily: "Poppins-SemiBold",
+    marginVertical: 10,
   },
 });
 

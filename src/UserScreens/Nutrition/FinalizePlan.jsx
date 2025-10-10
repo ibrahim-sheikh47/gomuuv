@@ -15,8 +15,8 @@ import { FontSize } from "../../utils/font";
 const FinalizePlan = ({ route }) => {
   const { planData } = route.params;
   const navigation = useNavigation();
-  const goalValue = "2000 kcal";
-  const currentValue = "1800 kcal";
+  const [goalValue, setGoalValue] = useState("0 kcal");
+  const [currentValue, setCurrentValue] = useState("0 kcal");
 
   const [addedMeals, setAddedMeals] = useState({}); // Track added meals by ID
   const { token } = useSelector((state) => state.Auth);
@@ -33,10 +33,20 @@ const FinalizePlan = ({ route }) => {
       } your plan.`,
     });
 
-    setAddedMeals((prev) => ({
-      ...prev,
-      [mealId]: !isAdded,
-    }));
+    setAddedMeals((prev) => {
+      const updatedMeals = {
+        ...prev,
+        [mealId]: !isAdded,
+      };
+
+      const totalCalories = nutritionMeals
+        .filter((meal) => updatedMeals[meal._id])
+        .reduce((sum, meal) => sum + (meal.calories || 0), 0);
+
+      setCurrentValue(`${totalCalories} kcal`);
+
+      return updatedMeals;
+    });
   };
 
   const handleFinalizePlan = async () => {

@@ -48,7 +48,6 @@ const ViewAllWorkouts = () => {
   };
 
   const renderWorkoutCard = ({ item }) => {
-    console.log("item", JSON.stringify(item, null, 2));
     return (
       <View style={{ marginBottom: 20 }}>
         <WorkoutCard

@@ -88,25 +88,38 @@ const WorkoutDetails = () => {
     return (
       <>
         <Text style={styles.exerciseHeading}>{heading}</Text>
-        {exercises.map((e) => (
-          <View key={getExerciseParam(e)._id} style={styles.exerciseContainer}>
-            <Image source={images.chestWorkout} style={styles.exerciseImage} />
-            <Text style={styles.exerciseTitle}>{getExerciseParam(e).name}</Text>
-            <Text style={styles.exerciseReps}>{getExerciseParam(e).reps}</Text>
-          </View>
-        ))}
+        {exercises.map((e) => {
+          const ex = getExerciseParam(e);
+          return (
+            <View key={ex._id} style={styles.exerciseContainer}>
+              <Image
+                source={images.chestWorkout}
+                style={styles.exerciseImage}
+              />
+              <Text style={styles.exerciseTitle}>{ex.name}</Text>
+              <Text
+                style={styles.exerciseReps}
+              >{`${ex.sets} Sets (${ex.reps} reps)`}</Text>
+            </View>
+          );
+        })}
       </>
     );
   };
 
   const renderDayExercise = (dayExercises) => {
-    return dayExercises.map((e) => (
-      <View key={getExerciseParam(e)._id} style={styles.exerciseContainer}>
-        <Image source={images.chestWorkout} style={styles.exerciseImage} />
-        <Text style={styles.exerciseTitle}>{getExerciseParam(e).name}</Text>
-        <Text style={styles.exerciseReps}>{getExerciseParam(e).reps}</Text>
-      </View>
-    ));
+    return dayExercises.map((e) => {
+      const ex = getExerciseParam(e);
+      return (
+        <View key={ex._id} style={styles.exerciseContainer}>
+          <Image source={images.chestWorkout} style={styles.exerciseImage} />
+          <Text style={styles.exerciseTitle}>{ex.name}</Text>
+          <Text
+            style={styles.exerciseReps}
+          >{`${ex.sets} Sets (${ex.reps} reps)`}</Text>
+        </View>
+      );
+    });
   };
 
   const deleteWorkoutSession = async (id) => {

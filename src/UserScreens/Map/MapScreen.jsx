@@ -6,10 +6,12 @@ import { FontSize } from "../../utils/font";
 import { StatusBar, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
-import { BACKGROUND_TASK, STORAGE_KEYS } from "../../tasks/trackingTasks";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Location from "expo-location";
-import { formatDistance } from "../../utils/utilities";
+import {
+  formatDistance,
+  formatElapsedTime,
+  formatElapsedTime2,
+} from "../../utils/utilities";
+import LocationHelper from "../../services/locationHelper";
 
 const MapScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -21,6 +23,7 @@ const MapScreen = ({ route }) => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [snapshot, setSnapshot] = useState(null);
   const [tracking, setTracking] = useState(true);
+  const helper = new LocationHelper(null);
 
   useEffect(() => {
     if (snapshot) {
@@ -29,7 +32,7 @@ const MapScreen = ({ route }) => {
   }, [snapshot]);
 
   const endTrackingAndDisplayResults = async () => {
-    await clearBackgroundData();
+    await helper.clearBackgroundData();
 
     navigation.navigate("FinishActivity", {
       goal: params.goal,
@@ -42,21 +45,6 @@ const MapScreen = ({ route }) => {
     });
   };
 
-  const clearBackgroundData = async () => {
-    const isRunning = await Location.hasStartedLocationUpdatesAsync(
-      BACKGROUND_TASK
-    );
-    await AsyncStorage.multiRemove([
-      STORAGE_KEYS.LAST_COORDS,
-      STORAGE_KEYS.TOTAL_DISTANCE,
-      STORAGE_KEYS.START_TIME,
-      STORAGE_KEYS.PATH,
-    ]);
-    if (isRunning) {
-      Location.stopLocationUpdatesAsync(BACKGROUND_TASK);
-    }
-  };
-
   const onLocationUpdate = ({ time, snapshot }) => {
     setElapsedTime(time);
     setSnapshot(snapshot);
@@ -64,29 +52,6 @@ const MapScreen = ({ route }) => {
 
   const stopTracking = () => {
     setTracking(false);
-  };
-
-  const formatElapsedTime2 = (seconds) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return { hours, minutes, seconds: seconds % 60 };
-  };
-
-  const formatElapsedTime = (totalSeconds = 0) => {
-    if (totalSeconds < 60) {
-      return `${totalSeconds}s`;
-    }
-
-    if (totalSeconds < 3600) {
-      const minutes = parseInt(totalSeconds / 60);
-      const secs = parseInt(totalSeconds % 60);
-      return `${minutes}m ${secs}s`;
-    }
-
-    const hours = parseInt(totalSeconds / 3600);
-    const minutes = parseInt(totalSeconds / 60);
-    const secs = parseInt(totalSeconds % 60);
-    return `${hours || 0}h ${minutes || 0}m ${secs || 0}s`;
   };
 
   return (

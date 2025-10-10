@@ -113,7 +113,9 @@ const ChallengeDetail = () => {
       <View key={e.exercise._id} style={styles.exerciseContainer}>
         <Image source={images.chestWorkout} style={styles.exerciseImage} />
         <Text style={styles.exerciseTitle}>{e.exercise.name}</Text>
-        <Text style={styles.exerciseReps}>{e.exercise.reps}</Text>
+        <Text style={styles.exerciseReps}>
+          {`${e.exercise.sets} (${e.exercise.reps})`}
+        </Text>
 
         {e.isCompleted && <Text style={styles.exerciseReps}>Done</Text>}
       </View>

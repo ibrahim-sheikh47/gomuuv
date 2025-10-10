@@ -2,18 +2,19 @@
 import * as TaskManager from "expo-task-manager";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { store } from "../redux/store";
-import { updateStats } from "../redux/reducers/trackingSlice";
+import { updateStatsAsync } from "../redux/reducers/trackingSlice";
 import haversine from "haversine";
 
 export const BACKGROUND_TASK = "BACKGROUND_TRACKING_TASK";
 export const STORAGE_KEYS = {
+  TYPE: "ACTIVITY_TYPE",
   PATH: "TRACK_PATH",
   START_TIME: "TRACK_START_TIME",
   LAST_COORDS: "TRACK_LAST_COORDS",
   TOTAL_DISTANCE: "TRACK_TOTAL_DISTANCE",
 };
 
-const convertThreshold = (unit, thresholdInMeters = 3.5) => {
+const convertThreshold = (unit, thresholdInMeters = 5) => {
   switch (unit) {
     case "km":
       return thresholdInMeters / 1000;
@@ -86,12 +87,8 @@ TaskManager.defineTask(BACKGROUND_TASK, async ({ data, error }) => {
         await AsyncStorage.setItem(STORAGE_KEYS.PATH, JSON.stringify(stored));
 
         // Update Redux store with distance
-        store.dispatch(updateStats({ distance: totalDistance, location: loc }));
-
-        console.log(
-          `Background location saved: ${latitude},${longitude} | Distance: ${totalDistance.toFixed(
-            3
-          )} m`
+        store.dispatch(
+          updateStatsAsync({ distance: totalDistance, location: loc })
         );
       }
     }

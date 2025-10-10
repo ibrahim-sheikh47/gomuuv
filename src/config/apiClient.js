@@ -3,6 +3,12 @@ import axiosRetry from "axios-retry";
 import { toastMessage } from "../components/toastMessage";
 import { loaderRef } from "../contexts/LoaderRef";
 
+let logoutHandler = null;
+
+export const setLogoutHandler = (fn) => {
+  logoutHandler = fn;
+};
+
 // Create an Axios instance
 const apiClient = axios.create({
   baseURL: process.env.EXPO_PUBLIC_BASE_URL,
@@ -60,6 +66,11 @@ apiClient.interceptors.response.use(
       message:
         err.response?.data?.message || err.response?.data?.msg || err.message,
     };
+
+    if ([401, 403].includes(error.code) && logoutHandler) {
+      logoutHandler();
+    }
+
     if (error.code !== 404) {
       toastMessage({
         type: "error",

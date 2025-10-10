@@ -78,7 +78,14 @@ const HomeScreen = () => {
         if (stat.totalCaloriesBurned > 0) {
           percentage += 20;
         }
-        if (stat.totalDistanceCovered > 0) {
+        if (
+          parseInt(
+            stat.totalDistanceCovered
+              .replace("m", "")
+              .replace("km", "")
+              .replace("mi", "")
+          ) > 0
+        ) {
           percentage += 20;
         }
         setCompletionPercentage(percentage);

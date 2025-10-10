@@ -29,16 +29,20 @@ import GoalIcon from "../../assets/svgs/GoalIcon";
 import { FontSize } from "../../utils/font";
 import { END_POINTS } from "../../config/routes";
 import { API } from "../../config/apiClient";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import LocationHelper from "../../services/locationHelper";
 import { STORAGE_KEYS } from "../../tasks/trackingTasks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { convertDistanceToMeter } from "../../utils/utilities";
+import {
+  convertDistanceToMeter,
+  formatElapsedTime,
+} from "../../utils/utilities";
+import { resetStats } from "../../redux/reducers/trackingSlice";
 
 const ActivityDetailScreen = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
   const route = useRoute();
-  const isFocussed = useIsFocused();
   const {
     activityType,
     activityName,
@@ -49,6 +53,7 @@ const ActivityDetailScreen = () => {
 
   const [goal, setGoal] = useState(item);
   const [stats, setStats] = useState(null);
+  const [initialApiCalled, setInitialApiCalled] = useState(false);
   const [time, setTime] = useState(0);
   const duration = ["Today", "Weekly", "Monthly", "Quarterly", "Yearly"];
   const [selectedPeriod, setSelectedPeriod] = useState("Today");
@@ -64,33 +69,56 @@ const ActivityDetailScreen = () => {
   let timer;
 
   // Reset position when the screen comes into focus
-  useFocusEffect(
-    React.useCallback(() => {
-      Animated.timing(pan, {
-        toValue: { x: 0, y: 0 },
-        duration: 0,
-        useNativeDriver: false,
-      }).start();
+  useEffect(() => {
+    Animated.timing(pan, {
+      toValue: { x: 0, y: 0 },
+      duration: 0,
+      useNativeDriver: false,
+    }).start();
 
-      fetchActiveGoal();
+    fetchActiveGoal();
 
-      return () => {
-        if (timer) clearInterval(timer);
-      };
-    }, [])
-  );
+    return async () => {
+      if (timer) clearInterval(timer);
+      await helper.clearBackgroundData();
+      dispatch(resetStats());
+    };
+  }, []);
 
   useEffect(() => {
-    if (startSession) {
-      checkAll();
+    if (initialApiCalled) {
+      processTracking(stats);
     }
-  }, [isFocussed]);
+  }, [stats, initialApiCalled]);
 
   const checkAll = async () => {
     const result = await helper.checkForPermissionsAndStartTracking();
 
     if (result) {
       startTimer();
+    }
+  };
+
+  const processTracking = async (stats) => {
+    await AsyncStorage.setItem(STORAGE_KEYS.TYPE, activityType.toString());
+
+    if (stats) {
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.TOTAL_DISTANCE,
+        stats.distance.toString()
+      );
+
+      const now = Date.now();
+      const durationMs = stats.duration * 1000;
+      const startTimeMs = now - durationMs;
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.START_TIME,
+        startTimeMs.toString()
+      );
+    }
+
+    if (startSession) {
+      checkAll();
     }
   };
 
@@ -111,6 +139,13 @@ const ActivityDetailScreen = () => {
         const elapsedSeconds = Math.floor((Date.now() - savedStartTime) / 1000);
         setTime(elapsedSeconds);
       }, 1000);
+
+      navigation.navigate("Map", {
+        goal,
+        activityName,
+        activityType,
+        heartRate,
+      });
     } catch (err) {
       console.log(err);
     }
@@ -168,13 +203,11 @@ const ActivityDetailScreen = () => {
       if (response?.data?.success) {
         setGoal(response?.data?.data?.goal);
         setStats(response?.data?.data?.stats);
-        console.log(response?.data?.data?.stats);
+        setInitialApiCalled(true);
       }
     } catch (error) {
       // console.log(error);
-      if (!startSession) {
-        fetchPhysicalActivity();
-      }
+      fetchPhysicalActivity();
     }
   };
 
@@ -191,24 +224,9 @@ const ActivityDetailScreen = () => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setInitialApiCalled(true);
     }
-  };
-
-  const formatElapsedTime = (totalSeconds = 0) => {
-    if (totalSeconds < 60) {
-      return `${totalSeconds}s`;
-    }
-
-    if (totalSeconds < 3600) {
-      const minutes = parseInt(totalSeconds / 60);
-      const secs = totalSeconds % 60;
-      return `${minutes}m ${secs}s`;
-    }
-
-    const hours = parseInt(totalSeconds / 3600);
-    const minutes = parseInt(totalSeconds / 60);
-    const secs = totalSeconds % 60;
-    return `${hours || 0}h ${minutes || 0}m ${secs || 0}s`;
   };
 
   return (
@@ -260,7 +278,7 @@ const ActivityDetailScreen = () => {
             }
             showGoal={goal ? goal.targetDistance.value !== null : false}
             goal={`Goal: ${goal?.targetDistance?.value || 0} ${
-              goal?.targetDistance?.unit || "mi"
+              goal?.targetDistance?.unit || "m"
             }`}
             message={`${
               startSession

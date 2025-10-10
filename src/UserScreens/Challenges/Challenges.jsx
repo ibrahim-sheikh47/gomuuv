@@ -32,6 +32,7 @@ import { API } from "../../config/apiClient";
 import moment from "moment";
 import { setTargetWeight, setUserData } from "../../redux/reducers/AuthSlice";
 import Toast from "react-native-toast-message";
+import { getResponsiveFontSize } from "../../utils/utilities";
 
 const ChallengesScreen = () => {
   const dispatch = useDispatch();
@@ -360,6 +361,19 @@ const ChallengesScreen = () => {
           }}
           style={[styles.barOuterContainer, { flex: 1 }]}
         >
+          {targetWeight !== undefined && (
+            <View
+              style={[
+                styles.goalLine,
+                {
+                  bottom: (targetWeight / maxValue) * maxHeight,
+                },
+              ]}
+            >
+              <Text style={styles.goalText}>{targetWeight}</Text>
+            </View>
+          )}
+
           {data.map((item, index) => {
             const barHeight = (item.value / maxValue) * maxHeight;
 
@@ -379,7 +393,7 @@ const ChallengesScreen = () => {
                     {
                       height: barHeight,
                       width: "90%",
-                      maxWidth: 30,
+                      maxWidth: getResponsiveFontSize(25),
                       backgroundColor: "#C2FF59",
                       justifyContent: "center",
                       alignItems: "center",
@@ -406,6 +420,51 @@ const ChallengesScreen = () => {
     );
   };
 
+  const getBmiPosition = (bmiValue) => {
+    if (!bmiValue) return 0;
+    const min = 0;
+    const max = 40;
+    const clamped = Math.max(min, Math.min(max, bmiValue));
+    return (clamped - min) / (max - min);
+  };
+
+  const getProgressInfo = (current, target) => {
+    if (!current || !target) {
+      return { progress: 0, targetPosition: 0, message: "N/A" };
+    }
+
+    const diff = target - current;
+    const absDiff = Math.abs(diff);
+    const message =
+      diff > 0
+        ? `You need to gain ${absDiff.toFixed(1)} ${weightUnit}`
+        : diff < 0
+        ? `You need to lose ${absDiff.toFixed(1)} ${weightUnit}`
+        : "You've reached your target weight!";
+
+    // normalize so that min = smaller weight, max = larger weight
+    const min = Math.min(current, target);
+    const max = Math.max(current, target);
+
+    // compute current progress position relative to the two
+    const progress = ((current - min) / (max - min)) * 100;
+    const targetPosition = (current / target) * 100;
+
+    if (current > target) {
+      return {
+        progress,
+        targetPosition: (target / current) * 100,
+        message,
+      };
+    }
+
+    return { progress, targetPosition, message };
+  };
+
+  const { progress, targetPosition, message } = getProgressInfo(
+    currentWeight,
+    targetWeight
+  );
   const renderGoalsSection = () => (
     <View>
       {/* Graph + Yearly Dropdown */}
@@ -469,28 +528,33 @@ const ChallengesScreen = () => {
 
         {/* Progress Bar */}
         <View style={styles.customProgressBarContainer}>
+          {/* Base bar */}
           <View style={[styles.customProgressBar, { width: "100%" }]} />
+
+          {/* Filled bar (current weight) */}
           <View
             style={[
               styles.customProgressBar,
               {
-                width: `${progressPercentage}%`,
+                width: `${progress}%`,
                 backgroundColor: colors.green,
                 position: "absolute",
               },
             ]}
+          />
+
+          <View
+            style={[
+              styles.bmiPointer,
+              { left: `${targetPosition}%`, top: -15 },
+            ]}
           >
-            <View
-              style={[
-                styles.progressMarker,
-                {
-                  alignSelf: "flex-end",
-                  marginTop: -4,
-                },
-              ]}
-            />
+            <View style={styles.bmiPointerTriangle} />
           </View>
         </View>
+
+        {/* Progress message */}
+        <Text style={styles.progressMessage}>{message}</Text>
       </View>
 
       {/* Update Weight & Set Target Buttons */}
@@ -526,11 +590,10 @@ const ChallengesScreen = () => {
           </Text>
           <Text style={styles.bmiLabel}>{getBmiLabel(bmiValue)}</Text>
         </View>
-
         {/* BMI Scale */}
         <View style={styles.bmiScaleContainer}>
           <View style={styles.bmiScale}>
-            {Array(40)
+            {Array(41)
               .fill()
               .map((_, i) => (
                 <View
@@ -541,11 +604,22 @@ const ChallengesScreen = () => {
                   ]}
                 />
               ))}
+
+            {/* Tracker Pointer */}
+            <View
+              style={[
+                styles.bmiPointer,
+                { left: `${getBmiPosition(bmiValue) * 100}%` },
+              ]}
+            >
+              <View style={styles.bmiPointerTriangle} />
+            </View>
           </View>
+          {/* Scale Numbers */}
           <View style={styles.bmiScaleNumbers}>
+            <Text style={styles.bmiScaleNumber}>0</Text>
             <Text style={styles.bmiScaleNumber}>10</Text>
             <Text style={styles.bmiScaleNumber}>20</Text>
-            <Text style={styles.bmiScaleNumber}>25</Text>
             <Text style={styles.bmiScaleNumber}>30</Text>
             <Text style={styles.bmiScaleNumber}>40</Text>
           </View>
@@ -898,7 +972,8 @@ const styles = StyleSheet.create({
   bmiScaleNumbers: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 5,
+    width: "100%", // important!
+    marginTop: 6,
   },
   bmiScaleNumber: {
     color: "#888",
@@ -917,13 +992,13 @@ const styles = StyleSheet.create({
     width: 30,
   },
   bar: {
-    width: 30,
-    borderRadius: 3,
+    width: getResponsiveFontSize(25),
+    borderRadius: getResponsiveFontSize(25),
     marginBottom: 6,
   },
   label: {
     color: "#aaa",
-    fontSize: 14,
+    fontSize: getResponsiveFontSize(12),
   },
   modalOverlay: {
     flex: 1,
@@ -963,6 +1038,60 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     margin: 10,
     color: "white",
+  },
+  bmiPointer: {
+    position: "absolute",
+    top: -20, // keeps it above the ruler
+    transform: [{ translateX: -7.5 }], // centers horizontally
+  },
+  bmiPointerTriangle: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 7.5,
+    borderRightWidth: 7.5,
+    borderTopWidth: 15,
+    borderStyle: "solid",
+    backgroundColor: "transparent",
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderTopColor: colors.green,
+  },
+  targetMarker: {
+    position: "absolute",
+    top: -1 * getResponsiveFontSize(2),
+    width: getResponsiveFontSize(3),
+    height: getResponsiveFontSize(14),
+    backgroundColor: "red",
+    borderRadius: getResponsiveFontSize(2),
+    transform: [{ translateX: -1 * getResponsiveFontSize(2) }],
+    zIndex: 10,
+  },
+  progressMessage: {
+    fontSize: getResponsiveFontSize(14),
+    textAlign: "center",
+    marginTop: getResponsiveFontSize(10),
+    color: colors.green,
+    fontFamily: "Poppins-SemiBold",
+  },
+  goalLine: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    borderTopWidth: 1,
+    borderStyle: "dashed",
+    borderColor: colors.white,
+  },
+  goalText: {
+    position: "absolute",
+    right: 0,
+    top: -1 * getResponsiveFontSize(14),
+    fontSize: getResponsiveFontSize(12),
+    color: colors.white,
+  },
+  barsRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
   },
 });
 

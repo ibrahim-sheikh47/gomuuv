@@ -4,7 +4,7 @@ import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
-import { Provider, useDispatch } from "react-redux";
+import { Provider } from "react-redux";
 
 // APP NAVIGATOR
 import { NavigationContainer } from "@react-navigation/native";
@@ -15,10 +15,8 @@ import { LogBox } from "react-native";
 import { LoaderProvider } from "./src/contexts/LoaderContext";
 import AppLoader from "./src/components/AppLoader";
 import { toastConfig } from "./src/components/toastMessage";
-import * as Location from "expo-location";
-import { BACKGROUND_TASK, STORAGE_KEYS } from "./src/tasks/trackingTasks";
-import { resetStats } from "./src/redux/reducers/trackingSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AuthProvider } from "./src/contexts/AuthContext";
+import { navigationRef } from "./src/navigation/RootNavigation";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -33,48 +31,6 @@ export default function App() {
     "Poppins-Italic": require("./src/assets/fonts/Poppins-Italic.ttf"), // If available
   });
 
-  const clearBackgroundData = async () => {
-    const isRunning = await Location.hasStartedLocationUpdatesAsync(
-      BACKGROUND_TASK
-    );
-    await AsyncStorage.multiRemove([
-      STORAGE_KEYS.LAST_COORDS,
-      STORAGE_KEYS.TOTAL_DISTANCE,
-      STORAGE_KEYS.START_TIME,
-      STORAGE_KEYS.PATH,
-    ]);
-    if (isRunning) {
-      Location.stopLocationUpdatesAsync(BACKGROUND_TASK);
-    }
-
-    store.dispatch(resetStats());
-  };
-
-  const init = async () => {
-    const isRunning = await Location.hasStartedLocationUpdatesAsync(
-      BACKGROUND_TASK
-    );
-    if (!isRunning) {
-      await AsyncStorage.multiRemove([
-        STORAGE_KEYS.LAST_COORDS,
-        STORAGE_KEYS.TOTAL_DISTANCE,
-        STORAGE_KEYS.START_TIME,
-        STORAGE_KEYS.PATH,
-      ]);
-      store.dispatch(resetStats());
-    }
-  };
-
-  useEffect(() => {
-    init();
-
-    return () => {
-      (async () => {
-        await clearBackgroundData();
-      })();
-    };
-  }, []);
-
   useEffect(() => {
     LogBox.ignoreAllLogs();
     if (fontsLoaded) {
@@ -88,17 +44,19 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <LoaderProvider>
-        <Provider store={store}>
-          <PersistGate persistor={persistor}>
-            <NavigationContainer>
-              <AppNavigator />
-              <Toast topOffset={60} config={toastConfig} />
-              <AppLoader />
-            </NavigationContainer>
-          </PersistGate>
-        </Provider>
-      </LoaderProvider>
+      <Provider store={store}>
+        <LoaderProvider>
+          <AuthProvider>
+            <PersistGate persistor={persistor}>
+              <NavigationContainer ref={navigationRef}>
+                <AppNavigator />
+                <Toast topOffset={60} config={toastConfig} />
+                <AppLoader />
+              </NavigationContainer>
+            </PersistGate>
+          </AuthProvider>
+        </LoaderProvider>
+      </Provider>
     </GestureHandlerRootView>
   );
 }

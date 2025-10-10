@@ -3,7 +3,6 @@ import React from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Container from "../../components/Container";
 import Header from "../../components/Header";
-import images from "../../constants/images";
 import { CustomCard } from "../../components/CustomCard";
 import icons from "../../constants/icons";
 import CustomButton from "../../components/CustomButton";
@@ -16,12 +15,11 @@ import PaceIcon from "../../assets/svgs/PaceIcon";
 import { FontSize } from "../../utils/font";
 import { API } from "../../config/apiClient";
 import { END_POINTS } from "../../config/routes";
-import { useDispatch, useSelector } from "react-redux";
-import { resetStats } from "../../redux/reducers/trackingSlice";
+import { useSelector } from "react-redux";
 import { formatDistance } from "../../utils/utilities";
+import { reset } from "../../navigation/RootNavigation";
 
 const FinishActivity = () => {
-  const dispatch = useDispatch();
   const route = useRoute();
   const { distance, calories } = useSelector((state) => state.tracking);
   const {
@@ -34,8 +32,8 @@ const FinishActivity = () => {
     snapshot,
   } = route.params;
 
-  const navigation = useNavigation();
   const { token } = useSelector((state) => state.Auth);
+  const navigation = useNavigation();
 
   const navigateBack = (data) => {
     navigation.reset({
@@ -96,12 +94,10 @@ const FinishActivity = () => {
           },
           token
         );
-
         if (response?.data?.success) {
           navigateBack(null);
         }
       }
-      dispatch(resetStats());
     } catch (error) {
       console.log(error);
     }

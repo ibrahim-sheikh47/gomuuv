@@ -65,7 +65,8 @@ const CreateProgram = () => {
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
 
   const openModal = () => {
-    if (days.length > 0) {
+    if (days.length > 0 || savedDays.length > 0) {
+      if (days.length === 0 && savedDays.length > 0) setDays([...savedDays]);
       setModalVisible(true);
     } else {
       Alert.alert("Kindly select start and end date before adding exercises");
@@ -435,24 +436,6 @@ const CreateProgram = () => {
     }
   };
 
-  const getMonthName = (monthIndex) => {
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    return months[monthIndex];
-  };
-
   const generateDaysFromRange = (startDate, endDate) => {
     const result = [];
     const start = new Date(startDate);
@@ -614,8 +597,8 @@ const CreateProgram = () => {
         />
         <InputField
           label={"Price $"}
-          value={formData.price}
-          onChangeText={(text) => handleInputChange("price", text)}
+          value={formData.price.replace("$ ", "")}
+          onChangeText={(text) => handleInputChange("price", "$ " + text)}
           keyboardType="numeric"
         />
 

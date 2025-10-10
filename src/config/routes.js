@@ -17,6 +17,7 @@ export const END_POINTS = {
   EXERCISE: "api/exercises",
   EXERCISE_COMPLETED: "api/workout-sessions/mark-exercise-complete",
   FASTING_PLANS: "api/fasting-plans",
+  FASTING_HISTORIES: "api/fasting-history",
   FASTING_HISTORY: "api/fasting-history/fasting-stats",
   CURRENT_FASTING: "api/fasting-history/current-fast",
   GET_ALL_FASTING_HISTORY: "api/fasting-history",

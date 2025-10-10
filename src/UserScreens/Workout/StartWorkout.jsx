@@ -232,7 +232,11 @@ const StartWorkout = () => {
                   {getExerciseParam(exercises[currentExerciseIndex]).name}
                 </Text>
                 <Text style={[styles.title]}>
-                  {getExerciseParam(exercises[currentExerciseIndex]).reps}
+                  {`${
+                    getExerciseParam(exercises[currentExerciseIndex]).sets
+                  } Sets (${
+                    getExerciseParam(exercises[currentExerciseIndex]).reps
+                  } reps)`}
                 </Text>
               </TouchableOpacity>
             )}
@@ -273,31 +277,32 @@ const StartWorkout = () => {
                   <ScrollView>
                     {exercises
                       .slice(currentExerciseIndex + 1)
-                      .map((exercise, index) => (
-                        <View
-                          key={index}
-                          style={[
-                            styles.exerciseContainer,
-                            {
-                              ...(index !== 0 && {
-                                borderWidth: 0,
-                                backgroundColor: colors.bgColorOpaque,
-                              }),
-                            },
-                          ]}
-                        >
-                          <Image
-                            source={images.chestWorkout}
-                            style={styles.exerciseImage}
-                          />
-                          <Text style={styles.exerciseTitle}>
-                            {getExerciseParam(exercise).name}
-                          </Text>
-                          <Text style={styles.exerciseReps}>
-                            {getExerciseParam(exercise).reps}
-                          </Text>
-                        </View>
-                      ))}
+                      .map((exercise, index) => {
+                        const ex = getExerciseParam(exercise);
+                        return (
+                          <View
+                            key={ex._id}
+                            style={[
+                              styles.exerciseContainer,
+                              {
+                                ...(index !== 0 && {
+                                  borderWidth: 0,
+                                  backgroundColor: colors.bgColorOpaque,
+                                }),
+                              },
+                            ]}
+                          >
+                            <Image
+                              source={images.chestWorkout}
+                              style={styles.exerciseImage}
+                            />
+                            <Text style={styles.exerciseTitle}>{ex.name}</Text>
+                            <Text style={styles.exerciseReps}>
+                              {`${ex.sets} Sets (${ex.reps} reps)`}
+                            </Text>
+                          </View>
+                        );
+                      })}
                   </ScrollView>
                 </View>
               )}

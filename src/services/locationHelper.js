@@ -1,8 +1,9 @@
 import * as Location from "expo-location";
 import { Alert, AppState, Linking, Platform } from "react-native";
 import * as IntentLauncher from "expo-intent-launcher";
-import { BACKGROUND_TASK } from "../tasks/trackingTasks";
+import { BACKGROUND_TASK, STORAGE_KEYS } from "../tasks/trackingTasks";
 import { toastMessage } from "../components/toastMessage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default class LocationHelper {
   constructor(onUpdate) {
@@ -88,7 +89,7 @@ export default class LocationHelper {
       if (!isRunning) {
         await Location.startLocationUpdatesAsync(BACKGROUND_TASK, {
           accuracy: Location.Accuracy.Highest,
-          distanceInterval: 0,
+          distanceInterval: 5,
           timeInterval: 1000,
           showsBackgroundLocationIndicator: true,
           foregroundService: {
@@ -109,6 +110,22 @@ export default class LocationHelper {
     } catch (err) {
       console.error("Permission check failed:", err);
       return false;
+    }
+  }
+
+  async clearBackgroundData() {
+    const isRunning = await Location.hasStartedLocationUpdatesAsync(
+      BACKGROUND_TASK
+    );
+    await AsyncStorage.multiRemove([
+      STORAGE_KEYS.TYPE,
+      STORAGE_KEYS.LAST_COORDS,
+      STORAGE_KEYS.TOTAL_DISTANCE,
+      STORAGE_KEYS.START_TIME,
+      STORAGE_KEYS.PATH,
+    ]);
+    if (isRunning) {
+      Location.stopLocationUpdatesAsync(BACKGROUND_TASK);
     }
   }
 

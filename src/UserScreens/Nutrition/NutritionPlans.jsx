@@ -60,7 +60,7 @@ const NutritionPlans = ({ route, navigation }) => {
             style={styles.ViewAll}
             title={item.title}
             mealName={item.name}
-            mealImage={item.meals[0]?.image}
+            mealImage={item.cover}
             calories={item.meals.reduce(
               (sum, meal) => sum + (meal.calories || 0),
               0
@@ -70,7 +70,22 @@ const NutritionPlans = ({ route, navigation }) => {
             onPress={() => navigation.navigate("NutritionPlan", { plan: item })}
           />
         )}
-        contentContainerStyle={{ flexGrow: 1 }}
+        ListEmptyComponent={
+          <Text
+            style={{
+              fontSize: FontSize.small,
+              color: "white",
+              fontWeight: "bold",
+            }}
+          >
+            No Plans
+          </Text>
+        }
+        contentContainerStyle={{
+          flexGrow: 1,
+          alignItems: "center",
+          justifyContent: filteredPlans.length === 0 ? "center" : "flex-start",
+        }}
         numColumns={1} // One item per row
         showsVerticalScrollIndicator={false}
       />

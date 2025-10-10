@@ -86,8 +86,6 @@ const Profile = ({ navigation }) => {
       type: image.mimeType || "image/jpeg",
     });
 
-    console.log(formData);
-
     try {
       const response = await API.patch(
         END_POINTS.UPDATE_PROFILE_PICTURE,
