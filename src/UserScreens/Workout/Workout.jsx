@@ -1,5 +1,6 @@
 import {
   useFocusEffect,
+  useIsFocused,
   useNavigation,
   useRoute,
 } from "@react-navigation/native";
@@ -37,12 +38,14 @@ import {
 } from "../../redux/reducers/WorkoutSlice";
 import { FontSize } from "../../utils/font";
 import moment from "moment";
+import { getResponsiveFontSize } from "../../utils/utilities";
 
 const WorkoutScreen = () => {
   const dispatch = useDispatch();
   const route = useRoute();
   const { screen } = route.params || {};
   const navigation = useNavigation();
+  const isFocussed = useIsFocused();
   const [stats, setStats] = useState(null);
   const [activeTab, setActiveTab] = useState(screen ? "Fasting" : "Workout");
   const tabs = ["Workout", "Fasting"];
@@ -57,10 +60,15 @@ const WorkoutScreen = () => {
   useFocusEffect(
     useCallback(() => {
       getTrendingWorkouts();
-      getTodaySessions();
       getStats();
     }, [])
   );
+
+  useEffect(() => {
+    if (activeTab === "Workout") {
+      getTodaySessions();
+    }
+  }, [isFocussed, activeTab]);
 
   useEffect(() => {
     getStats();
@@ -124,26 +132,92 @@ const WorkoutScreen = () => {
     { label: "Kettle Bells", value: "kettlebells", icon: <PullupBarIcon /> },
   ];
 
-  const activityData = [
-    { day: "M", value: 0 },
-    { day: "T", value: 0 },
-    { day: "W", value: 0 },
-    { day: "T", value: 0 },
-    { day: "F", value: 0 },
-    { day: "S", value: 0 },
-    { day: "S", value: 0 },
-  ];
+  const getMonthlyData = () => {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    return months.map((month) => ({
+      day: month,
+      value: 0,
+    }));
+  };
+
+  const activityDataSets = {
+    Weekly: [
+      { day: "M", value: 0 },
+      { day: "T", value: 0 },
+      { day: "W", value: 0 },
+      { day: "T", value: 0 },
+      { day: "F", value: 0 },
+      { day: "S", value: 0 },
+      { day: "S", value: 0 },
+    ],
+    Monthly: [
+      { day: "Wk1", value: 0 },
+      { day: "Wk2", value: 0 },
+      { day: "Wk3", value: 0 },
+      { day: "Wk4", value: 0 },
+    ],
+    Quarterly: [
+      { day: "Q1", value: 0 },
+      { day: "Q2", value: 0 },
+      { day: "Q3", value: 0 },
+      { day: "Q4", value: 0 },
+    ],
+    Yearly: getMonthlyData(),
+  };
 
   const BarGraph = () => {
-    const maxHeight = 150;
+    const maxHeight = getResponsiveFontSize(150);
+    const activityData = activityDataSets[selectedPeriod];
+    const maxValue = Math.max(...activityData.map((d) => d.value)) || 1;
+
+    const isScrollable =
+      selectedPeriod === "Yearly" || selectedPeriod === "Weekly";
+    const containerWidth = isScrollable ? undefined : "100%";
 
     return (
-      <View style={styles.barOuterContainer}>
+      <ScrollView
+        horizontal
+        scrollEnabled={isScrollable}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={[
+          {
+            flexDirection: "row",
+            alignItems: "flex-end",
+            width: containerWidth,
+            justifyContent: isScrollable ? "flex-start" : "space-between",
+            paddingHorizontal: getResponsiveFontSize(10),
+          },
+        ]}
+      >
         {activityData.map((item, index) => {
-          const barHeight = (item.value / 100) * maxHeight;
+          const barHeight = (item.value / maxValue) * maxHeight;
 
           return (
-            <View key={index} style={styles.barContainer}>
+            <View
+              key={index}
+              style={{
+                alignItems: "center",
+                marginHorizontal:
+                  selectedPeriod === "Yearly" || selectedPeriod === "Monthly"
+                    ? getResponsiveFontSize(8)
+                    : 0,
+                flexShrink: 0,
+              }}
+            >
               <View
                 style={[
                   styles.bar,
@@ -170,7 +244,7 @@ const WorkoutScreen = () => {
             </View>
           );
         })}
-      </View>
+      </ScrollView>
     );
   };
 
@@ -233,7 +307,7 @@ const WorkoutScreen = () => {
                   </Text>
                 </View>
 
-                <BarGraph />
+                {selectedPeriod !== "Today" && <BarGraph />}
 
                 {/* <Image
                   source={images.stepsGraph}

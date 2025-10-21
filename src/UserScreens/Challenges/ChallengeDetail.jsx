@@ -51,7 +51,7 @@ const ChallengeDetail = () => {
     setSelectedTitle("");
     // navigation.goBack();
     const day = challenge.workout.days.find((d) => date === d.date);
-    const activity = day.activities.find((a) => date === a.date) || null;
+    const activity = day?.activities?.find((a) => date === a.date) || null;
     if (day) {
       navigation.navigate("StartWorkout", {
         title: challenge.workout.name,
@@ -66,7 +66,7 @@ const ChallengeDetail = () => {
         workoutSessionId: challenge._id,
         isChallenge: true,
         refresh: () => {
-          fetchChallenge();
+          fetchChallenge(null, true);
         },
       });
     } else
@@ -76,15 +76,18 @@ const ChallengeDetail = () => {
       });
   };
 
-  const fetchChallenge = async () => {
+  const fetchChallenge = async (id, isRefresh = false) => {
     try {
       const res = await API.get(
-        `${END_POINTS.CHALLENGES}/${challenge._id}`,
+        `${END_POINTS.CHALLENGES}/${id ? id : challenge._id}`,
         null,
         token
       );
       if (res.data.success) {
         setChallenge(res.data.data);
+        if (!isRefresh) {
+          openModal(challenge.workout.name);
+        }
       }
     } catch (error) {
       console.error("Error fetching challenge:", error);
@@ -100,8 +103,7 @@ const ChallengeDetail = () => {
         token
       );
       if (res.data.success) {
-        openModal(challenge.workout.name);
-        fetchChallenge();
+        fetchChallenge(res.data.data._id);
       }
     } catch (error) {
       console.error("Error enrolling into challenge:", error);

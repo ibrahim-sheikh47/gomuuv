@@ -40,6 +40,7 @@ const StartWorkout = () => {
   const [isRunning, setIsRunning] = useState(true);
   const [isWorkoutComplete, setIsWorkoutComplete] = useState(false);
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
+  const currentExerciseIndexRef = useRef(currentExerciseIndex);
   const { token } = useSelector((state) => state.Auth);
 
   const [secondsRemaining, setSecondsRemaining] = useState(time);
@@ -62,7 +63,7 @@ const StartWorkout = () => {
       if (!movingNext.current) {
         updateDayStats(
           false,
-          getExerciseParam(exercises[currentExerciseIndex])?._id
+          getExerciseParam(exercises[currentExerciseIndexRef.current])?._id
         );
       }
     };
@@ -92,6 +93,8 @@ const StartWorkout = () => {
         // If nextIndex is still within the exercises list, just move forward
         if (nextIndex < exercises.length) {
           setCurrentExerciseIndex(nextIndex);
+          currentExerciseIndexRef.current = nextIndex;
+          movingNext.current = false;
         } else {
           // Last exercise completed → navigate
           movingNext.current = true;
